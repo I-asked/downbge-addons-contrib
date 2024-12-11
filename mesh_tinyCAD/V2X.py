@@ -18,6 +18,8 @@ Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 END GPL LICENCE BLOCK
 '''
 
+from __future__ import division
+from __future__ import absolute_import
 import bpy
 import bmesh
 from mathutils import geometry
@@ -51,7 +53,7 @@ class Vert2Intersection(bpy.types.Operator):
 
     bl_idname = 'mesh.vertintersect'
     bl_label = 'v2x vertex to intersection'
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     @classmethod
     def poll(self, context):
@@ -60,4 +62,4 @@ class Vert2Intersection(bpy.types.Operator):
 
     def execute(self, context):
         add_vertex_to_intersection()
-        return {'FINISHED'}
+        return set(['FINISHED'])

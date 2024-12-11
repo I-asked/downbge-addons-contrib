@@ -1,5 +1,6 @@
 # Copyright 2015 Théo Friberg under GNU GPL 3
 
+from __future__ import absolute_import
 if "bpy" in locals():
 	import importlib
 	importlib.reload(JSONOps)
@@ -18,7 +19,7 @@ class AutomatOperatorFromTexture(bpy.types.Operator):
 
 	bl_idname = "com.new_automat"
 	bl_label = "Automatic Material from Image"
-	bl_options = {"UNDO"}
+	bl_options = set(["UNDO"])
 
 	# Variables used for storing the filepath given by blender's file manager
 
@@ -177,7 +178,7 @@ This creates all the node setup."""
 
 		# Tell that all went well
 
-		return {"FINISHED"}
+		return set(["FINISHED"])
 
 	def invoke(self, context, event):
 
@@ -188,8 +189,8 @@ It also checks that the render engine is Cycles.  """
 		if bpy.context.scene.render.engine == 'CYCLES':
 			self.filename = ""
 			context.window_manager.fileselect_add(self)
-			return {"RUNNING_MODAL"}
+			return set(["RUNNING_MODAL"])
 		else:
-			self.report({'ERROR'}, "Can't generate Cycles material with Blender"
+			self.report(set(['ERROR']), "Can't generate Cycles material with Blender"
 			"internal as active renderer.")
-			return {"FINISHED"}
+			return set(["FINISHED"])

@@ -16,6 +16,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import absolute_import
+from io import open
 bl_info = {
     "name": "QuickPrefs",
     "author": "Sean Olson",
@@ -185,7 +187,7 @@ def gllightpreset_importsingle(filename):
 #Export all exports the entire contents of your presets list to the given file
 @persistent
 def gllightpreset_exportall(context):
-   for i in range(len(bpy.context.scene.quickprefs.gllightpreset)):
+   for i in xrange(len(bpy.context.scene.quickprefs.gllightpreset)):
         gllightpreset_exportsingle(i, True)
 
 
@@ -486,7 +488,7 @@ def gllightpreset_checkname(name):
         name=name+".001"
         pos=len(name)-4
 
-    for i in range(1, 1000):
+    for i in xrange(1, 1000):
         nr="00"+str(i)
         tmp=name[:pos+1]+nr[len(nr)-3:]
         if not tmp in collection:
@@ -581,14 +583,14 @@ def gllightpreset_select():
 def gllightpreset_sort():
     collection=bpy.context.scene.quickprefs.gllightpreset
     count=len(collection)
-    for i in range(0, count):
-        for j in range(i+1, count):
+    for i in xrange(0, count):
+        for j in xrange(i+1, count):
             if collection[i].name > collection[j].name:
                 collection.move(j, i)
 
 #Add default setting
 def gllightpreset_addDefault():
-    print('adding default presets')
+    print 'adding default presets'
     gllightpreset_addPresets()
     gllightpreset_sort();
     bpy.context.scene.quickprefs['gllightpreset_index']=0
@@ -604,15 +606,15 @@ def gllightpreset_chooseLoadLocation(context):
     filepath=bpy.context.scene.quickprefs.gllightpreset_importdirectory
     if len(bpy.context.scene.quickprefs.gllightpreset)==0:                    #is it in bpy?
           if not os.path.exists(filepath):                                                     #is it in the folder?
-               print('quickprefs: loading default presets')
+               print 'quickprefs: loading default presets'
                gllightpreset_addDefault()                                                       #it's not, add the default
           else:                                                                                             #the folder exists
                directorylisting = os.listdir(filepath)
                if len(directorylisting)==0:                                                      #is the folder empty?
-                    print('quickprefs: loading default presets')
+                    print 'quickprefs: loading default presets'
                     gllightpreset_addDefault()                                                  #the folder is empty, add default
                else:                                                                                        #the folder is not empty
-                    print('quickprefs: loading preset folder')
+                    print 'quickprefs: loading preset folder'
                     gllightpreset_loadpresets(1)                                                #go ahead and load it
     #print('quickprefs: loading from bpy')
 
@@ -699,37 +701,37 @@ class SCENE_OT_gllightpreset(bpy.types.Operator):
             if len(scn.quickprefs.gllightpreset)>1:
                 gllightpreset_delete()
             else:
-                self.report({'INFO'}, "Must have at least 1 Preset")
+                self.report(set(['INFO']), "Must have at least 1 Preset")
 
         elif button=="save":
             gllightpreset_save()
-            self.report({'INFO'}, "Saved Preset to Blend File.")
+            self.report(set(['INFO']), "Saved Preset to Blend File.")
         elif button=="sort":     gllightpreset_sort()
         elif button=="select":   gllightpreset_select()
         elif button=="export":
             gllightpreset_exportsingle(scn.quickprefs.gllightpreset_index, False)
-            self.report({'INFO'}, "Exported Preset to: "+scn.quickprefs.gllightpreset_exportfile)
+            self.report(set(['INFO']), "Exported Preset to: "+scn.quickprefs.gllightpreset_exportfile)
         elif button=="exportall":
             gllightpreset_exportall(1)
-            self.report({'INFO'}, "Exported Presets to: "+scn.quickprefs.gllightpreset_exportdirectory)
+            self.report(set(['INFO']), "Exported Presets to: "+scn.quickprefs.gllightpreset_exportdirectory)
         elif button=="import":
             if not os.path.isdir(scn.quickprefs.gllightpreset_importfile):
                 if not scn.quickprefs.gllightpreset_importdirectory=="":
                     gllightpreset_importsingle(scn.quickprefs.gllightpreset_importfile)
                 else:
-                    self.report({'INFO'}, "Please choose a valid preset file")
+                    self.report(set(['INFO']), "Please choose a valid preset file")
             else:
-                self.report({'INFO'}, "Please choose a valid preset file")
+                self.report(set(['INFO']), "Please choose a valid preset file")
         elif button=="importall":
             gllightpreset_importall()
-            self.report({'INFO'}, "Imported Presets from: "+scn.quickprefs.gllightpreset_importdirectory)
+            self.report(set(['INFO']), "Imported Presets from: "+scn.quickprefs.gllightpreset_importdirectory)
         elif button=="defaults":
                 gllightpreset_addDefault()
 
         if scn.quickprefs.gllightpreset_index > len(scn.quickprefs.gllightpreset)-1:
             scn.quickprefs.gllightpreset_index = len(scn.quickprefs.gllightpreset)-1
 
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 #Panel for tools
 class PANEL(bpy.types.Panel):
@@ -737,7 +739,7 @@ class PANEL(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_context = "render"
     bl_region_type = 'UI'
-    bl_options = {'DEFAULT_CLOSED'}
+    bl_options = set(['DEFAULT_CLOSED'])
 
 
     def draw(self, context):

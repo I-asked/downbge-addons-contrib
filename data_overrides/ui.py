@@ -79,6 +79,7 @@ class OBJECT_PT_SimulationOverrides(Panel):
 '''
 
 
+from __future__ import absolute_import
 class SCENE_OT_Override_Add(Operator):
     """Add Datablock Override"""
     bl_idname = "scene.override_add"
@@ -92,7 +93,7 @@ class SCENE_OT_Override_Add(Operator):
 
     def invoke(self, context, evemt):
         context.window_manager.invoke_search_popup(self)
-        return {'CANCELLED'}
+        return set(['CANCELLED'])
 
     def execute(self, context):
         scene = context.scene
@@ -100,14 +101,14 @@ class SCENE_OT_Override_Add(Operator):
         id_data = id_data_from_enum(self.id_block)
         add_override(scene, id_data)
         
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class SCENE_OT_Override_AddCustomProperty(Operator):
     """Add Custom Property Override"""
     bl_idname = "scene.override_add_custom_property"
     bl_label = "Add Custom Property Override"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     propname = StringProperty(name="Property", description="Path to the custom property to override")
 
@@ -123,17 +124,17 @@ class SCENE_OT_Override_AddCustomProperty(Operator):
         return context.window_manager.invoke_props_popup(self, event)
 
     def execute(self, context):
-        print("AAAAAA")
+        print "AAAAAA"
         scene = context.scene
         override = context.id_data_override
 
         if not self.propname:
-            print("no propname?")
-            return {'CANCELLED'}
+            print "no propname?"
+            return set(['CANCELLED'])
 
-        print("adding %s" % self.propname)
+        print "adding %s" % self.propname
         override.add_custom_property(self.propname)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 def template_overrides(layout, context, scene):
     for override in scene.overrides:

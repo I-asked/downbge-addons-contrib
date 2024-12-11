@@ -31,6 +31,7 @@ Motion Paths bpy.
 Developed during Caminandes Open Movie Project
 """
 
+from __future__ import absolute_import
 import bpy
 
 
@@ -39,7 +40,7 @@ class AMTH_POSE_OT_paths_clear_all(bpy.types.Operator):
     """Clear motion paths from all bones"""
     bl_idname = "pose.paths_clear_all"
     bl_label = "Clear All Motion Paths"
-    bl_options = {"UNDO"}
+    bl_options = set(["UNDO"])
 
     @classmethod
     def poll(cls, context):
@@ -51,7 +52,7 @@ class AMTH_POSE_OT_paths_clear_all(bpy.types.Operator):
             b.select = True
             bpy.ops.pose.paths_clear()
             b.select = False
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 
 class AMTH_POSE_OT_paths_frame_match(bpy.types.Operator):
@@ -59,7 +60,7 @@ class AMTH_POSE_OT_paths_frame_match(bpy.types.Operator):
     """Match Start/End frame of scene to motion path range"""
     bl_idname = "pose.paths_frame_match"
     bl_label = "Match Frame Range"
-    bl_options = {"UNDO"}
+    bl_options = set(["UNDO"])
 
     def execute(self, context):
         avs = context.object.pose.animation_visualization
@@ -81,7 +82,7 @@ class AMTH_POSE_OT_paths_frame_match(bpy.types.Operator):
                 avs.motion_path.frame_before = scene.frame_start
                 avs.motion_path.frame_after = scene.frame_end
 
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 
 def pose_motion_paths_ui(self, context):

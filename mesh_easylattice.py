@@ -17,6 +17,8 @@
 # ##### END GPL LICENSE BLOCK #####
 
 
+from __future__ import division
+from __future__ import absolute_import
 bl_info = {
     "name": "Easy Lattice Object",
     "author": "Kursad Karatas",
@@ -38,11 +40,11 @@ import math
 def modifiersDelete( obj ):
 
     for mod in obj.modifiers:
-        print(mod)
+        print mod
         if mod.name == "latticeeasytemp":
             try:
                 if mod.object == bpy.data.objects['LatticeEasytTemp']:
-                    print("applying modifier")
+                    print "applying modifier"
                     bpy.ops.object.modifier_apply( apply_as = 'DATA', modifier = mod.name )
 
             except:
@@ -185,7 +187,7 @@ def findBBox( obj, selvertsarray ):
 
     c = 1
 #     for vert in selvertsarray:
-    for c in range( len( selvertsarray ) ):
+    for c in xrange( len( selvertsarray ) ):
         # co=obj.matrix_world*vert.co.to_4d()
 
 #         co = vert.co
@@ -344,7 +346,7 @@ def run( lat_props ):
 
         if bpy.types.Scene.activelatticeobject:
             name = bpy.types.Scene.activelatticeobject
-            print("last active latticed object", name)
+            print "last active latticed object", name
 
             #Are we in edit lattice mode? If so move on to object mode
             if obj.mode=="EDIT":
@@ -352,7 +354,7 @@ def run( lat_props ):
 
             for ob in bpy.context.scene.objects:
                 if ob.name == name:  # found the object with the lattice mod
-                    print("apply mod on", ob)
+                    print "apply mod on", ob
                     object = ob
                     modifiersApplyRemove(object)
                     #modifiersDelete( object )  # apply the modifier and delete the lattice
@@ -395,7 +397,7 @@ class EasyLattice( bpy.types.Operator ):
         lat_props = [lat_u, lat_w, lat_m, lat_type]
 
         main( context, lat_props )
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def invoke( self, context, event ):
         wm = context.window_manager

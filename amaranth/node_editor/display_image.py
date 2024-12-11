@@ -22,6 +22,7 @@ Coded by the awesome Sergey Sharybin. This feature only works on Blender
 editor, there must be at least one image editor available.
 """
 
+from __future__ import absolute_import
 import bpy
 
 
@@ -39,7 +40,7 @@ class AMTH_NODE_OT_show_active_node_image(bpy.types.Operator):
     """Show active image node image in the image editor"""
     bl_idname = "node.show_active_node_image"
     bl_label = "Show Active Node Node"
-    bl_options = {"UNDO"}
+    bl_options = set(["UNDO"])
 
     def execute(self, context):
         preferences = context.user_preferences.addons["amaranth"].preferences
@@ -62,7 +63,7 @@ class AMTH_NODE_OT_show_active_node_image(bpy.types.Operator):
                                         space.image = active_node.image
                             break
 
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 
 def register():

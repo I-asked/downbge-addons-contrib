@@ -18,6 +18,7 @@ Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 END GPL LICENCE BLOCK
 '''
 
+from __future__ import absolute_import
 import math
 
 import bpy
@@ -53,7 +54,7 @@ def generate_3PT_mode_1(pts, obj):
         bpy.context.scene.cursor_location = cp
         # generate_gp3d_stroke(cp, axis, obj, radius=(p1-v1).length)
     else:
-        print('not on a circle')
+        print 'not on a circle'
 
 
 def get_three_verts_from_selection(obj):
@@ -71,7 +72,7 @@ class CircleCenter(bpy.types.Operator):
 
     bl_idname = 'mesh.circlecenter'
     bl_label = 'circle center from selected'
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     @classmethod
     def poll(self, context):
@@ -82,4 +83,4 @@ class CircleCenter(bpy.types.Operator):
         obj = bpy.context.object
         pts = get_three_verts_from_selection(obj)
         generate_3PT_mode_1(pts, obj)
-        return {'FINISHED'}
+        return set(['FINISHED'])

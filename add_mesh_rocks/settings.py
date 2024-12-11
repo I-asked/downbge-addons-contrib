@@ -32,6 +32,7 @@
 
 # <pep8 compliant>
 
+from __future__ import absolute_import
 import inspect
 import shutil
 from add_mesh_rocks import utils
@@ -42,9 +43,9 @@ path = basePath + "add_mesh_rocks.xml"
 
 try:
     source = minidom.parse(path)
-    print("Rock generator settings file found:\n" + path)
+    print "Rock generator settings file found:\n" + path
 except:
-    print("Rock generator settings file not found.  Creating settings file.")
+    print "Rock generator settings file not found.  Creating settings file."
     shutil.copy(basePath + "factory.xml", path)
     source = minidom.parse(path)
 
@@ -180,5 +181,5 @@ def save():
 
 def _print():
     for i in presets:
-        print(i)
+        print i
     return '{FINISHED}'

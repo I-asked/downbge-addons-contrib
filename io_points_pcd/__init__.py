@@ -16,6 +16,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import absolute_import
 bl_info = {
     "name": "PCD",
     "author": "Aurel Wildfellner",
@@ -52,7 +53,7 @@ class ImportPCD(bpy.types.Operator, ImportHelper):
 
     filename_ext = ".pcd"
 
-    filter_glob = StringProperty(default="*.pcd", options={'HIDDEN'})
+    filter_glob = StringProperty(default="*.pcd", options=set(['HIDDEN']))
 
     files = CollectionProperty(name="File Path",
                           description="File path used for importing "
@@ -69,7 +70,7 @@ class ImportPCD(bpy.types.Operator, ImportHelper):
         for path in paths:
             pcd_utils.import_pcd(path)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 
@@ -81,13 +82,13 @@ class ExportPCD(bpy.types.Operator, ExportHelper):
 
     filename_ext = ".pcd"
 
-    filter_glob = StringProperty(default="*.pcd", options={'HIDDEN'})
+    filter_glob = StringProperty(default="*.pcd", options=set(['HIDDEN']))
 
 
     def execute(self, context):
         pcd_utils.export_pcd(self.filepath)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 

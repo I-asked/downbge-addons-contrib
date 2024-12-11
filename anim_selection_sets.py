@@ -27,6 +27,7 @@
 
 # <pep8 compliant>
 
+from __future__ import absolute_import
 import string
 import bpy
 
@@ -87,7 +88,7 @@ class SelectionSetBone(bpy.types.PropertyGroup):
 
 
 class SelectionSet(bpy.types.PropertyGroup):
-    name = bpy.props.StringProperty(options={'LIBRARY_EDITABLE'})
+    name = bpy.props.StringProperty(options=set(['LIBRARY_EDITABLE']))
     bones = bpy.props.CollectionProperty(type=SelectionSetBone)
 
 
@@ -114,7 +115,7 @@ class ANIM_OT_selection_set_add(bpy.types.Operator):
 
         arm.active_selection_set = arm.selection_sets.find(name)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class ANIM_OT_selection_set_remove(bpy.types.Operator):
@@ -136,7 +137,7 @@ class ANIM_OT_selection_set_remove(bpy.types.Operator):
         if active_index >= len(arm.selection_sets):
             arm.active_selection_set = len(arm.selection_sets) - 1
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class ANIM_OT_selection_set_assign(bpy.types.Operator):
@@ -159,7 +160,7 @@ class ANIM_OT_selection_set_assign(bpy.types.Operator):
                 set_bone = sel_set.bones.add()
                 set_bone.name = bone.name
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class ANIM_OT_selection_set_unassign(bpy.types.Operator):
@@ -182,7 +183,7 @@ class ANIM_OT_selection_set_unassign(bpy.types.Operator):
             if bone_index != -1:
                 sel_set.bones.remove(bone_index)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class ANIM_OT_selection_set_select(bpy.types.Operator):
@@ -206,7 +207,7 @@ class ANIM_OT_selection_set_select(bpy.types.Operator):
                 bone_index = sel_set.bones.find(bone.name)
                 sel_set.bones.remove(bone_index)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class ANIM_OT_selection_set_deselect(bpy.types.Operator):
@@ -230,7 +231,7 @@ class ANIM_OT_selection_set_deselect(bpy.types.Operator):
                 bone_index = sel_set.bones.find(bone.name)
                 sel_set.bones.remove(bone_index)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class ANIM_OT_selection_set_export(bpy.types.Operator):
@@ -261,7 +262,7 @@ class ANIM_OT_selection_set_export(bpy.types.Operator):
         script_file.clear()
         script_file.write(set_script.substitute(name=arm.name, set_list=set_list))
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class DATA_PT_bone_sets(bpy.types.Panel):
@@ -331,7 +332,7 @@ def register():
 
     bpy.types.Armature.active_selection_set = bpy.props.IntProperty(name="Active Selection Set",
                                                                     default=-1,
-                                                                    options={'LIBRARY_EDITABLE'},
+                                                                    options=set(['LIBRARY_EDITABLE']),
                                                                     update=active_selection_set_update_func)
 
 

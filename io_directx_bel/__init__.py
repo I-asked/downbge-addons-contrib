@@ -1,4 +1,5 @@
 # Blender directX importer
+from __future__ import absolute_import
 bl_info = {
     "name": "DirectX Importer",
     "description": "Import directX Model Format (.x)",
@@ -39,12 +40,12 @@ class ImportX(bpy.types.Operator, ImportHelper):
     '''Load a Direct x File'''
     bl_idname = "import_scene.x"
     bl_label = "Import X"
-    bl_options = {'PRESET', 'UNDO'}
+    bl_options = set(['PRESET', 'UNDO'])
 
     filename_ext = ".x"
     filter_glob = StringProperty(
             default="*.x",
-            options={'HIDDEN'},
+            options=set(['HIDDEN']),
             )
     show_tree = BoolProperty(
             name="Show x tokens tree",

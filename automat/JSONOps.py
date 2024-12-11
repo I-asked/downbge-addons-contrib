@@ -1,6 +1,9 @@
 # Copyright 2015 Théo Friberg under GNU GPL 3
 
+from __future__ import with_statement
+from __future__ import absolute_import
 import json
+from io import open
 
 def readNodes(file):
     with open(file, "r") as data_file:

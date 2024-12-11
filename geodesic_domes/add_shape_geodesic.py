@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import bpy
 import mathutils
 
@@ -30,13 +31,13 @@ def func_add_corrective_pose_shape_fast(source, target):
         vgroup = target.active_shape_key.vertex_group
         target.active_shape_key.vertex_group = ''
     except:
-        print("blub")
+        print "blub"
         result = "***ERROR*** blub"
         pass
     # copy the local vertex positions to the new shape
     verts = source.data.vertices
     try:
-        for n in range( len(verts)):
+        for n in xrange( len(verts)):
             shape_key_verts[n].co = verts[n].co
     # go to all armature modifies and unpose the shape
     except:
@@ -57,7 +58,7 @@ def func_add_corrective_pose_shape_fast(source, target):
     try:
         target.active_shape_key.vertex_group = vgroup
     except:
-        print("bluba")
+        print "bluba"
         result  = result + "bluba"
         pass
     target.show_only_shape_key = False
@@ -76,8 +77,8 @@ class add_corrective_pose_shape_fast(bpy.types.Operator):
     def execute(self, context):
     
         if len(context.selected_objects) > 2:
-            print("Select source and target objects please")
-            return {'FINISHED'}
+            print "Select source and target objects please"
+            return set(['FINISHED'])
 
         selection = context.selected_objects
         target = context.active_object
@@ -85,10 +86,10 @@ class add_corrective_pose_shape_fast(bpy.types.Operator):
             source = selection[1]
         else:
             source = selection[0]
-        print(source)
-        print(target)
+        print source
+        print target
         func_add_corrective_pose_shape_fast( source, target)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 def register():
     bpy.utils.register_module(__name__)

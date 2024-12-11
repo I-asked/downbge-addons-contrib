@@ -18,6 +18,8 @@
 
 # <pep8 compliant>
 
+from __future__ import division
+from __future__ import absolute_import
 bl_info = {
   "name": "Adobe Illustrator / PDF / SVG",
   "author": "Howard Trickey",
@@ -58,9 +60,9 @@ from bpy_extras.io_utils import ImportHelper
 class VectorImporter(bpy.types.Operator, ImportHelper):
     bl_idname = "import_vec.aipdfsvg"
     bl_label = "Import AI/PDF/SVG"
-    bl_options = {"REGISTER", "UNDO"}
+    bl_options = set(["REGISTER", "UNDO"])
 
-    filter_glob = StringProperty(default="*.ai;*.pdf;*.svg", options={"HIDDEN"})
+    filter_glob = StringProperty(default="*.ai;*.pdf;*.svg", options=set(["HIDDEN"]))
     smoothness = IntProperty(name="Smoothness",
         description="How closely to approximate curves",
         default=1,
@@ -171,9 +173,9 @@ class VectorImporter(bpy.types.Operator, ImportHelper):
         options.convert_options.combine_paths = self.combine_paths
         (mdl, msg) = import_vecfile.ReadVecFileToModel(self.filepath, options)
         if msg:
-            self.report({'ERROR'},
+            self.report(set(['ERROR']),
                 "Problem reading file " + self.filepath + ": " + msg)
-            return {'FINISHED'}
+            return set(['FINISHED'])
         verts = mdl.points.pos
         if self.true_scale:
             # assume model units are 90 dpi, if svg file
@@ -181,7 +183,7 @@ class VectorImporter(bpy.types.Operator, ImportHelper):
             # convert to meters (1 inch = 0.0254 meters)
             if self.filepath[-4:] in (".svg", ".SVG"):
                 s = 0.0254 / 90.0
-                print("svg s=", s)
+                print "svg s=", s
             else:
                 s = 0.0254 / 72.0
             verts = [(s * v[0], s * v[1], s * v[2]) for v in verts]
@@ -201,7 +203,7 @@ class VectorImporter(bpy.types.Operator, ImportHelper):
 
     def execute(self, context):
         self.action(context)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 def add_colors(mesh, colors):
@@ -214,7 +216,7 @@ def add_colors(mesh, colors):
     rgbtoindex = {}
     matnameprefix = "VImat." + mesh.name + "."
     for i, c in enumerate(colors):
-        print("color for face", i)
+        print "color for face", i
         if c not in rgbtoindex:
             matname = matnameprefix + str(len(bpy.data.materials))
             mat = bpy.data.materials.new(matname)

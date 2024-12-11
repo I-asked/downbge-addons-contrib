@@ -19,6 +19,7 @@ menu for easy access.
 Under Specials menu W, when in Camera view.
 """
 
+from __future__ import absolute_import
 import bpy
 
 

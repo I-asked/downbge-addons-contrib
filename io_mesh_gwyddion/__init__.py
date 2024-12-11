@@ -32,6 +32,7 @@
 #  Other: Frank Palmino
 #
 
+from __future__ import absolute_import
 bl_info = {
     "name": "Atomic Blender - Gwyddion",
     "description": "Loading Gwyddion Atomic Force Microscopy images",
@@ -63,10 +64,10 @@ from . import import_gwyddion
 class ImportGwyddion(Operator, ImportHelper):
     bl_idname = "import_mesh.gwy"
     bl_label  = "Import Gwyddion (*.gwy)"
-    bl_options = {'PRESET', 'UNDO'}
+    bl_options = set(['PRESET', 'UNDO'])
 
     filename_ext = ".gwy"
-    filter_glob  = StringProperty(default="*.gwy", options={'HIDDEN'},)
+    filter_glob  = StringProperty(default="*.gwy", options=set(['HIDDEN']),)
 
     use_camera = BoolProperty(
         name="Camera", default=False,
@@ -162,7 +163,7 @@ class ImportGwyddion(Operator, ImportHelper):
                                  self.use_lamp)
         #print("passed - 4")
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # The entry into the menu 'file -> import'

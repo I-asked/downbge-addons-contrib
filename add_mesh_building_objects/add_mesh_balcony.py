@@ -11,6 +11,8 @@ bl_info = {
     "tracker_url": "",
     "category": "Add Mesh"}
 '''
+from __future__ import division
+from __future__ import absolute_import
 import bpy, bmesh
 from bpy.props import *
 from bpy_extras.object_utils import object_data_add
@@ -78,8 +80,8 @@ def EXT(PR,vr,fc,lz,mz,rz):
     elif lz==0 and rz> 0:l=2
     elif lz> 0 and rz==0:l=2
     elif lz> 0 and rz> 0:l=3
-    for j in range(0,l):
-        for i in range(0,m):
+    for j in xrange(0,l):
+        for i in xrange(0,m):
             a=j*m
             if i==m-1:fc.append([a+i+n,a+0+n+0,a+0+n+0+m,a+i+n+m])
             else:     fc.append([a+i+n,a+i+n+1,a+i+n+1+m,a+i+n+m])
@@ -121,13 +123,13 @@ def add_object(s,context):
             [-mz,du,dh],[mz,du,dh],[-mz, 0,dh],[mz, 0,dh]]
         fc=[[1,0,2,3],[5,4,6,7]];Dos=[0,1]
     z=0
-    for i in range(s.lst):
+    for i in xrange(s.lst):
         if blok[i][0]=='1':#Balcony
             k1=blok[i][1][1]/100;h =blok[i][1][0]/100
             fh=blok[i][1][3]/100;fd=blok[i][1][4]/100
             PR=[[-k1,z],[0,z],[0,z+h],[-k1,z+h]]
             z+=h;fz=z
-            for f in range(blok[i][1][2]):
+            for f in xrange(blok[i][1][2]):
                 fz-=blok[i][1][5][f]/100
                 PR.append([-k1,   fz   ]);PR.append([-k1+fd,fz   ])
                 PR.append([-k1+fd,fz-fh]);PR.append([-k1,   fz-fh])
@@ -135,7 +137,7 @@ def add_object(s,context):
             BB=len(fc)
             EXT(PR,vr,fc,lz,mz,rz)
             BE=len(fc)
-            for F in range(BB,BE):Bal.append(F)
+            for F in xrange(BB,BE):Bal.append(F)
         if blok[i][0]=='2':#Bulwark
             k1=blok[i][2][1]/100;h=blok[i][2][0]/100
             PR=[[-k1,z],[0,z],[0,z+h],[-k1,z+h]]
@@ -143,7 +145,7 @@ def add_object(s,context):
             BB=len(fc)
             EXT(PR,vr,fc,lz,mz,rz)
             BE=len(fc)
-            for F in range(BB,BE):Par.append(F)
+            for F in xrange(BB,BE):Par.append(F)
         if blok[i][0]=='3':#Marble
             k1=blok[0][1][1]/100;k2=blok[i][3][1]/100;h=blok[i][3][0]/100
             PR=[[-k1-k2,z],[k2,z],[k2,z+h],[-k1-k2,z+h]]
@@ -151,7 +153,7 @@ def add_object(s,context):
             BB=len(fc)
             EXT(PR,vr,fc,lz,mz,rz)
             BE=len(fc)
-            for F in range(BB,BE):Mer.append(F)
+            for F in xrange(BB,BE):Mer.append(F)
         if blok[i][0]=='4':#Chrome
             k1=blok[0][1][1]/200;k2=blok[i][4][2]/200;h=blok[i][4][1]/100
             if blok[i][4][0]=="1":#Duz
@@ -160,16 +162,16 @@ def add_object(s,context):
                 z+=k2*2
             else:#Round
                 PR=[];z+=h+k2
-                for a in range(24):
+                for a in xrange(24):
                     x=-k1+cos(a*pi/12)*k2;y=z+sin(a*pi/12)*k2
                     PR.append([x,y])
                 z+=k2
             BB=len(fc)
             EXT(PR,vr,fc,lz,mz,rz)
             BE=len(fc)
-            for F in range(BB,BE):Krm.append(F)
+            for F in xrange(BB,BE):Krm.append(F)
             if blok[i][4][0]=="2":
-                for F in range(BB,BE):SM.append(F)
+                for F in xrange(BB,BE):SM.append(F)
         if blok[i][0]=='5':#Glass
             k1=blok[0][1][1]/200;h=blok[i][5][0]/100
             PR=[[-k1-0.001,z],[-k1+0.001,z],[-k1+0.001,z+h],[-k1-0.001,z+h]]
@@ -179,7 +181,7 @@ def add_object(s,context):
             n=len(vr)
             fc.append([n-2,n-1,n-4,n-3])
             BE=len(fc)
-            for F in range(BB,BE):Glass.append(F)
+            for F in xrange(BB,BE):Glass.append(F)
 #OBJE -----------------------------------------------------------
     mesh = bpy.data.meshes.new(name='Balcony')
     mesh.from_pydata(vr,[],fc)
@@ -209,7 +211,7 @@ class OBJECT_OT_add_balcony(bpy.types.Operator):
     bl_idname = "mesh.add_say3d_balcony"
     bl_label = "Balcony"
     bl_description = "Balcony Olustur"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
     prs = EnumProperty(items = (("1","Joint_Gap",    ""),
                                 ("2","Bulwark", ""),
                                 ("3","Glass",     ""),
@@ -442,7 +444,7 @@ class OBJECT_OT_add_balcony(bpy.types.Operator):
         ls.append(self.ls5);lf.append(self.bf5)
         ls.append(self.ls6);lf.append(self.bf6)
         ls.append(self.ls7);lf.append(self.bf7)
-        for i in range(self.lst-1,-1,-1):
+        for i in xrange(self.lst-1,-1,-1):
             box=layout.box()
             box.prop(self,'ls'+str(i))
             if  ls[i]=='1':#Balcony
@@ -453,7 +455,7 @@ class OBJECT_OT_add_balcony(bpy.types.Operator):
                     row=box.row()
                     row.prop(self,'fh'+str(i))
                     row.prop(self,'fd'+str(i))
-                for f in range(lf[i]):
+                for f in xrange(lf[i]):
                     box.prop(self,'f'+str(i)+str(f))
             if  ls[i]=='2':#Bulwark
                 box.prop(self,'py'+str(i))
@@ -474,7 +476,7 @@ class OBJECT_OT_add_balcony(bpy.types.Operator):
             Prs(self,self.prs)
             self.son=self.prs
         add_object(self,context)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 # Registration
 def add_object_button(self, context):
     self.layout.operator(

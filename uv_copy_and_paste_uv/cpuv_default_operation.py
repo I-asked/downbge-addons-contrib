@@ -18,6 +18,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import absolute_import
 import bpy
 from bpy.props import BoolProperty, IntProperty
 from . import cpuv_common
@@ -35,28 +36,28 @@ class CPUVCopyUV(bpy.types.Operator):
     bl_idname = "uv.cpuv_copy_uv"
     bl_label = "Copy UV"
     bl_description = "Copy UV data"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     def execute(self, context):
         props = context.scene.cpuv_props.default
-        self.report({'INFO'}, "Copy UV coordinate.")
+        self.report(set(['INFO']), "Copy UV coordinate.")
         mem = cpuv_common.View3DModeMemory(context)
 
         # prepare for coping
         ret, props.src_obj = cpuv_common.prep_copy(context, self)
         if ret != 0:
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
         # copy
         props.src_faces = cpuv_common.get_selected_faces(
             context, props.src_obj)
         ret, props.src_uv_map = cpuv_common.copy_opt(
             self, "", props.src_obj, props.src_faces)
         if ret != 0:
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
         # finish coping
         cpuv_common.fini_copy()
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # paste UV
@@ -66,7 +67,7 @@ class CPUVPasteUV(bpy.types.Operator):
     bl_idname = "uv.cpuv_paste_uv"
     bl_label = "Paste UV"
     bl_description = "Paste UV data"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     flip_copied_uv = BoolProperty(
         name="Flip Copied UV",
@@ -81,22 +82,22 @@ class CPUVPasteUV(bpy.types.Operator):
 
     def execute(self, context):
         props = context.scene.cpuv_props.default
-        self.report({'INFO'}, "Paste UV coordinate.")
+        self.report(set(['INFO']), "Paste UV coordinate.")
         mem = cpuv_common.View3DModeMemory(context)
 
         # prepare for pasting
         ret, dest_obj = cpuv_common.prep_paste(
             context, self, props.src_obj, props.src_faces)
         if ret != 0:
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
         # paste
         dest_faces = cpuv_common.get_selected_faces(context, dest_obj)
         ret = cpuv_common.paste_opt(
             context, self, "", props.src_obj, props.src_faces,
             props.src_uv_map, dest_obj, dest_faces)
         if ret != 0:
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
         # finish pasting
         cpuv_common.fini_paste()
 
-        return {'FINISHED'}
+        return set(['FINISHED'])

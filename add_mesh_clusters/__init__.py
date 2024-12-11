@@ -37,6 +37,8 @@
 #  4. Icosahedron: unlimited size ...
 #
 
+from __future__ import division
+from __future__ import absolute_import
 bl_info = {
     "name": "Atomic Blender - Cluster",
     "description": "Creating cluster formed by atoms",
@@ -73,14 +75,14 @@ ATOM_Cluster_PANEL = 0
 class CLASS_ImportCluster(bpy.types.Operator):
     bl_idname = "mesh.cluster"
     bl_label = "Atom cluster"
-    bl_options = {'REGISTER', 'UNDO', 'PRESET'}
+    bl_options = set(['REGISTER', 'UNDO', 'PRESET'])
 
     def execute(self, context):
 
         global ATOM_Cluster_PANEL
         ATOM_Cluster_PANEL = 1
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 
@@ -313,7 +315,7 @@ class CLASS_atom_cluster_load_button(Operator):
         scn.atom_number_total = str(numbers[0])
         scn.atom_number_drawn = str(numbers[1])
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 def DEF_atom_draw_atoms(prop_element,
@@ -375,7 +377,7 @@ def DEF_atom_cluster_radius_type(rtype,how):
 
         # Note all layers that are active.
         layers = []
-        for i in range(20):
+        for i in xrange(20):
             if bpy.context.scene.layers[i] == True:
                 layers.append(i)
 
@@ -406,7 +408,7 @@ def DEF_atom_cluster_radius_all(scale, how):
     if how == "ALL_IN_LAYER":
 
         layers = []
-        for i in range(20):
+        for i in xrange(20):
             if bpy.context.scene.layers[i] == True:
                 layers.append(i)
 
@@ -449,7 +451,7 @@ class CLASS_atom_cluster_radius_all_bigger_button(Operator):
         DEF_atom_cluster_radius_all(
                 scn.radius_all,
                 scn.radius_how,)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # Button for decreasing the radii of all atoms
@@ -463,7 +465,7 @@ class CLASS_atom_cluster_radius_all_smaller_button(Operator):
         DEF_atom_cluster_radius_all(
                 1.0/scn.radius_all,
                 scn.radius_how,)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # Routine to scale the radii of all atoms
@@ -472,7 +474,7 @@ def DEF_atom_cluster_radius_all(scale, how):
     if how == "ALL_IN_LAYER":
 
         layers = []
-        for i in range(20):
+        for i in xrange(20):
             if bpy.context.scene.layers[i] == True:
                 layers.append(i)
 

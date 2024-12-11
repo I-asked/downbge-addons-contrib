@@ -16,6 +16,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import absolute_import
 import bpy
 
 
@@ -142,7 +143,7 @@ class ExifInfoPanel(bpy.types.Panel):
     @staticmethod
     def has_sequencer(context):
         return (context.space_data.view_type\
-        in {'SEQUENCER', 'SEQUENCER_PREVIEW'})
+        in set(['SEQUENCER', 'SEQUENCER_PREVIEW']))
 
     @classmethod
     def poll(cls, context):

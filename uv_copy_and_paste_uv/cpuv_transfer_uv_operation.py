@@ -18,6 +18,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import absolute_import
 import bpy
 import bmesh
 from collections import OrderedDict
@@ -37,7 +38,7 @@ class CPUVTransferUVCopy(bpy.types.Operator):
     bl_idname = "uv.transfer_uv_copy"
     bl_label = "Transfer UV Copy"
     bl_description = "Transfer UV Copy"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     def execute(self, context):
         props = context.scene.cpuv_props.transuv
@@ -45,8 +46,8 @@ class CPUVTransferUVCopy(bpy.types.Operator):
         bm = bmesh.from_edit_mesh(active_obj.data)
 
         if not bm.loops.layers.uv:
-            self.report({'WARNING'}, "No UV Map!!")
-            return {'CANCELLED'}
+            self.report(set(['WARNING']), "No UV Map!!")
+            return set(['CANCELLED'])
 
         uv_layer = bm.loops.layers.uv.verify()
         props.topology_copied.clear()
@@ -55,8 +56,8 @@ class CPUVTransferUVCopy(bpy.types.Operator):
         active_face = bm.faces.active
         sel_faces = [face for face in bm.faces if face.select]
         if len(sel_faces) != 2 or not active_face or active_face not in sel_faces:
-            self.report({'WARNING'}, "Two faces should be selected and active!!")
-            return {'CANCELLED'}
+            self.report(set(['WARNING']), "Two faces should be selected and active!!")
+            return set(['CANCELLED'])
 
         # parse all faces according to selection
         all_sorted_faces = main_parse(self, active_obj, bm, uv_layer, sel_faces, active_face)
@@ -74,7 +75,7 @@ class CPUVTransferUVCopy(bpy.types.Operator):
 
         bmesh.update_edit_mesh(active_obj.data)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # transfer UV (paste)
@@ -84,7 +85,7 @@ class CPUVTransferUVPaste(bpy.types.Operator):
     bl_idname = "uv.transfer_uv_paste"
     bl_label = "Transfer UV Paste"
     bl_description = "Transfer UV Paste"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     def execute(self, context):
         props = context.scene.cpuv_props.transuv
@@ -92,19 +93,19 @@ class CPUVTransferUVPaste(bpy.types.Operator):
         bm = bmesh.from_edit_mesh(active_obj.data)
 
         if not bm.loops.layers.uv:
-            self.report({'WARNING'}, "No UV Map!!")
-            return {'CANCELLED'}
+            self.report(set(['WARNING']), "No UV Map!!")
+            return set(['CANCELLED'])
 
         uv_layer = bm.loops.layers.uv.verify()  # another approach
 
         # get selection history
         all_sel_faces = [e for e in bm.select_history if isinstance(e, bmesh.types.BMFace) and e.select]
         if len(all_sel_faces) % 2 != 0:
-            self.report({'WARNING'}, "Number of selected face must be even every part.")
-            return {'CANCELLED'}
+            self.report(set(['WARNING']), "Number of selected face must be even every part.")
+            return set(['CANCELLED'])
 
         # parse selection history
-        for i in range(len(all_sel_faces)):
+        for i in xrange(len(all_sel_faces)):
             if i > 0 and i % 2 != 0:
                 sel_faces = [all_sel_faces[i-1], all_sel_faces[i]]
                 active_face = all_sel_faces[i]
@@ -115,8 +116,8 @@ class CPUVTransferUVPaste(bpy.types.Operator):
                 if all_sorted_faces:
                     # check amount of copied/pasted faces
                     if len(all_sorted_faces) != len(props.topology_copied):
-                        self.report({'WARNING'}, "Mesh has different amount of faces!!")
-                        return {'CANCELLED'}
+                        self.report(set(['WARNING']), "Mesh has different amount of faces!!")
+                        return set(['CANCELLED'])
 
                     for i, face_data in enumerate(all_sorted_faces.values()):
                         copied_data = props.topology_copied[i]
@@ -126,8 +127,8 @@ class CPUVTransferUVPaste(bpy.types.Operator):
                             bpy.ops.mesh.select_all(action='DESELECT')
                             list(all_sorted_faces.keys())[i].select = True  # select problematic face
 
-                            self.report({'WARNING'}, "Face have different amount of verts!!")
-                            return {'CANCELLED'}
+                            self.report(set(['WARNING']), "Face have different amount of verts!!")
+                            return set(['CANCELLED'])
 
                         for j, uvloop in enumerate(face_data[2]):
                             uvloop.uv = copied_data[0][j]
@@ -135,7 +136,7 @@ class CPUVTransferUVPaste(bpy.types.Operator):
 
         bmesh.update_edit_mesh(active_obj.data)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 def main_parse(self, active_obj, bm, uv_layer, sel_faces, active_face):
@@ -195,7 +196,7 @@ def main_parse(self, active_obj, bm, uv_layer, sel_faces, active_face):
         faces_to_parse.append(second_face)
 
     else:
-        self.report({'WARNING'}, "Two faces should should share one edge!!")
+        self.report(set(['WARNING']), "Two faces should should share one edge!!")
         return None
 
     # parse all faces
@@ -210,7 +211,7 @@ def main_parse(self, active_obj, bm, uv_layer, sel_faces, active_face):
             new_faces = parse_faces(face, face_stuff, used_verts, used_edges, all_sorted_faces, uv_layer, self)
 
             if new_faces == 'CANCELLED':
-                self.report({'WARNING'}, "More than 2 faces share edge!!")
+                self.report(set(['WARNING']), "More than 2 faces share edge!!")
                 return None
 
             new_parsed_faces += new_faces
@@ -282,7 +283,7 @@ def get_other_verts_edges(face, vert1, vert2, first_edge, uv_layer):
 
     other_edges = [edge for edge in face.edges if edge not in face_edges]
 
-    for i in range(len(other_edges)):
+    for i in xrange(len(other_edges)):
         found_edge = None
 
         # get sorted verts and edges

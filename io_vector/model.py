@@ -21,6 +21,8 @@
 """Manipulations of Models.
 """
 
+from __future__ import division
+from __future__ import absolute_import
 __author__ = "howard.trickey@gmail.com"
 
 from . import geom
@@ -299,7 +301,7 @@ def RegionToPolyAreas(faces, points, data):
     (edges, vtoe) = _GetEdgeData(faces)
     (face_adj, is_interior_edge) = _GetFaceGraph(faces, edges, vtoe, points)
     (components, ftoc) = _FindFaceGraphComponents(faces, face_adj)
-    for c in range(len(components)):
+    for c in xrange(len(components)):
         boundary_edges = set()
         betodata = dict()
         vstobe = dict()
@@ -323,7 +325,7 @@ def RegionToPolyAreas(faces, points, data):
             datum = betodata[(vstart, ve)]
             while ve != vstart:
                 if ve not in vstobe:
-                    print("whoops, couldn't close boundary")
+                    print "whoops, couldn't close boundary"
                     break
                 nextes = vstobe[ve]
                 if len(nextes) == 1:
@@ -345,7 +347,7 @@ def RegionToPolyAreas(faces, points, data):
                         nexte = nextes[0]
                 ((_, ve), face_i) = edges[nexte]
                 if nexte not in boundary_edges:
-                    print("whoops, nexte not a boundary edge", nexte)
+                    print "whoops, nexte not a boundary edge", nexte
                     break
                 boundary_edges.remove(nexte)
                 if ve != vstart:
@@ -361,7 +363,7 @@ def RegionToPolyAreas(faces, points, data):
         else:
             outerf = _FindOuterPoly(polys, points, faces)
             pa = geom.PolyArea(points, polys[outerf], [], poly_data[outerf])
-            pa.holes = [polys[i] for i in range(len(polys)) if i != outerf]
+            pa.holes = [polys[i] for i in xrange(len(polys)) if i != outerf]
             ans.append(pa)
     return ans
 
@@ -410,7 +412,7 @@ def _GetFaceGraph(faces, edges, vtoe, points):
         second list: maps edge index to True if it separates adjacent faces
     """
 
-    face_adj = [[] for i in range(len(faces))]
+    face_adj = [[] for i in xrange(len(faces))]
     is_interior_edge = [False] * len(edges)
     for e, ((vs, ve), f) in enumerate(edges):
         for othere in vtoe[ve]:
@@ -442,7 +444,7 @@ def _FindFaceGraphComponents(faces, face_adj):
         return ([], [])
     components = []
     ftoc = [-1] * len(faces)
-    for i in range(len(faces)):
+    for i in xrange(len(faces)):
         if ftoc[i] == -1:
             compi = len(components)
             comp = []
@@ -495,7 +497,7 @@ def _FindOuterPoly(polys, points, faces):
             pnorm = geom.Newell(poly, points)
             if geom.VecDot(fnorm, pnorm) > 0:
                 return i
-    print("whoops, couldn't find an outermost poly")
+    print "whoops, couldn't find an outermost poly"
     return 0
 
 

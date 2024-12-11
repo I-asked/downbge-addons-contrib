@@ -17,6 +17,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 
+from __future__ import absolute_import
 bl_info = {
     "name": "Jump to Cut",
     "author": "Carlos Padial",
@@ -112,7 +113,7 @@ class OBJECT_OT_Setinout(bpy.types.Operator):
                 else:
                     mark=markers["OUT"]
                     mark.frame=sout
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 def triminout(strip,sin,sout):
@@ -130,7 +131,7 @@ def triminout(strip,sin,sout):
             strip.select_right_handle = True
             bpy.ops.sequencer.snap(frame=sout)
             strip.select_right_handle = False
-    return {'FINISHED'}
+    return set(['FINISHED'])
 
 
 class OBJECT_OT_Triminout(bpy.types.Operator):
@@ -150,9 +151,9 @@ class OBJECT_OT_Triminout(bpy.types.Operator):
                     sout=markers["OUT"].frame
                     triminout(strip,sin,sout)
                 else:
-                    self.report({'WARNING'}, "there is no IN and OUT")
+                    self.report(set(['WARNING']), "there is no IN and OUT")
             bpy.ops.sequencer.reload()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 def searchprev(j, list):
     list.sort(reverse=True)
@@ -212,7 +213,7 @@ class OBJECT_OT_Jumpprev(bpy.types.Operator):  #Operator jump previous edit poin
         seq=scene.sequence_editor
         editpoints = geteditpoints(seq)
         bpy.context.scene.frame_current = searchprev(scene.frame_current, editpoints)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class OBJECT_OT_Jumpnext(bpy.types.Operator):  #Operator jump next edit point
     bl_label = "Cut next"
@@ -229,8 +230,8 @@ class OBJECT_OT_Jumpnext(bpy.types.Operator):  #Operator jump next edit point
             if i > last: last = i
         if bpy.context.scene.frame_current == last:
             bpy.context.scene.frame_current = last-1
-            self.report({'INFO'},'Last Frame')
-        return {'FINISHED'}
+            self.report(set(['INFO']),'Last Frame')
+        return set(['FINISHED'])
 
 # MARKER
 class OBJECT_OT_Markerprev(bpy.types.Operator):
@@ -244,7 +245,7 @@ class OBJECT_OT_Markerprev(bpy.types.Operator):
         markers = scene.timeline_markers
         for i in markers: markerlist.append(i.frame)
         bpy.context.scene.frame_current = searchprev(scene.frame_current, markerlist)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class OBJECT_OT_Markernext(bpy.types.Operator):
     bl_label = "Marker next"
@@ -257,7 +258,7 @@ class OBJECT_OT_Markernext(bpy.types.Operator):
         markers = scene.timeline_markers
         for i in markers: markerlist.append(i.frame)
         bpy.context.scene.frame_current = searchnext(scene.frame_current, markerlist)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 # SOURCE IN OUT
 
@@ -287,7 +288,7 @@ class OBJECT_OT_Sourcein(bpy.types.Operator):  #Operator source in
                 else:
                     sin=markers["IN"]
                     sin.frame=sout.frame
-                self.report({'WARNING'},'IN after OUT')
+                self.report(set(['WARNING']),'IN after OUT')
         else:
             if "IN" not in markers:
                 sin=markers.new(name="IN")
@@ -297,7 +298,7 @@ class OBJECT_OT_Sourcein(bpy.types.Operator):  #Operator source in
                 sin.frame=scene.frame_current
         if seq:
             bpy.ops.sequencer.reload()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class OBJECT_OT_Sourceout(bpy.types.Operator):  #Operator source out
     bl_label = "Source OUT"
@@ -325,13 +326,13 @@ class OBJECT_OT_Sourceout(bpy.types.Operator):  #Operator source out
                 else:
                     sout=markers["OUT"]
                     sout.frame = sin.frame
-                self.report({'WARNING'}, "OUT before IN")
+                self.report(set(['WARNING']), "OUT before IN")
         else:
             sout= markers.new(name="OUT")
             sout.frame=scene.frame_current
         if seq:
             bpy.ops.sequencer.reload()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 
@@ -350,11 +351,11 @@ class OBJECT_OT_Setstartend(bpy.types.Operator):  #Operator set start & end
                 sout=markers["OUT"]
                 scene.frame_start = sin.frame
                 scene.frame_end = sout.frame
-                print("change")
+                print "change"
             else:
-                self.report({'WARNING'}, "there is no IN and OUT")
+                self.report(set(['WARNING']), "there is no IN and OUT")
             bpy.ops.sequencer.reload()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # COPY PASTE
@@ -379,15 +380,15 @@ class OBJECT_OT_Metacopy(bpy.types.Operator):  #Operator copy source in/out
                 triminout(strip2,sin,sout)
                 bpy.ops.sequencer.copy()
                 bpy.ops.sequencer.meta_separate()
-                self.report({'INFO'}, "META has been trimed and copied")
+                self.report(set(['INFO']), "META has been trimed and copied")
             else:
                 bpy.ops.sequencer.meta_make()
                 bpy.ops.sequencer.copy()
                 bpy.ops.sequencer.meta_separate()
-                self.report({'WARNING'}, "No In & Out!! META has been copied")
+                self.report(set(['WARNING']), "No In & Out!! META has been copied")
         else:
-            self.report({'ERROR'}, "No strip selected")
-        return {'FINISHED'}
+            self.report(set(['ERROR']), "No strip selected")
+        return set(['FINISHED'])
 
 class OBJECT_OT_Metapaste(bpy.types.Operator):  #Operator paste source in/out
     bl_label = "Paste in current Frame"
@@ -399,7 +400,7 @@ class OBJECT_OT_Metapaste(bpy.types.Operator):  #Operator paste source in/out
         scene=bpy.context.scene
         bpy.ops.sequencer.paste()
         bpy.ops.sequencer.snap(frame=scene.frame_current)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 # Registering / Unregister
 

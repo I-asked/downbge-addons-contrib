@@ -19,6 +19,7 @@ open blend's directory. Look for it on the File Browser's header, only
 shows up if the file is saved.
 """
 
+from __future__ import absolute_import
 import bpy
 
 
@@ -30,7 +31,7 @@ class AMTH_FILE_OT_directory_current_blend(bpy.types.Operator):
 
     def execute(self, context):
         bpy.ops.file.select_bookmark(dir="//")
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 
 def button_directory_current_blend(self, context):

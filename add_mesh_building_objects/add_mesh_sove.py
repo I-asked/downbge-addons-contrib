@@ -10,6 +10,8 @@
     "tracker_url": "",
     "category": "Add Mesh"}
 '''
+from __future__ import division
+from __future__ import absolute_import
 import bpy
 from bpy.props import *
 from bpy_extras.object_utils import object_data_add
@@ -53,7 +55,7 @@ def add_object(self, context):
         ou=self.fg*12
         fc.append([4,7,12+ou,24+ou]);fc.append([6,5,25+ou,13+ou])
     z=my
-    for i in range(self.fg):
+    for i in xrange(self.fg):
         if i==0:z-=self.f0/100
         if i==1:z-=self.f1/100
         if i==2:z-=self.f2/100
@@ -111,7 +113,7 @@ def add_object(self, context):
         R=sqrt(H1**2+H2**2)
         M=ust-R
         A=pi-atan(O)*2
-        for a in range(1,24):
+        for a in xrange(1,24):
             p=(a*A/12)+(pi*1.5)-A
             vr.append([cos(p)*R,pdr,M-sin(p)*R])
             vr.append([cos(p)*R,drn,M-sin(p)*R])
@@ -150,7 +152,7 @@ class OBJECT_OT_add_object(bpy.types.Operator):
     bl_idname = "mesh.add_say3d_sove"
     bl_label = "Sove"
     bl_description = "Sove Frame"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     prs = EnumProperty(items = (("1","PENCERE 200",""),
                                 ("2","PENCERE 180",""),
@@ -194,7 +196,7 @@ class OBJECT_OT_add_object(bpy.types.Operator):
         box=layout.box()
         box.prop(self,'fg')
         row=box.row();row.prop(self, 'fh');row.prop(self, 'fd')
-        for i in range(self.fg):
+        for i in xrange(self.fg):
             box.prop(self,'f'+str(i))
 
     def execute(self, context):
@@ -204,4 +206,4 @@ class OBJECT_OT_add_object(bpy.types.Operator):
             if self.prs=='3':Prs(self,160,15,590,44,33,15,20,30,True,1,2,3,90,30,30,30,30,30,30,30,30,30)
             self.son=self.prs
         add_object(self, context)
-        return {'FINISHED'}
+        return set(['FINISHED'])

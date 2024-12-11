@@ -18,6 +18,8 @@
 
 # <pep8 compliant>
 
+from __future__ import division
+from __future__ import absolute_import
 bl_info = {
     "name": "Render to Print",
     "author": "Marco Crippa <thekrypt77@tiscali.it>, Dealga McArdle",
@@ -106,8 +108,8 @@ def paper_enum_parse(idname):
     return tipo, float(dim_w), float(dim_h)
 
 
-paper_presets_data = {idname: paper_enum_parse(idname)
-                      for idname, name, descr in paper_presets}
+paper_presets_data = dict((idname, paper_enum_parse(idname))
+                      for idname, name, descr in paper_presets)
 
 
 def update_settings_cb(self, context):
@@ -323,7 +325,7 @@ class RENDER_OT_apply_size(Operator):
         render.resolution_x = ps.width_px
         render.resolution_y = ps.height_px
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 def register():

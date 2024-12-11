@@ -25,6 +25,10 @@
 # Science and Technology of Portugal, under the grant SFRH/BD/66452/2009.
 
 
+from __future__ import with_statement
+from __future__ import absolute_import
+from io import open
+import sys
 skeleton_url = "http://mocap.cs.cmu.edu/subjects/{0:02d}/{0:02d}.asf"
 motion_url = "http://mocap.cs.cmu.edu/subjects/{0:02d}/{0:02d}_{1:02d}."
 search_url = "http://mocap.cs.cmu.edu/search.php?subjectnumber=%&motion=%"
@@ -7449,7 +7453,7 @@ if __name__ == '__main__':
     import re
     import os
     from pprint import pformat
-    from urllib.request import urlopen
+from urllib2 import urlopen
 
     subjects_re = re.compile(
         r"(?ms)909090.*?Subject\ \#(?P<subjno>\d+)\s+(?P<desc>[^<]*).*?"
@@ -7483,5 +7487,5 @@ if __name__ == '__main__':
                 mot.setdefault('files', []).append(u.group(2))
 
     m = myself_re.match(open(__file__).read())
-    print("{0}\nsubjects={1}\n\n{2}".format(
-            m.group(1), pformat(subjects), m.group(2)), end='')
+    print "{0}\nsubjects={1}\n\n{2}".format(
+            m.group(1), pformat(subjects), m.group(2)),; sys.stdout.write('')

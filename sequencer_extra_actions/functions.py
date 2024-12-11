@@ -16,6 +16,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import division
+from __future__ import absolute_import
 import bpy
 import os.path
 import operator
@@ -130,8 +132,8 @@ def getpathfrombrowser():
         params
     except UnboundLocalError:
         #print("no browser")
-        self.report({'ERROR_INVALID_INPUT'}, 'No visible File Browser')
-        return {'CANCELLED'}
+        self.report(set(['ERROR_INVALID_INPUT']), 'No visible File Browser')
+        return set(['CANCELLED'])
     path = params.directory
     return path
 
@@ -150,12 +152,12 @@ def getfilepathfrombrowser():
     except UnboundLocalError:
         #print("no browser")
         #self.report({'ERROR_INVALID_INPUT'}, 'No visible File Browser')
-        return {'CANCELLED'}
+        return set(['CANCELLED'])
 
     if params.filename == '':
         #print("no file selected")
         #self.report({'ERROR_INVALID_INPUT'}, 'No file selected')
-        return {'CANCELLED'}
+        return set(['CANCELLED'])
     path = params.directory
     filename = params.filename
     return path, filename
@@ -174,8 +176,8 @@ def setpathinbrowser(path, file):
         params
     except UnboundLocalError:
         #print("no browser")
-        self.report({'ERROR_INVALID_INPUT'}, 'No visible File Browser')
-        return {'CANCELLED'}
+        self.report(set(['ERROR_INVALID_INPUT']), 'No visible File Browser')
+        return set(['CANCELLED'])
 
     params.directory = path
     params.filename = file
@@ -263,7 +265,7 @@ def triminout(strip, sin, sout):
             strip.select_right_handle = True
             bpy.ops.sequencer.snap(frame=sout)
             strip.select_right_handle = False
-    return {'FINISHED'}
+    return set(['FINISHED'])
 
 
 #------------ random edit functions...
@@ -271,9 +273,9 @@ def triminout(strip, sin, sout):
 def randompartition(lst,n,rand):
     division = len(lst) / float(n)
     lista = []
-    for i in range(n):	lista.append(division)
+    for i in xrange(n):	lista.append(division)
     var=0
-    for i in range(n-1):
+    for i in xrange(n-1):
         lista[i]+= random.randint(-int(rand*division),int(rand*division))
         var+=lista[i]
     if lista[n-1] != len(lst)-var:
@@ -282,8 +284,8 @@ def randompartition(lst,n,rand):
     division = len(lst) / float(n)
     count = 0
     newlist=[]
-    for i in range(n):
-        print(lst[count : int(lista[i]-1)+count])
+    for i in xrange(n):
+        print lst[count : int(lista[i]-1)+count]
         newlist.append([lst[count : int(lista[i]-1)+count]])
         count += int(lista[i]) 
     return newlist

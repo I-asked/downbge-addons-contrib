@@ -24,6 +24,7 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from __future__ import absolute_import
 bl_info = {
     "name": "Insert Edge Ring",
     "author": "tstscr (tstscr@web.de)",
@@ -119,8 +120,8 @@ def collect_edge_loops(bme):
             try:
                 verts_to_consider.remove(v)
             except:
-                print('tried to remove vert %d from verts_to_consider. \
-                       Failed somehow' %v.index)
+                print 'tried to remove vert %d from verts_to_consider. \
+                       Failed somehow' %v.index
 
         if len(edge_loop) >= 3:
             edge_loops.append(edge_loop)
@@ -295,7 +296,7 @@ class MESH_OT_Insert_Edge_Ring(Operator):
     bl_idname = "mesh.insert_edge_ring"
     bl_label = "Insert edge ring"
     bl_description = "Insert an edge ring along the selected edge loop"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     distance = FloatProperty(
             name="distance",
@@ -317,11 +318,10 @@ class MESH_OT_Insert_Edge_Ring(Operator):
     direction = EnumProperty(
             name='direction',
             description='Direction in which to expand the edge_ring',
-            items={
+            items=set([
             ('LEFT', '<|', 'only move verts left of loop (arbitrary)'),
             ('CENTER', '<|>', 'move verts on both sides of loop'),
-            ('RIGHT', '|>', 'only move verts right of loop (arbitrary)'),
-            },
+            ('RIGHT', '|>', 'only move verts right of loop (arbitrary)'),]),
             default='CENTER')
 
     def draw(self, context):
@@ -343,7 +343,7 @@ class MESH_OT_Insert_Edge_Ring(Operator):
     def execute(self, context):
         #print('\nInserting edge ring')
         insert_edge_ring(self, context)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 def insert_edge_ring_button(self, context):
     self.layout.operator(MESH_OT_Insert_Edge_Ring.bl_idname,

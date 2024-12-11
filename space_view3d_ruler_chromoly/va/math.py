@@ -26,6 +26,7 @@ import bpy
 from bpy.props import *
 import mathutils as Math
 from mathutils import Matrix, Euler, Vector, Quaternion
+from itertools import izip
 #geo = mathutils.geometry
 
 MIN_NUMBER = 1E-8
@@ -96,7 +97,7 @@ def rotation_between_vecs_to_quat(vec1, vec2):
 
 
 def removed_same_coordinate(vecs):
-    d = OrderedDict(zip((tuple(v) for v in vecs), range(len(vecs))))
+    d = OrderedDict(izip((tuple(v) for v in vecs), xrange(len(vecs))))
     return [vecs[i] for i in d.values()]
 
 
@@ -115,6 +116,8 @@ def removed_same_coordinate(vecs):
 
 
 ### 旧 ###
+from __future__ import division
+from __future__ import absolute_import
 def intersect(vec1, vec2, vec3, ray, orig, clip=1):
     v1 = vec1.copy()
     v2 = vec2.copy()

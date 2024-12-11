@@ -34,6 +34,7 @@
 #  Other: Frank Palmino
 #
 
+from __future__ import absolute_import
 bl_info = {
     "name": "Atomic Blender - XYZ",
     "description": "Import/export of atoms described in .xyz files",
@@ -68,10 +69,10 @@ from . import export_xyz
 class ImportXYZ(Operator, ImportHelper):
     bl_idname = "import_mesh.xyz"
     bl_label  = "Import XYZ (*.xyz)"
-    bl_options = {'PRESET', 'UNDO'}
+    bl_options = set(['PRESET', 'UNDO'])
 
     filename_ext = ".xyz"
-    filter_glob  = StringProperty(default="*.xyz", options={'HIDDEN'},)
+    filter_glob  = StringProperty(default="*.xyz", options=set(['HIDDEN']),)
 
     use_camera = BoolProperty(
         name="Camera", default=False,
@@ -194,7 +195,7 @@ class ImportXYZ(Operator, ImportHelper):
             import_xyz.build_frames(self.images_per_key,
                                     self.skip_frames)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # This is the class for the file dialog of the exporter.
@@ -204,7 +205,7 @@ class ExportXYZ(Operator, ExportHelper):
     filename_ext = ".xyz"
 
     filter_glob  = StringProperty(
-        default="*.xyz", options={'HIDDEN'},)
+        default="*.xyz", options=set(['HIDDEN']),)
 
     atom_xyz_export_type = EnumProperty(
         name="Type of Objects",
@@ -223,7 +224,7 @@ class ExportXYZ(Operator, ExportHelper):
         export_xyz.export_xyz(self.atom_xyz_export_type,
                               bpy.path.abspath(self.filepath))
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # The entry into the menu 'file -> import'

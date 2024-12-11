@@ -1,12 +1,15 @@
+from __future__ import division
+from __future__ import absolute_import
 import bpy
 import bmesh
 
 from mathutils import Vector, geometry
 from mathutils.geometry import intersect_line_line as LineIntersect
 from mathutils.geometry import intersect_point_line as PtLineIntersect
+from itertools import izip
 
 
-class CAD_prefs:
+class CAD_prefs(object):
     VTX_PRECISION = 1.0e-5
     VTX_DOUBLES_THRSHLD = 0.0001
 
@@ -79,7 +82,7 @@ def closest_idx(pt, e):
         distance_test = (v1 - pt).length <= (v2 - pt).length
         return ev[0].index if distance_test else ev[1].index
 
-    print("received {0}, check expected input in docstring ".format(e))
+    print "received {0}, check expected input in docstring ".format(e)
 
 
 def closest_vector(pt, e):
@@ -96,7 +99,7 @@ def closest_vector(pt, e):
         distance_test = (v1 - pt).length <= (v2 - pt).length
         return v1 if distance_test else v2
 
-    print("received {0}, check expected input in docstring ".format(e))
+    print "received {0}, check expected input in docstring ".format(e)
 
 
 def coords_tuple_from_edge_idx(bm, idx):
@@ -116,7 +119,7 @@ def vertex_indices_from_edges_tuple(bm, edge_tuple):
     < returns the vertex indices of edge_tuple
     '''
     k = lambda v, w: bm.edges[edge_tuple[v]].verts[w].index
-    return [k(i >> 1, i % 2) for i in range(4)]
+    return [k(i >> 1, i % 2) for i in xrange(4)]
 
 
 def num_edges_point_lies_on(pt, edges):
@@ -133,7 +136,7 @@ def find_intersecting_edges(bm, pt, idx1, idx2):
     '''
     idxs = [idx1, idx2]
     edges = [coords_tuple_from_edge_idx(bm, idx) for idx in idxs]
-    return [idx for edge, idx in zip(edges, idxs) if point_on_edge(pt, edge)]
+    return [idx for edge, idx in izip(edges, idxs) if point_on_edge(pt, edge)]
 
 
 def duplicates(indices):

@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import bpy
 from mathutils import Vector
 from amaranth.utils import cycles_exists
@@ -9,7 +10,7 @@ class AMTH_OBJECT_OT_meshlight_add(bpy.types.Operator):
     """Add a light emitting mesh"""
     bl_idname = "object.meshlight_add"
     bl_label = "Add Meshlight"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     single_sided = bpy.props.BoolProperty(
         name="Single Sided",
@@ -171,7 +172,7 @@ class AMTH_OBJECT_OT_meshlight_add(bpy.types.Operator):
         meshlight.cycles_visibility.shadow = False
         meshlight.cycles_visibility.camera = self.visible
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 def ui_menu_lamps_add(self, context):

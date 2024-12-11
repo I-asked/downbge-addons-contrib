@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 bl_info = {
     "name": "Curve Tools 2",
     "description": "Adds some functionality for bezier/nurbs curve/surface modeling",

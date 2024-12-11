@@ -22,6 +22,7 @@ yes :
 for now, and mesh data, 0 2 or 3
 '''
 
+from __future__ import absolute_import
 '''
 given name < 21
 if material name exists :
@@ -165,8 +166,8 @@ def shadeflat(me,lst=True) :
             face.use_smooth = False
 
 def weightsadd(ob, groupname, vindices, vweights=False) :
-    if vweights == False : vweights = [1.0 for i in range(len(vindices))]
-    elif type(vweights) == float : vweights = [vweights for i in range(len(vindices))]
+    if vweights == False : vweights = [1.0 for i in xrange(len(vindices))]
+    elif type(vweights) == float : vweights = [vweights for i in xrange(len(vindices))]
     group = ob.vertex_groups.new(groupname)
     for vi,v in enumerate(vindices) :
         group.add([v], vweights[vi], 'REPLACE')
@@ -209,7 +210,7 @@ def objectBuild(elm, verts, edges=[], faces=[], matslots=[], mats=[], uvs=[] ) :
 
 def dprint(str,l=2) :
     if l <= debuglevel :
-        print(str)
+        print str
 
 
 def materialsCheck(bld) :

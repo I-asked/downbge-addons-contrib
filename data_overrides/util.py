@@ -18,6 +18,7 @@
 
 # <pep8 compliant>
 
+from __future__ import absolute_import
 import bpy, time, sys, hashlib
 from bpy.types import UILayout
 from math import *
@@ -39,9 +40,9 @@ def round_sigfigs(num, sig_figs):
 def data_uuid(id_data, path=""):
     identifier = id_data.name.encode(encoding="utf-8")
     if id_data.library:
-        identifier += b'\0' + id_data.library.filepath.encode(encoding="utf-8")
+        identifier += '\0' + id_data.library.filepath.encode(encoding="utf-8")
     if path:
-        identifier += b'\0' + path.encode(encoding="utf-8")
+        identifier += '\0' + path.encode(encoding="utf-8")
 
     m = hashlib.md5()
     m.update(identifier)
@@ -76,14 +77,14 @@ def id_data_enum_item(id_data):
     return (identifier, id_data.name, "", UILayout.icon(id_data), number)
 
 
-class OperatorCallContext():
+class OperatorCallContext(object):
     def __enter__(self):
         scene = bpy.context.scene
         prefs = bpy.context.user_preferences
 
         # store active/selected state to restore it after operator execution
         self.curact = scene.objects.active
-        self.cursel = { ob : ob.select for ob in scene.objects }
+        self.cursel = dict(( ob, ob.select) for ob in scene.objects)
         
         # undo can store files a lot when running operators internally,
         # disable since we only need one undo step after main operators anyway

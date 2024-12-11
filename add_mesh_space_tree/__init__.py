@@ -21,6 +21,8 @@
 
 # <pep8 compliant>
 
+from __future__ import division
+from __future__ import absolute_import
 bl_info = {
     "name": "SCA Tree Generator",
     "author": "michel anders (varkenvarken)",
@@ -303,7 +305,7 @@ def createObjects(tree, parent=None, objectname=None, probability=0.5, size=0.5,
 def vertextend(v, dv):
     n = len(v)
     v.extend(dv)
-    return tuple(range(n, n + len(dv)))
+    return tuple(xrange(n, n + len(dv)))
 
 
 def vertcopy(loopa, v, p):
@@ -333,7 +335,7 @@ def extend(p0, p1, p2, loopa, verts):
         loopb = vertcopy(loopa, verts, p0 - d2 / 2 - p)
         # all verts in loopb are displaced the same amount so no need to find the minimum distance
         n = 4
-        return ([(loopa[(i) % n], loopa[(i + 1) % n], loopb[(i + 1) % n], loopb[(i) % n]) for i in range(n)], loopa, loopb)
+        return ([(loopa[(i) % n], loopa[(i + 1) % n], loopb[(i + 1) % n], loopb[(i) % n]) for i in xrange(n)], loopa, loopb)
 
     r = d2.cross(d1)
     q = Quaternion(r, -a)
@@ -348,7 +350,7 @@ def extend(p0, p1, p2, loopa, verts):
     loopb = vertextend(verts, dverts)
     # none of the verts in loopb are rotated so no need to find the minimum distance
     n = 4
-    return ([(loopa[(i) % n], loopa[(i + 1) % n], loopb[(i + 1) % n], loopb[(i) % n]) for i in range(n)], loopa, loopb)
+    return ([(loopa[(i) % n], loopa[(i + 1) % n], loopb[(i + 1) % n], loopb[(i) % n]) for i in xrange(n)], loopa, loopb)
 
 
 def nonfork(bp, parent, apex, verts, p, branchpoints):
@@ -396,7 +398,7 @@ def root(bp, apex, verts, p):
 
 def skin(aloop, bloop, faces):
     n = len(aloop)
-    for i in range(n):
+    for i in xrange(n):
         faces.append((aloop[i], aloop[(i + 1) % n], bloop[(i + 1) % n], bloop[i]))
 
 
@@ -576,7 +578,7 @@ def createGeometry(tree, power=0.5, scale=0.01, addleaves=False, pleaf=0.5, leaf
     timings.add('leaves')
 
     if timeperf:
-        print(timings)
+        print timings
 
     return obj_new
 
@@ -584,7 +586,7 @@ def createGeometry(tree, power=0.5, scale=0.01, addleaves=False, pleaf=0.5, leaf
 class SCATree(bpy.types.Operator):
     bl_idname = "mesh.sca_tree"
     bl_label = "SCATree"
-    bl_options = {'REGISTER', 'UNDO', 'PRESET'}
+    bl_options = set(['REGISTER', 'UNDO', 'PRESET'])
 
     internodeLength = FloatProperty(name="Internode Length",
                     description="Internode length in Blender Units",
@@ -621,32 +623,32 @@ class SCATree(bpy.types.Operator):
 
     # the group related properties are not saved as presets because on reload no groups with the same names might exist, causing an exception
     useGroups = BoolProperty(name="Use object groups",
-                    options={'ANIMATABLE', 'SKIP_SAVE'},
+                    options=set(['ANIMATABLE', 'SKIP_SAVE']),
                     description="Use groups of objects to specify marker distribution",
                     default=False)
 
     crownGroup = EnumProperty(items=availableGroups,
-                    options={'ANIMATABLE', 'SKIP_SAVE'},
+                    options=set(['ANIMATABLE', 'SKIP_SAVE']),
                     name='Crown Group',
                     description='Group of objects that specify crown shape')
 
     shadowGroup = EnumProperty(items=availableGroupsOrNone,
-                    options={'ANIMATABLE', 'SKIP_SAVE'},
+                    options=set(['ANIMATABLE', 'SKIP_SAVE']),
                     name='Shadow Group',
                     description='Group of objects subtracted from the crown shape')
 
     exclusionGroup = EnumProperty(items=availableGroupsOrNone,
-                    options={'ANIMATABLE', 'SKIP_SAVE'},
+                    options=set(['ANIMATABLE', 'SKIP_SAVE']),
                     name='Exclusion Group',
                     description='Group of objects that will not be penetrated by growing branches')
 
     useTrunkGroup = BoolProperty(name="Use trunk group",
-                    options={'ANIMATABLE', 'SKIP_SAVE'},
+                    options=set(['ANIMATABLE', 'SKIP_SAVE']),
                     description="Use the locations of a group of objects to specify trunk starting points instead of 3d cursor",
                     default=False)
 
     trunkGroup = EnumProperty(items=availableGroups,
-                    options={'ANIMATABLE', 'SKIP_SAVE'},
+                    options=set(['ANIMATABLE', 'SKIP_SAVE']),
                     name='Trunk Group',
                     description='Group of objects whose locations specify trunk starting points')
 
@@ -732,7 +734,7 @@ class SCATree(bpy.types.Operator):
     addLeaves = BoolProperty(name="Add Leaves", default=False)
 
     objectName = EnumProperty(items=availableObjects,
-                    options={'ANIMATABLE', 'SKIP_SAVE'},
+                    options=set(['ANIMATABLE', 'SKIP_SAVE']),
                     name='Object Name',
                     description='Name of additional objects to duplicate at the branchpoints')
     pObject = FloatProperty(name="Objects per internode",
@@ -771,7 +773,7 @@ class SCATree(bpy.types.Operator):
     noModifiers = BoolProperty(name="No Modifers", default=True)
     subSurface = BoolProperty(name="Sub Surface", default=False, description="Add subsurface modifier to trunk skin")
     skinMethod = EnumProperty(items=[('NATIVE', 'Native', 'Built in skinning method', 1), ('BLENDER', 'Skin modifier', 'Use Blenders skin modifier', 2)],
-                    options={'ANIMATABLE', 'SKIP_SAVE'},
+                    options=set(['ANIMATABLE', 'SKIP_SAVE']),
                     name='Skinning method',
                     description='How to add a surface to the trunk skeleton')
 
@@ -791,7 +793,7 @@ class SCATree(bpy.types.Operator):
     def execute(self, context):
 
         if not self.updateTree:
-            return {'PASS_THROUGH'}
+            return set(['PASS_THROUGH'])
 
         timings = Timer()
 
@@ -861,9 +863,9 @@ class SCATree(bpy.types.Operator):
 
         if self.timePerformance:
             timings.add('Total')
-            print(timings)
+            print timings
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def draw(self, context):
         layout = self.layout

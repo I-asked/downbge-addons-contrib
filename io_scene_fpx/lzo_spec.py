@@ -36,7 +36,7 @@
 ## http://www.oberhumer.com/opensource/lzo/download/LZO-v1/java-lzo-1.00.tar.gz
 
 
-class Lzo_Codec:
+class Lzo_Codec(object):
 
     LZO_E_OK                  =  0
     LZO_E_ERROR               = -1

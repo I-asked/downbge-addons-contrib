@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import bpy
 import bmesh
 
@@ -60,7 +61,7 @@ class MESH_OT_border_deselect_outer(bpy.types.Operator):
     """Border select an existing selection and make only the intersection selected"""
     bl_idname = "mesh.border_deselect_outer"
     bl_label = "Border Deselect Outer"
-    bl_options = {'REGISTER'}
+    bl_options = set(['REGISTER'])
 
     init = True
     bm = None
@@ -70,16 +71,16 @@ class MESH_OT_border_deselect_outer(bpy.types.Operator):
 
         if changed_sel() or not self.init:
             restore_sel(context.object.data)
-            return {'FINISHED'}
+            return set(['FINISHED'])
 
         elif event.type in ('RIGHTMOUSE', 'ESC'):
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
 
         if self.init:
             bpy.ops.view3d.select_border('INVOKE_DEFAULT', extend=False)
             self.init = False
 
-        return {'RUNNING_MODAL'}
+        return set(['RUNNING_MODAL'])
         #return {'PASS_THROUGH'} # Makes no difference
 
     @staticmethod
@@ -99,10 +100,10 @@ class MESH_OT_border_deselect_outer(bpy.types.Operator):
             MESH_OT_border_deselect_outer.bm = bmesh.from_edit_mesh(context.object.data)
             store_sel()
             context.window_manager.modal_handler_add(self)
-            return {'RUNNING_MODAL'}
+            return set(['RUNNING_MODAL'])
         else:
-            self.report({'WARNING'}, "No active editmesh!")
-            return {'CANCELLED'}
+            self.report(set(['WARNING']), "No active editmesh!")
+            return set(['CANCELLED'])
 
 def menu_func(self, context):
     self.layout.operator("mesh.border_deselect_outer")

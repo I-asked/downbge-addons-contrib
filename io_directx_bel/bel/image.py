@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import bpy
 import bpy.path
 
@@ -8,7 +9,7 @@ debuglevel = 0
 
 def dprint(str,l=2) :
     if l <= debuglevel :
-        print(str)
+        print str
 
 # create or retrieve a bdata image
 # given its path 
@@ -24,7 +25,7 @@ def new(path, name=False, relative = True) :
             path = bpy.path.relpath(path)
             path = fs.clean(path)
         except : 
-            print('cant turn path into relative one (.blend and img path drive letters ?) ')
+            print 'cant turn path into relative one (.blend and img path drive letters ?) '
         
     # retrieve paths to image file from existing image slot
     # returns img if paths match
@@ -183,7 +184,7 @@ def BSshader(nodes,pointer) :
         Transparency = RenderMaterial['Transparency'] if 'Transparency' in RenderMaterial else False
         for key in RenderMaterial.keys() :
             if key not in ['DiffuseColor','SpecularColor','AmbientColor','EmissionColor','Shininess','Transparency'] :
-                print('NEW RENDERMATERIAL PROP ! : %s'%key)
+                print 'NEW RENDERMATERIAL PROP ! : %s'%key
         
         #print(AmbientColor)
         if DiffuseColor : mat.diffuse_color = Color(DiffuseColor) #[0][0],DiffuseColor[0][1],DiffuseColor[0][2])
@@ -207,8 +208,8 @@ def BSshader(nodes,pointer) :
             ShaderTexture = BSnode(nodes,ShaderPhong['Reflection'])
             texinfluence = 'Reflection'
         if texinfluence == False :
-            print('neither color nor refl. in ShaderPhong %s'%RenderShader['Surface'])
-            print('other props are : %s'%ShaderPhong.keys())
+            print 'neither color nor refl. in ShaderPhong %s'%RenderShader['Surface']
+            print 'other props are : %s'%ShaderPhong.keys()
             return mat
 
         ShaderTextureName = ShaderTexture['Object.Name']
@@ -225,8 +226,8 @@ def BSshader(nodes,pointer) :
             if os.path.isfile(imgpath+'.png') : ext = '.png'
             elif os.path.isfile(imgpath+'.jp2') : ext = '.jp2'
             else :
-                print('Texture image not found ! %s'%Texture2D['Texture.FileObject'])
-                print('path : %s.png or .jp2 '%imgpath)
+                print 'Texture image not found ! %s'%Texture2D['Texture.FileObject']
+                print 'path : %s.png or .jp2 '%imgpath
                 return mat
             img = bpy.data.images.load(filepath=imgpath+ext)
             img.name = imgname

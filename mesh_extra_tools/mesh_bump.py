@@ -43,12 +43,13 @@ Additional links:
 	e-mail: dolf {at} macouno {dot} com
 """
 
+from __future__ import absolute_import
 import bpy
 from bpy.props import EnumProperty, FloatVectorProperty, FloatProperty, BoolProperty
 from . import mesh_extras
 
 # Bump stuff!
-class Bump():
+class Bump(object):
 
 	# Initialise the class
 	def __init__(self, context, type, scale, steps):
@@ -81,7 +82,7 @@ class Bump():
 		# Spike!
 		elif type == 'SPI':
 
-			for i in range(3):
+			for i in xrange(3):
 
 				self.extrude()
 
@@ -150,7 +151,7 @@ class Bump_init(bpy.types.Operator):
 	'''Bump by extruding and moving/rotating/scaling multiple times'''
 	bl_idname = 'mesh.bump'
 	bl_label = 'Inset Extrude Bump'
-	bl_options = {'REGISTER', 'UNDO'}
+	bl_options = set(['REGISTER', 'UNDO'])
 
 	# The falloffs we use
 	types=(
@@ -174,7 +175,7 @@ class Bump_init(bpy.types.Operator):
 
 	def execute(self, context):
 		BUMP = Bump(context, self.type, self.scale, self.steps)
-		return {'FINISHED'}
+		return set(['FINISHED'])
 
 class bump_help(bpy.types.Operator):
 	bl_idname = 'help.bump'
@@ -191,7 +192,7 @@ class bump_help(bpy.types.Operator):
 		layout.label('if using with create armature, enter object mode first')
 
 	def execute(self, context):
-		return {'FINISHED'}
+		return set(['FINISHED'])
 
 	def invoke(self, context, event):
 		return context.window_manager.invoke_popup(self, width = 350)

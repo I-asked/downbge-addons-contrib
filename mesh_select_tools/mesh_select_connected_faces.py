@@ -43,11 +43,12 @@ Additional links:
 	e-mail: dolf {at} macouno {dot} com
 """
 '''
+from __future__ import absolute_import
 import bpy, mathutils, math
 from bpy.props import IntProperty, BoolProperty
 
 
-class Select_connected_faces():
+class Select_connected_faces(object):
 
 	# Initialise the class
 	def __init__(self, context, iterations, extend):
@@ -60,7 +61,7 @@ class Select_connected_faces():
 
 		hasSelected = self.hasSelected(self.ob.data.polygons)
 
-		for i in range(iterations):
+		for i in xrange(iterations):
 
 			nextVerts = []
 
@@ -130,7 +131,7 @@ class Select_init(bpy.types.Operator):
 	'''Select all faces connected to the current selection'''
 	bl_idname = 'mesh.select_connected_faces'
 	bl_label = 'Select connected faces'
-	bl_options = {'REGISTER', 'UNDO'}
+	bl_options = set(['REGISTER', 'UNDO'])
 
 	# Iterations
 	iterations = IntProperty(name='Iterations', default=1, min=0, max=1000, soft_min=0, soft_max=100)
@@ -144,5 +145,5 @@ class Select_init(bpy.types.Operator):
 
 	def execute(self, context):
 		SELECT_CONNECTED = Select_connected_faces(context, self.iterations, self.extend)
-		return {'FINISHED'}
+		return set(['FINISHED'])
 

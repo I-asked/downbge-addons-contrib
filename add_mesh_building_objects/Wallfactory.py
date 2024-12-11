@@ -29,6 +29,8 @@
 #
 
 
+from __future__ import division
+from __future__ import absolute_import
 import bpy
 import mathutils
 from bpy.props import *
@@ -41,7 +43,7 @@ class add_mesh_wallb(bpy.types.Operator):
     """Add a wall mesh"""
     bl_idname = "mesh.wall_add"
     bl_label = "Add A Masonry Wall"
-    bl_options = {'REGISTER', 'UNDO'} # removes object, does not reset to "last" modification.
+    bl_options = set(['REGISTER', 'UNDO']) # removes object, does not reset to "last" modification.
     bl_description = "adds a block wall"
 
     # UI items - API for properties - User accessable variables... 
@@ -411,7 +413,7 @@ class add_mesh_wallb(bpy.types.Operator):
         global stepBack
 
         # Create the wall when enabled (skip regen iterations when off)
-        if not self.properties.ConstructTog: return {'FINISHED'}
+        if not self.properties.ConstructTog: return set(['FINISHED'])
 
         #enter the settings for the wall dimensions (area)
 # start can't be zero - min/max don't matter [if max less than end] but zero don't workie.
@@ -644,4 +646,4 @@ class add_mesh_wallb(bpy.types.Operator):
         ob_new.location = tuple(context.scene.cursor_location)
         ob_new.rotation_quaternion = [1.0,0.0,0.0,0.0]
 
-        return {'FINISHED'}
+        return set(['FINISHED'])

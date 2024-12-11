@@ -29,6 +29,7 @@ import time
 import bpy
 import mathutils as bmat
 from mathutils import Vector, Matrix
+from io import open
 
 try :
 	import bel
@@ -58,6 +59,8 @@ imp.reload(bel.uv)
 
 ###################################################
 
+from __future__ import division
+from __future__ import absolute_import
 def load(operator, context, filepath,
          global_clamp_size=0.0,
          show_tree=False,
@@ -192,8 +195,8 @@ BINARY FORMAT
     '''
     def dXheader(data) :
         l = data.read(4)
-        if l != b'xof ' :
-            print ('no header found !')
+        if l != 'xof ' :
+            print 'no header found !'
             data.seek(0)
             return False
         minor = data.read(2).decode()
@@ -266,7 +269,7 @@ BINARY FORMAT
                         # put it in childs since order can matter in sub tokens declaration
                         tokens[parent]['childs'].append('*'+refname)
                         if refname not in tokens :
-                            print('reference to %s done before its declaration (line %s)\ncreated dummy'%(refname,c))
+                            print 'reference to %s done before its declaration (line %s)\ncreated dummy'%(refname,c)
                             tokens[refname] = {}
                         if 'user' not in tokens[refname] : tokens[refname]['users'] = [parent]
                         else : tokens[refname]['users'].append(parent)
@@ -318,10 +321,10 @@ BINARY FORMAT
             return lines, lines.pop()
         # wip, todo for binaries
         else :
-            print(chunk)
-            for word in range(0,len(chunk)) :
+            print chunk
+            for word in xrange(0,len(chunk)) :
                 w = chunk[word:word+4]
-                print(word,w,struct.unpack("<l", w),binascii.unhexlify(w))
+                print word,w,struct.unpack("<l", w),binascii.unhexlify(w)
 
     
     # name unnamed tokens, watchout for x duplicate
@@ -361,16 +364,16 @@ BINARY FORMAT
                 frame_type = tokens[tokenname]['type']
                 line = ('{:7}'.format(tokens[tokenname]['line']))
                 log = ' %s%s (%s)'%( ref if ref else '', tokenname, frame_type )
-                print('%s.%s%s'%(line, tab, log))
+                print '%s.%s%s'%(line, tab, log)
                 if fi == len(field) - 1 : tab = tab[:-3] + '   '
     
                 if ref == False :
                     for user in tokens[tokenname]['users'] :
-                         print('%s.%s |__ user: %s'%(line, tab.replace('_',' '), user))
+                         print '%s.%s |__ user: %s'%(line, tab.replace('_',' '), user)
                     walk_dXtree(tokens[tokenname]['childs'],lvl+1,tab.replace('_',' ')+' |__')
                 
                 if fi == len(field) - 1 and len(tokens[tokenname]['childs']) == 0 :
-                    print('%s.%s'%(line,tab))
+                    print '%s.%s'%(line,tab)
     
     ## remove eol, comments, spaces from a raw block of datas
     def cleanBlock(block) :
@@ -391,7 +394,7 @@ BINARY FORMAT
         if datatype in templates : tpl = templates[datatype]
         elif datatype in defaultTemplates : tpl = defaultTemplates[datatype]
         else :
-            print("can't find any template to read %s (type : %s)"%(tokenname,datatype))
+            print "can't find any template to read %s (type : %s)"%(tokenname,datatype)
             return False
         #print('> use template %s'%datatype)
         block = readBlock(data,token)
@@ -451,7 +454,7 @@ BINARY FORMAT
             if datatype in templates : tpl = templates[datatype]
             elif datatype in defaultTemplates : tpl = defaultTemplates[datatype]
             else :
-                print("can't find any template for type : %s"%(datatype))
+                print "can't find any template for type : %s"%(datatype)
                 return False
             #print('> use template %s'%datatype)
             fields, ptr = dXtemplateData(tpl,block,s)
@@ -464,14 +467,14 @@ BINARY FORMAT
         lst = []
         if datatype in reserved_type :
             eoi=','
-            for i in range(length) :
+            for i in xrange(length) :
                 if i+1 == length : eoi = ';'
                 datavalue, s = dXdata(block,datatype,1,s,eoi)
                 lst.append( datavalue )
             
         else :
             eoi = ';,'
-            for i in range(length) :
+            for i in xrange(length) :
                 if i+1 == length : eoi = ';;'
                 #print(eoi)
                 e = block.index(eoi,s)
@@ -518,23 +521,23 @@ BINARY FORMAT
             templates[tpl_name]['members'].append( member.split(' ') )
     
         if display : 
-            print('\ntemplate %s :'%tpl_name)
+            print '\ntemplate %s :'%tpl_name
             for k,v in templates[tpl_name].items() :
                 if k != 'members' :
-                    print('  %s : %s'%(k,v))
+                    print '  %s : %s'%(k,v)
                 else :
                     for member in v :
-                        print('  %s'%str(member)[1:-1].replace(',',' ').replace("'",''))
+                        print '  %s'%str(member)[1:-1].replace(',',' ').replace("'",'')
                 
             if tpl_name in defaultTemplates :
                 defaultTemplates[tpl_name]['line'] = templates[tpl_name]['line']
                 defaultTemplates[tpl_name]['pointer'] = templates[tpl_name]['pointer']
                 if defaultTemplates[tpl_name] != templates[tpl_name] :
-                    print('! DIFFERS FROM BUILTIN TEMPLATE :')
-                    print('raw template %s :'%tpl_name)
-                    print(templates[tpl_name])
-                    print('raw default template %s :'%tpl_name)
-                    print(defaultTemplates[tpl_name])
+                    print '! DIFFERS FROM BUILTIN TEMPLATE :'
+                    print 'raw template %s :'%tpl_name
+                    print templates[tpl_name]
+                    print 'raw default template %s :'%tpl_name
+                    print defaultTemplates[tpl_name]
                     #for k,v in defaultTemplates[tpl_name].items() :
                     #    if k != 'members' :
                     #        print('  %s : %s'%(k,v))
@@ -542,7 +545,7 @@ BINARY FORMAT
                     #        for member in v :
                     #            print('  %s'%str(member)[1:-1].replace(',',' ').replace("'",''))
                 else :
-                    print('MATCHES BUILTIN TEMPLATE')
+                    print 'MATCHES BUILTIN TEMPLATE'
     
             
     ##  read any kind of token data block
@@ -615,7 +618,7 @@ BINARY FORMAT
     def import_dXtree(field,lvl=0) :
         tab = ' '*lvl*2
         if field == [] : 
-            if show_geninfo : print('%s>> no childs, return False'%(tab))
+            if show_geninfo : print '%s>> no childs, return False'%(tab)
             return False
         ob = False
         mat = False
@@ -624,7 +627,7 @@ BINARY FORMAT
         obs = []
         
         parentname = tokens[field[0]]['parent']
-        if show_geninfo : print('%s>>childs in frame %s :'%(tab,parentname))
+        if show_geninfo : print '%s>>childs in frame %s :'%(tab,parentname)
         
         for tokenname in field :
 
@@ -648,24 +651,24 @@ BINARY FORMAT
                 ob = getMesh(parentname,tokenname)
                 obs.append(ob)
 
-                if show_geninfo : print('%smesh : %s'%(tab,tokenname))
+                if show_geninfo : print '%smesh : %s'%(tab,tokenname)
             
             # frames contain one matrix (empty or bone)
             elif tokentype  == 'frametransformmatrix' :
                 [mat] = readToken(tokenname)
-                if show_geninfo : print('%smatrix : %s'%(tab,tokenname))
+                if show_geninfo : print '%smatrix : %s'%(tab,tokenname)
             
             # frames can contain 0 or more frames
             elif tokentype  == 'frame' :
                 frames.append(tokenname)
-                if show_geninfo : print('%sframe : %s'%(tab,tokenname))
+                if show_geninfo : print '%sframe : %s'%(tab,tokenname)
         
         # matrix is used for mesh transform if some mesh(es) exist(s)      
         if ob :
             is_root = True
             if mat == False :
                 mat = Matrix()
-                if show_geninfo : print('%smesh token without matrix, set it to default\n%splease report in bug tracker if you read this !'%(tab,tab))
+                if show_geninfo : print '%smesh token without matrix, set it to default\n%splease report in bug tracker if you read this !'%(tab,tab)
             if parentname == '' : 
                 mat = mat * global_matrix
             if len(obs) == 1 :
@@ -684,30 +687,30 @@ BINARY FORMAT
         # nothing case ?
         else :
             ob = [parentname, Matrix() * global_matrix,[]]
-            if show_geninfo : print('%snothing here'%(tab))
+            if show_geninfo : print '%snothing here'%(tab)
 
         childs = []
         
         for tokenname in frames :
-            if show_geninfo : print('%s<Begin %s :'%(tab,tokenname))
+            if show_geninfo : print '%s<Begin %s :'%(tab,tokenname)
             
             # child is either False, empty, object, or a list or undefined name matrices hierarchy
             child = import_dXtree(getChilds(tokenname),lvl+1)
             if child and type(child) != list :
                 is_root = True
             childs.append( [tokenname, child] )
-            if show_geninfo : print('%sEnd %s>'%(tab,tokenname))
+            if show_geninfo : print '%sEnd %s>'%(tab,tokenname)
         
         if is_root and parentname != '' :
             
-            if show_geninfo : print('%send of tree a this point'%(tab))
+            if show_geninfo : print '%send of tree a this point'%(tab)
             if type(ob) == list :
                 mat = ob[1]
                 ob = bel.ob.new(parentname, None, naming_method)
             ob.matrix_world = mat
             
         for tokenname, child in childs :
-            if show_geninfo : print('%sbegin2 %s>'%(tab,tokenname))
+            if show_geninfo : print '%sbegin2 %s>'%(tab,tokenname)
             # returned a list of object(s) or matrice(s)
             if child :
 
@@ -716,7 +719,7 @@ BINARY FORMAT
                 if is_root :
                     # this branch is an armature, convert it
                     if type(child) == list :
-                        if show_geninfo : print('%sconvert to armature %s'%(tab,tokenname))
+                        if show_geninfo : print '%sconvert to armature %s'%(tab,tokenname)
                         child = buildArm(tokenname, child)
                         
                     # parent the obj/empty/arm to current
@@ -738,7 +741,7 @@ BINARY FORMAT
                 
             # returned False
             else :
-                 if show_geninfo : print('%sreturned %s, nothing'%(tab,child))
+                 if show_geninfo : print '%sreturned %s, nothing'%(tab,child)
 
         #print('>> %s return %s'%(field,ob))
         return ob# if ob else False
@@ -746,7 +749,7 @@ BINARY FORMAT
     # build from mesh token type
     def getMesh(obname,tokenname,debug = False):
     
-        if debug : print('\nmesh name : %s'%tokenname)
+        if debug : print '\nmesh name : %s'%tokenname
         
         verts = []
         edges = []
@@ -761,7 +764,7 @@ BINARY FORMAT
         nVerts, verts, nFaces, faces = readToken(tokenname) 
 
         if debug :
-            print('verts    : %s %s\nfaces    : %s %s'%(nVerts, len(verts),nFaces, len(faces)))
+            print 'verts    : %s %s\nfaces    : %s %s'%(nVerts, len(verts),nFaces, len(faces))
         
         #for childname in token['childs'] :
         for childname in getChilds(tokenname) :
@@ -775,17 +778,17 @@ BINARY FORMAT
                 uv = bel.uv.asFlatList(uv, faces)
                 uvs.append(uv)
                 
-                if debug : print('uv       : %s'%(len(uv)))
+                if debug : print 'uv       : %s'%(len(uv))
             
             # MATERIALS
             elif tokentype == 'meshmateriallist' :
                 nbslots, facemats = readToken(childname)
                 
-                if debug : print('facemats : %s'%(len(facemats)))
+                if debug : print 'facemats : %s'%(len(facemats))
                 
                 # mat can exist but with no datas so we prepare the mat slot
                 # with dummy ones
-                for slot in range(nbslots) :
+                for slot in xrange(nbslots) :
                     matslots.append('dXnoname%s'%slot )
         
                 # length does not match (could be tuned more, need more cases)
@@ -869,14 +872,14 @@ BINARY FORMAT
                         mat = bel.material.new(matname,naming_method)
                         matslots[slotid] = mat.name
                         
-                if debug : print('matslots : %s'%matslots)
+                if debug : print 'matslots : %s'%matslots
                 
             # VERTICES GROUPS/WEIGHTS
             elif tokentype == 'skinweights' :
                 groupname, nverts, vindices, vweights, mat = readToken(childname)
                 groupname = namelookup[groupname]
                 if debug : 
-                    print('vgroup    : %s (%s/%s verts) %s'%(groupname,len(vindices),len(vweights),'bone' if groupname in tokens else ''))
+                    print 'vgroup    : %s (%s/%s verts) %s'%(groupname,len(vindices),len(vweights),'bone' if groupname in tokens else '')
 
                 #if debug : print('matrix : %s\n%s'%(type(mat),mat))
                 
@@ -897,7 +900,7 @@ BINARY FORMAT
      
     file = os.path.basename(filepath)
     
-    print('\nimporting %s...'%file)
+    print '\nimporting %s...'%file
     start = time.clock()
     path = os.path.dirname(filepath)
     filepath = os.fsencode(filepath)
@@ -911,20 +914,20 @@ BINARY FORMAT
         minor, major, format, accuracy = header
         
         if show_geninfo :
-            print('\n%s directX header'%file)
-            print('  minor  : %s'%(minor))
-            print('  major  : %s'%(major))
-            print('  format : %s'%(format))
-            print('  floats are %s bits'%(accuracy))
+            print '\n%s directX header'%file
+            print '  minor  : %s'%(minor)
+            print '  major  : %s'%(major)
+            print '  format : %s'%(format)
+            print '  floats are %s bits'%(accuracy)
 
         if format in [ 'txt' ] : #, 'bin' ] :
 
             ## FILE READ : STEP 1 : STRUCTURE
-            if show_geninfo : print('\nBuilding internal .x tree')
+            if show_geninfo : print '\nBuilding internal .x tree'
             t = time.clock()
             tokens, templates, tokentypes = dXtree(data,quickmode)
             readstruct_time = time.clock()-t
-            if show_geninfo : print('builded tree in %.2f\''%(readstruct_time)) # ,end='\r')
+            if show_geninfo : print 'builded tree in %.2f\''%(readstruct_time) # ,end='\r')
 
             ## populate templates with datas
             for tplname in templates :
@@ -932,13 +935,13 @@ BINARY FORMAT
 
             ## DATA TREE CHECK
             if show_tree :
-                print('\nDirectX Data Tree :\n')
+                print '\nDirectX Data Tree :\n'
                 walk_dXtree(tokens.keys())
             
             ## DATA IMPORTATION
             if show_geninfo : 
                 #print(tokens)
-                print('Root frames :\n %s'%rootTokens)
+                print 'Root frames :\n %s'%rootTokens
             if parented :
                 import_dXtree(rootTokens)
             else :
@@ -960,12 +963,12 @@ BINARY FORMAT
                     ob = getMesh(obname,tokenname,show_geninfo)
                     ob.matrix_world = global_matrix
                     
-            print('done in %.2f\''%(time.clock()-start)) # ,end='\r')
+            print 'done in %.2f\''%(time.clock()-start) # ,end='\r')
             
         else :
-            print('only .x files in text format are currently supported')
-            print('please share your file to make the importer evolve')
+            print 'only .x files in text format are currently supported'
+            print 'please share your file to make the importer evolve'
 
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
         

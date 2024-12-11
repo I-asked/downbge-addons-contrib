@@ -34,11 +34,14 @@ bl_info = {
     "category": "Mesh"}
 '''
 
+from __future__ import division
+from __future__ import absolute_import
 import  bpy, bmesh, mathutils, random
 from random import gauss
 from math import radians
 from mathutils import Euler, Vector
 from bpy.props import BoolProperty, FloatProperty, IntProperty, StringProperty
+from itertools import izip
 
 def vloc(self, r):
     random.seed(self.ran + r)
@@ -67,14 +70,14 @@ def centro(ver):
 def volver(obj, copia, om, msm, msv):
     for i in copia: obj.data.vertices[i].select = True
     bpy.context.tool_settings.mesh_select_mode = msm
-    for i in range(len(msv)):
+    for i in xrange(len(msv)):
         obj.modifiers[i].show_viewport = msv[i]
 
 class MExtrude(bpy.types.Operator):
     bl_idname = 'object.mextrude'
     bl_label = 'MExtrude'
     bl_description = 'Multi Extrude'
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     off = FloatProperty(name='Offset', min=-2, soft_min=0.001, \
         soft_max=2, max=5, default=.5, description='Translation')
@@ -140,7 +143,7 @@ class MExtrude(bpy.types.Operator):
             of.normal_update()
 
             # extrusion loop
-            for r in range(self.num):
+            for r in xrange(self.num):
                 nf = of.copy()
                 nf.normal_update()
                 no = nf.normal.copy()
@@ -154,7 +157,7 @@ class MExtrude(bpy.types.Operator):
                     v.co = v.co.lerp(ce, 1 - s)
 
                 # extrude code from TrumanBlending
-                for a, b in zip(of.loops, nf.loops):
+                for a, b in izip(of.loops, nf.loops):
                     sf = bm.faces.new((a.vert, a.link_loop_next.vert, \
                         b.link_loop_next.vert, b.vert))
                     sf.normal_update()
@@ -176,8 +179,8 @@ class MExtrude(bpy.types.Operator):
         bpy.ops.object.mode_set(mode=om)
 
         if not len(sel):
-            self.report({'INFO'}, 'Select one or more faces...')
-        return{'FINISHED'}
+            self.report(set(['INFO']), 'Select one or more faces...')
+        returnset(['FINISHED'])
 
 class mextrude_help(bpy.types.Operator):
 	bl_idname = 'help.mextrude'
@@ -204,7 +207,7 @@ class addarm_help(bpy.types.Operator):
 		layout.label('Based on selected face/s & object center.')
 
 	def execute(self, context):
-		return {'FINISHED'}
+		return set(['FINISHED'])
 
 	def invoke(self, context, event):
 		return context.window_manager.invoke_popup(self, width = 300)
@@ -213,7 +216,7 @@ class BB(bpy.types.Operator):
     bl_idname = 'object.mesh2bones'
     bl_label = 'Create Armature'
     bl_description = 'Create an armature rig based on mesh selection'
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     numb = IntProperty(name='Max Bones', min=1, max=1000, soft_max=100, default=5, description='Max number of bones')
     skip = IntProperty(name='Skip Loops', min=0, max=5, default=0, description='Skip some edges to get longer bones')
@@ -252,7 +255,7 @@ class BB(bpy.types.Operator):
         # save state and selection
         ver, om = obj.data.vertices, obj.mode
         msm, msv = list(bpy.context.tool_settings.mesh_select_mode), []
-        for i in range(len(obj.modifiers)):
+        for i in xrange(len(obj.modifiers)):
             msv.append(obj.modifiers[i].show_viewport)
             obj.modifiers[i].show_viewport = False
         bpy.ops.object.mode_set(mode='OBJECT')
@@ -281,16 +284,16 @@ class BB(bpy.types.Operator):
                 for v in fac[i].vertices: ver[v].select = True
             lista = [centro(ver)]
             if lista[0] == 'error':
-                self.report({'INFO'}, txt)
+                self.report(set(['INFO']), txt)
                 volver(obj, copia, om, msm, msv)
-                return{'FINISHED'}
+                returnset(['FINISHED'])
 
             # create list of coordinates for bones
             scn.objects.active = obj
-            for t in range(self.numb):
+            for t in xrange(self.numb):
                 bpy.ops.object.mode_set(mode='EDIT')
                 bpy.ops.object.vertex_group_add()
-                for m in range(self.skip+1):
+                for m in xrange(self.skip+1):
                     bpy.ops.mesh.select_more()
                 bpy.ops.object.vertex_group_deselect()
                 bpy.ops.object.mode_set(mode='OBJECT')
@@ -313,9 +316,9 @@ class BB(bpy.types.Operator):
             # create and copy armature object transformations
             lista.reverse()
             if len(lista) < 2:
-                self.report({'INFO'}, txt)
+                self.report(set(['INFO']), txt)
                 volver(obj, copia, om, msm, msv)
-                return{'FINISHED'}
+                returnset(['FINISHED'])
             try: arm
             except:
                 arm = bpy.data.armatures.new('arm')
@@ -330,7 +333,7 @@ class BB(bpy.types.Operator):
             bpy.ops.object.mode_set(mode='EDIT')
 
             # create the chain of bones from the list
-            for i in range(len(lista)-1):
+            for i in xrange(len(lista)-1):
                 bon = arm.edit_bones.new(self.nam+'.000')
                 bon.use_connect = True
                 bon.tail = lista[i+1]
@@ -374,7 +377,7 @@ class BB(bpy.types.Operator):
             else: bpy.ops.object.parent_set(type='ARMATURE_AUTO')
         scn.objects.active = obj
         volver(obj, copia, om, msm, msv)
-        return{'FINISHED'}
+        returnset(['FINISHED'])
 '''
 def register():
     bpy.utils.register_class(MExtrude)

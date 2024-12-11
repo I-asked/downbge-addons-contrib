@@ -25,6 +25,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+from __future__ import absolute_import
 bl_info = {
     "name": "Auto Save Render",
     "author": "tstscr",
@@ -89,10 +90,10 @@ def auto_save_render(scene):
 
     image = bpy.data.images['Render Result']
     if not image:
-        print('Auto Save: Render Result not found. Image not saved')
+        print 'Auto Save: Render Result not found. Image not saved'
         return
 
-    print('Auto_Save:', save_name)
+    print 'Auto_Save:', save_name
     image.save_render(save_name, scene=None)
 
     rndr.image_settings.file_format = original_format
@@ -117,10 +118,10 @@ def register():
     bpy.types.Scene.auto_save_format = EnumProperty(
                     name='Auto Save File Format',
                     description='File Format for the auto saves.',
-                    items={
+                    items=set([
                     ('PNG', 'png', 'Save as png'),
                     ('JPEG', 'jpg', 'Save as jpg'),
-                    ('OPEN_EXR_MULTILAYER', 'exr', 'Save as multilayer exr')},
+                    ('OPEN_EXR_MULTILAYER', 'exr', 'Save as multilayer exr')]),
                     default='PNG')
     bpy.types.Scene.auto_save_subfolders = BoolProperty(
                     name='subfolder',

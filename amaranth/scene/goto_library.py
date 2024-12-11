@@ -22,6 +22,7 @@ Click on any path to go to that directory.
 Developed during Caminandes Open Movie Project
 """
 
+from __future__ import absolute_import
 import bpy
 
 
@@ -77,7 +78,7 @@ class AMTH_FILE_OT_directory_go_to(bpy.types.Operator):
 
     def execute(self, context):
         bpy.ops.file.select_bookmark(dir=self.filepath)
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 
 def register():

@@ -19,6 +19,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 
+from __future__ import absolute_import
 bl_info = {
     "name": "3d View: Manipulator Menu",
     "author": "MichaelW",

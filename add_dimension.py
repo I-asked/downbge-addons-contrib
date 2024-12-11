@@ -16,6 +16,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import division
+from __future__ import absolute_import
 bl_info = {
     'name': 'Dimension',
     'author': 'Spivak Vladimir (http://cwolf3d.korostyshev.net)',
@@ -1938,7 +1940,7 @@ def main(self, align_matrix):
 
     #
     if self.Dimension_width == 0:
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     # get verts
     if Type == 'Linear-1':
@@ -1992,7 +1994,7 @@ def main(self, align_matrix):
 
     if Type == 'Angular1':
         if self.Dimension_angle == 0:
-            return {'FINISHED'}
+            return set(['FINISHED'])
         verts = Angular1(self.Dimension_width,
                           self.Dimension_length,
                           self.Dimension_depth,
@@ -2005,7 +2007,7 @@ def main(self, align_matrix):
 
     if Type == 'Angular2':
         if self.Dimension_angle == 0:
-            return {'FINISHED'}
+            return set(['FINISHED'])
         verts = Angular2(self.Dimension_width,
                           self.Dimension_depth,
                           self.Dimension_angle,
@@ -2016,7 +2018,7 @@ def main(self, align_matrix):
 
     if Type == 'Angular3':
         if self.Dimension_angle == 0:
-            return {'FINISHED'}
+            return set(['FINISHED'])
         verts = Angular3(self.Dimension_width,
                           self.Dimension_length,
                           self.Dimension_dsize,
@@ -2063,7 +2065,7 @@ class Dimension(bpy.types.Operator):
     ''''''
     bl_idname = "curve.dimension"
     bl_label = "Dimension"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
     bl_description = "add dimension"
 
     # align_matrix for the invoke
@@ -2631,7 +2633,7 @@ class Dimension(bpy.types.Operator):
         # restore pre operator undo state
         bpy.context.user_preferences.edit.use_global_undo = undo
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     ##### INVOKE #####
     def invoke(self, context, event):
@@ -2657,7 +2659,7 @@ class Dimension(bpy.types.Operator):
 
         self.execute(context)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 # Properties class
 class DimensionAdd(bpy.types.Panel):

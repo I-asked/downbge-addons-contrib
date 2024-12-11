@@ -16,12 +16,15 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import division
+from __future__ import absolute_import
 import bpy
 import os
 import re
 from math import pi, sqrt
 from mathutils import Vector, Matrix
 import struct
+from io import open
 
 # All data for the images. Basically, each variable is a list with a length,
 # which equals the number of images.
@@ -79,7 +82,7 @@ def load_gwyddion_images(data_file, channels):
     datafile.close()   
     
     # Search the title of each image
-    for a in list(re.finditer(b"data/title\x00", data)):    
+    for a in list(re.finditer("data/title\x00", data)):    
             
         pos = a.start()
         channel_number = int(data[pos-2:pos-1])
@@ -87,8 +90,8 @@ def load_gwyddion_images(data_file, channels):
         if channels[channel_number] == False:
             continue
                 
-        pos1 = data[pos:].find(b"\x00") + pos + len("\x00") + 1
-        pos2 = data[pos1:].find(b"\x00") + pos1
+        pos1 = data[pos:].find("\x00") + pos + len("\x00") + 1
+        pos2 = data[pos1:].find("\x00") + pos1
 
         channel_name = data[pos1:pos2].decode("utf-8")
         
@@ -96,7 +99,7 @@ def load_gwyddion_images(data_file, channels):
         
     # Search important parameters and finally the image data.    
     images = []    
-    for a in list(re.finditer(b"/data\x00", data)):
+    for a in list(re.finditer("/data\x00", data)):
     
         pos = a.start()    
 
@@ -106,35 +109,35 @@ def load_gwyddion_images(data_file, channels):
             continue
 
         # Find the image size in pixel (x direction)
-        pos1 = data[pos:].find(b"xres") + pos+len("xres")
+        pos1 = data[pos:].find("xres") + pos+len("xres")
         size_x_pixel = struct.unpack("i",data[pos1+2:pos1+4+2])[0]
 
         # ... the image size in pixel (y direction)
-        pos1 = data[pos:].find(b"yres") + pos+len("yres")
+        pos1 = data[pos:].find("yres") + pos+len("yres")
         size_y_pixel = struct.unpack("i",data[pos1+2:pos1+4+2])[0]
 
         # ... the real image size (x direction)
-        pos1 = data[pos:].find(b"xreal") + pos+len("xreal")
+        pos1 = data[pos:].find("xreal") + pos+len("xreal")
         size_x_real = struct.unpack("d",data[pos1+2:pos1+8+2])[0]
 
         # ... the real image size (y direction)
-        pos1 = data[pos:].find(b"yreal") + pos+len("yreal")
+        pos1 = data[pos:].find("yreal") + pos+len("yreal")
         size_y_real = struct.unpack("d",data[pos1+2:pos1+8+2])[0]
 
         # If it is a z image, multiply with 10^9 nm
         factor = 1.0        
-        pos1 = data[pos:].find(b"si_unit_z") + pos
+        pos1 = data[pos:].find("si_unit_z") + pos
         unit = data[pos1+34:pos1+36].decode("utf-8")
         if "m" in unit:
             factor = 1000000000.0
         
         # Now, find the image data and store it
-        pos1 = data[pos:].find(b"\x00data\x00") + pos + len("\x00data\x00") + 5
+        pos1 = data[pos:].find("\x00data\x00") + pos + len("\x00data\x00") + 5
 
         image = []        
-        for i in range(size_y_pixel):
+        for i in xrange(size_y_pixel):
             line = []
-            for j in range(size_x_pixel):
+            for j in xrange(size_x_pixel):
                 # The '8' is for the double values
                 k = pos1 + (i*size_x_pixel+j)   * 8
                 l = pos1 + (i*size_x_pixel+j+1) * 8

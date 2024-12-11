@@ -19,6 +19,7 @@ of the camera, so we don't render outside the view. Makes faster render
 preview. Under Specials menu W, when in Camera view.
 """
 
+from __future__ import absolute_import
 import bpy
 
 
@@ -40,7 +41,7 @@ class AMTH_VIEW3D_OT_render_border_camera(bpy.types.Operator):
         render.border_max_x = 1
         render.border_max_y = 1
 
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 
 def button_render_border_camera(self, context):

@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import logging
 module_logger = logging.getLogger(__name__)
 
@@ -6,7 +7,7 @@ import hashlib
 import bpy
 
 
-class StoredView():
+class StoredView(object):
     def __init__(self, mode, index=None):
         self.logger = logging.getLogger('%s.StoredView' % __name__)
         self.scene = bpy.context.scene
@@ -40,7 +41,7 @@ class StoredView():
 
 class POV(StoredView):
     def __init__(self, index=None):
-        super().__init__(mode='POV', index=index)
+        super(POV, self).__init__(mode='POV', index=index)
         self.logger = logging.getLogger('%s.POV' % __name__)
 
     def from_v3d(self, stored_view):
@@ -143,7 +144,7 @@ class POV(StoredView):
 
 class Layers(StoredView):
     def __init__(self, index=None):
-        super().__init__(mode='LAYERS', index=index)
+        super(Layers, self).__init__(mode='LAYERS', index=index)
         self.logger = logging.getLogger('%s.Layers' % __name__)
 
     def from_v3d(self, stored_view):
@@ -167,12 +168,12 @@ class Layers(StoredView):
             logger.debug('lock_camera_and_layers')
             return True
         if stored_view.lock_camera_and_layers == True:
-            for i in range(20):
+            for i in xrange(20):
                 if stored_view.scene_layers[i] != context.scene.layers[i]:
                     logger.debug('scene_layers[%s]' % (i, ))
                     return True
         else:
-            for i in range(20):
+            for i in xrange(20):
                 if stored_view.view_layers[i] != context.space_data.view3d.layers[i]:
                     logger.debug('view_layers[%s]' % (i ,))
                     return True
@@ -181,7 +182,7 @@ class Layers(StoredView):
 
 class Display(StoredView):
     def __init__(self, index=None):
-        super().__init__(mode='DISPLAY', index=index)
+        super(Display, self).__init__(mode='DISPLAY', index=index)
         self.logger = logging.getLogger('%s.Display' % __name__)
 
     def from_v3d(self, stored_view):
@@ -236,7 +237,7 @@ class Display(StoredView):
 
 class View(StoredView):
     def __init__(self, index=None):
-        super().__init__(mode='VIEW', index=index)
+        super(View, self).__init__(mode='VIEW', index=index)
         self.logger = logging.getLogger('%s.View' % __name__)
         self.pov = POV()
         self.layers = Layers()
@@ -261,7 +262,7 @@ class View(StoredView):
         return False
 
 
-class DataStore():
+class DataStore(object):
     def __init__(self, scene=None, mode=None):
         if scene == None:
             scene = bpy.context.scene

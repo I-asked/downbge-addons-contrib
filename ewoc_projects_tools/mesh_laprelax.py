@@ -36,6 +36,7 @@ Save as Default (Optional).
 """
 
 
+from __future__ import absolute_import
 bl_info = {
 	"name": "LapRelax",
 	"author": "Gert De Roost",
@@ -60,7 +61,7 @@ class LapRelax(bpy.types.Operator):
 	bl_idname = "mesh.laprelax"
 	bl_label = "LapRelax"
 	bl_description = "Smoothing mesh keeping volume"
-	bl_options = {'REGISTER', 'UNDO'}
+	bl_options = set(['REGISTER', 'UNDO'])
 
 	Repeat = bpy.props.IntProperty(
 		name = "Repeat",
@@ -78,10 +79,10 @@ class LapRelax(bpy.types.Operator):
 	def invoke(self, context, event):
 
 		# smooth #Repeat times
-		for i in range(self.Repeat):
+		for i in xrange(self.Repeat):
 			self.do_laprelax()
 
-		return {'FINISHED'}
+		return set(['FINISHED'])
 
 
 	def do_laprelax(self):

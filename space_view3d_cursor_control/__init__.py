@@ -21,6 +21,7 @@
 
 # Blender Add-Ons menu registration (in User Prefs)
 
+from __future__ import absolute_import
 bl_info = {
     "name": "Cursor Control",
     "author": "Morgan Mörtsell (Seminumerical)",

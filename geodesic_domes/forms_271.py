@@ -1,3 +1,5 @@
+from __future__ import division
+from __future__ import absolute_import
 import math
 #PKHG>TOOMUCH?? from math import pi, sin, cos, atan, tan, fabs
 from math import sin, cos
@@ -54,9 +56,9 @@ class form(mesh):
         self.rowlist=[]
 
     def generatepoints(self):
-        for i in range(self.ufinish):
+        for i in xrange(self.ufinish):
             row=[]
-            for j in range(self.vfinish):
+            for j in xrange(self.vfinish):
                 u = self.ustep * i + self.uphase
                 v = self.vstep * j + self.vphase
             #    if self.xscaleflag:
@@ -83,7 +85,7 @@ class form(mesh):
         if self.vflag:
             pass
         else:
-            for i in range(len(self.rowlist)):
+            for i in xrange(len(self.rowlist)):
                 self.rowlist[i].append(self.rowlist[i][0])
         if  self.uflag:
             pass
@@ -96,8 +98,8 @@ class form(mesh):
     def generatefaces(self):
         ufin = len(self.rowlist) - 1
         vfin = len(self.rowlist[0]) - 1
-        for i in range(ufin):
-            for j in range(vfin):
+        for i in xrange(ufin):
+            for j in xrange(vfin):
                 top = i
                 bottom = i + 1
                 left = j
@@ -126,10 +128,10 @@ class grid(form):
                         uphase, vphase, utwist, vtwist, xscale, yscale, sform)
         unit = 1.0 / self.a360
         if self.ures == 1 :            
-            print("\n***ERRORin forms_271.grid L121***, ures is  1, changed into 2\n\n")
+            print "\n***ERRORin forms_271.grid L121***, ures is  1, changed into 2\n\n"
             self.ures = 2
         if self.vres == 1 :            
-            print("\n***ERROR in grid forms_271.grid L124***, vres is 1, changed into 2\n\n")
+            print "\n***ERROR in grid forms_271.grid L124***, vres is 1, changed into 2\n\n"
             self.vres = 2            
         self.ustep = self.a360 / (self.ures - 1)
         self.vstep = self.a360 / (self.vres - 1)
@@ -146,7 +148,7 @@ class grid(form):
         
         self.generatepoints()
         self.generatefaces()
-        for i in range(len(self.verts)):
+        for i in xrange(len(self.verts)):
             self.verts[i].index = i
         self.connectivity()
                 
@@ -168,7 +170,7 @@ class cylinder(form):
         self.vflag = 1    
         self.generatepoints()
         self.generatefaces()
-        for i in range(len(self.verts)):
+        for i in xrange(len(self.verts)):
             self.verts[i].index = i
         self.connectivity()    
 
@@ -189,7 +191,7 @@ class parabola(form):
         self.vflag = 1
         self.generatepoints()
         self.generatefaces()
-        for i in range(len(self.verts)):
+        for i in xrange(len(self.verts)):
             self.verts[i].index = i
         self.connectivity()        
     
@@ -207,7 +209,7 @@ class torus(form):
                       uphase, vphase, utwist, vtwist, xscale, yscale, sform)
         self.generatepoints()
         self.generatefaces()
-        for i in range(len(self.verts)):
+        for i in xrange(len(self.verts)):
             self.verts[i].index = i
         self.connectivity()        
                     
@@ -226,7 +228,7 @@ class sphere(form):
         self.vflag = 1
         self.generatepoints()
         self.generatefaces()
-        for i in range(len(self.verts)):
+        for i in xrange(len(self.verts)):
             self.verts[i].index = i
         self.connectivity()        
         

@@ -43,11 +43,12 @@ Additional links:
 	e-mail: dolf {at} macouno {dot} com
 """
 
+from __future__ import absolute_import
 import bpy
 from bpy.props import BoolProperty
 
 
-class Select_checkered():
+class Select_checkered(object):
 
 	# Initialise the class
 	def __init__(self, context, invert, extend):
@@ -167,7 +168,7 @@ class Select_init(bpy.types.Operator):
 	'''Select faces based on pi'''
 	bl_idname = 'mesh.select_checkered'
 	bl_label = 'Select checkered'
-	bl_options = {'REGISTER', 'UNDO'}
+	bl_options = set(['REGISTER', 'UNDO'])
 
 	invert = BoolProperty(name='Invert', description='Invert the selection result', default=False)
 
@@ -180,5 +181,5 @@ class Select_init(bpy.types.Operator):
 
 	def execute(self, context):
 		SELECT_DIRECTION = Select_checkered(context, self.invert, self.extend)
-		return {'FINISHED'}
+		return set(['FINISHED'])
 

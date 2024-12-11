@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import logging
 module_logger = logging.getLogger(__name__)
 
@@ -30,9 +31,9 @@ def init_draw(context=None):
 def _draw_callback_px(self, context):
 
     try:
-        print("SELF", self)
+        print "SELF", self
     except:
-        print("red err?")
+        print "red err?"
 
     r_width = context.region.width
     r_height = context.region.height
@@ -81,7 +82,7 @@ class VIEW3D_stored_views_draw(bpy.types.Operator):
             context.area.tag_redraw()
 
         if not context.area.type or context.area.type != "VIEW_3D":
-            return {"PASS_THROUGH"}
+            return set(["PASS_THROUGH"])
 
         data = core.DataStore()
         stored_views = context.scene.stored_views
@@ -107,24 +108,24 @@ class VIEW3D_stored_views_draw(bpy.types.Operator):
                         module_logger.debug('view modified - index: %s name: %s' % (data.current_index, sv.name))
                         self.view_name = ""
                         stored_views.view_modified = is_modified
-                return {"PASS_THROUGH"}
+                return set(["PASS_THROUGH"])
 
         else:
             module_logger.debug('exit')
             context.window_manager["stored_views_osd"] = False
             VIEW3D_stored_views_draw.handle_remove(context)
-            return {'FINISHED'}
+            return set(['FINISHED'])
 
     def execute(self, context):
         if context.area.type == "VIEW_3D":
             self.view_name = ""
             VIEW3D_stored_views_draw.handle_add(self, context)
             context.window_manager.modal_handler_add(self)
-            return {"RUNNING_MODAL"}
+            return set(["RUNNING_MODAL"])
 
         else:
-            self.report({"WARNING"}, "View3D not found, can't run operator")
-            return {"CANCELLED"}
+            self.report(set(["WARNING"]), "View3D not found, can't run operator")
+            return set(["CANCELLED"])
 
 
 class VIEW3D_PT_properties_stored_views(bpy.types.Panel):
@@ -164,7 +165,7 @@ class VIEW3D_PT_properties_stored_views(bpy.types.Panel):
             box = row.box()
             # items list
             mode = stored_views.mode
-            for i in range(len(list)):
+            for i in xrange(len(list)):
                 # associated icon
                 icon_string = "MESH_CUBE"  # default icon
                 # TODO: icons for view

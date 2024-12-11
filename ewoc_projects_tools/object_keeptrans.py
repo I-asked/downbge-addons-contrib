@@ -34,6 +34,7 @@ Save as Default (Optional).
 """
 
 
+from __future__ import absolute_import
 bl_info = {
 	"name": "KeepTrans",
 	"author": "Gert De Roost",
@@ -60,7 +61,7 @@ class DeCouple(bpy.types.Operator):
 	bl_idname = "object.keeptrans"
 	bl_label = "KeepTrans"
 	bl_description = "Remove ChildOf constraint and keep transforms"
-	bl_options = {"REGISTER", "UNDO"}
+	bl_options = set(["REGISTER", "UNDO"])
 
 	@classmethod
 	def poll(cls, context):
@@ -75,7 +76,7 @@ class DeCouple(bpy.types.Operator):
 
 		self.do_keeptrans(context)
 
-		return {'FINISHED'}
+		return set(['FINISHED'])
 
 
 	def do_keeptrans(self, context):

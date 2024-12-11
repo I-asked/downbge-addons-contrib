@@ -34,6 +34,7 @@ Save as Default (Optional).
 """
 
 
+from __future__ import absolute_import
 bl_info = {
 	"name": "InnerWeld",
 	"author": "Gert De Roost",
@@ -58,7 +59,7 @@ class InnerWeld(bpy.types.Operator):
 	bl_idname = "mesh.innerweld"
 	bl_label = "InnerWeld"
 	bl_description = "Welding parallel edges together"
-	bl_options = {'REGISTER', 'UNDO'}
+	bl_options = set(['REGISTER', 'UNDO'])
 
 
 	@classmethod
@@ -76,7 +77,7 @@ class InnerWeld(bpy.types.Operator):
 		bpy.ops.object.editmode_toggle()
 		bpy.ops.object.editmode_toggle()
 
-		return {'FINISHED'}
+		return set(['FINISHED'])
 
 
 	def do_innerweld(self, context):
@@ -129,7 +130,7 @@ class InnerWeld(bpy.types.Operator):
 		mergesets = []
 		while found:
 			found = False
-			for idx in range(len(self.vertlist)):
+			for idx in xrange(len(self.vertlist)):
 				if len(self.vertlist[idx]) > 0:
 					found = True
 					vset = set([])

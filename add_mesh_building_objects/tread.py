@@ -42,12 +42,14 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import division
+from __future__ import absolute_import
 import mathutils
 from copy import copy
 from math import radians, sqrt
 from mathutils import Matrix, Vector
 
-class Treads:
+class Treads(object):
     def __init__(self,G,typ,typ_t,run,w,h,d,r,toe,o,n,tk,sec,sp,sn,deg=4):
         self.G = G #General
         self.typ = typ #Stair type
@@ -98,7 +100,7 @@ class Treads:
                 coords.append(Vector([self.d,-self.o,0]))
                 coords.append(Vector([-self.t,self.w + self.o,0]))
                 coords.append(Vector([self.d,self.w + self.o,0]))
-                for i in range(4):
+                for i in xrange(4):
                     coords.append(coords[i]+Vector([0,0,-self.h]))
 
             elif self.typ_t == "tId2":
@@ -117,7 +119,7 @@ class Treads:
                 coords.append(Vector([tDepth, -self.o, -self.h]))                           #9
                 coords.append(Vector([tDepth - inset, -self.o, -self.h]))           #10
                 coords.append(Vector([tDepth - inset, -self.o, -self.h + self.tk])) #11
-                for i in range(12):
+                for i in xrange(12):
                     coords.append(coords[i] + Vector([0, self.w + (2 * self.o), 0]))
             
             elif self.typ_t in ["tId3", "tId4", "tId5"]:
@@ -126,14 +128,14 @@ class Treads:
                 coords.append(Vector([self.d,-self.o,-self.h]))
                 coords.append(Vector([-self.t,-self.o,0]))
                 coords.append(Vector([self.d,-self.o,0]))
-                for i in range(4):
+                for i in xrange(4):
                     if (i % 2) == 0:
                         coords.append(coords[i] + Vector([self.tk,self.tk,0]))
                     else:
                         coords.append(coords[i] + Vector([-self.tk,self.tk,0]))
-                for i in range(4):
+                for i in xrange(4):
                     coords.append(coords[i] + Vector([0,self.w + self.o,0]))
-                for i in range(4):
+                for i in xrange(4):
                     coords.append(coords[i + 4] + Vector([0,self.w + self.o - (2 * self.tk),0]))
 
                 # Tread sections:
@@ -144,9 +146,9 @@ class Treads:
                     baseX = -self.t + self.sp + self.tk
                     coords2.append(Vector([baseX, self.tk - self.o, offset - self.h]))
                     coords2.append(Vector([baseX + offset, self.tk - self.o, -self.h]))
-                    for i in range(2):
+                    for i in xrange(2):
                         coords2.append(coords2[i] + Vector([topset, 0, topset]))
-                    for i in range(4):
+                    for i in xrange(4):
                         coords2.append(coords2[i] + Vector([0, (self.w + self.o) - (2 * self.tk), 0]))
                 elif self.typ_t in ["tId4", "tId5"]:
                     offset = ((self.run + self.t) * self.sp) / (self.sec + 1)
@@ -157,7 +159,7 @@ class Treads:
                     coords2.append(Vector([baseX + topset, -self.o + self.tk, -self.h / 2]))
                     coords2.append(Vector([baseX, -self.o + self.tk, 0]))
                     coords2.append(Vector([baseX + topset, -self.o + self.tk, 0]))
-                    for i in range(4):
+                    for i in xrange(4):
                         coords2.append(coords2[i] + Vector([0, baseY, 0]))
 
                 # Tread cross-sections:
@@ -175,18 +177,18 @@ class Treads:
                 coords3.append(Vector([self.d - self.tk, baseY, -self.h]))
                 coords3.append(Vector([-self.t + self.tk, baseY, height]))
                 coords3.append(Vector([self.d - self.tk, baseY, height]))
-                for i in range(4):
+                for i in xrange(4):
                     coords3.append(coords3[i] + Vector([0, cW, 0]))
 
             # Make the treads:
-            for i in range(self.n):
+            for i in xrange(self.n):
                 if self.typ_t == "tId1":
                     self.G.Make_mesh(coords,self.G.faces,'treads')
                 elif self.typ_t == "tId2":
                     temp = []
                     for j in coords:
                         temp.append(copy(j))
-                    for j in range(self.sec):
+                    for j in xrange(self.sec):
                         self.G.Make_mesh(temp, self.tId2_faces, 'treads')
                         for k in temp:
                             k += Vector([depth + self.sp, 0, 0])
@@ -195,7 +197,7 @@ class Treads:
                     temp = []
                     for j in coords2:
                         temp.append(copy(j))
-                    for j in range(self.sec):
+                    for j in xrange(self.sec):
                         self.G.Make_mesh(temp,self.G.faces,'bars')
                         for k in temp:
                             k += Vector([offset + self.sp, 0, 0])
@@ -204,7 +206,7 @@ class Treads:
                     temp = []
                     for j in coords3:
                         temp.append(copy(j))
-                    for j in range(self.sn):
+                    for j in xrange(self.sn):
                         self.G.Make_mesh(temp,self.G.faces,'crosses')
                         for k in temp:
                             k += Vector([0, cW + cross, 0])
@@ -217,7 +219,7 @@ class Treads:
             start = [Vector([0, -self.o, 0]), Vector([0, -self.o, -self.h]),
                      Vector([0, -self.w, 0]), Vector([0, -self.w, -self.h])]
             self.d = radians(self.run) / self.n
-            for i in range(self.n):
+            for i in xrange(self.n):
                 coords = []
                 # Base faces.  Should be able to append more sections:
                 tId4_faces = [[0, 1, 3, 2]]
@@ -228,7 +230,7 @@ class Treads:
                 coords.append((t_outer * start[2]) + Vector([0, 0, self.r * i]))
                 coords.append((t_outer * start[3]) + Vector([0, 0, self.r * i]))
                 k = 0
-                for j in range(self.deg + 1):
+                for j in xrange(self.deg + 1):
                     k = (j * 4) + 4
                     tId4_faces.append([k, k - 4, k - 3, k + 1])
                     tId4_faces.append([k - 2, k - 1, k + 3, k + 2])

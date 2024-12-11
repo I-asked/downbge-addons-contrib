@@ -1,3 +1,5 @@
+from __future__ import division
+from __future__ import absolute_import
 from . import Math
 from . import Curves
 from . import Util
@@ -11,14 +13,14 @@ algoPOV = None
 algoDIR = None
 
 
-class BezierSegmentIntersectionPoint:
+class BezierSegmentIntersectionPoint(object):
     def __init__(self, segment, parameter, intersectionPoint):
         self.segment = segment
         self.parameter = parameter
         self.intersectionPoint = intersectionPoint
         
         
-class BezierSegmentsIntersector:
+class BezierSegmentsIntersector(object):
     def __init__(self, segment1, segment2, worldMatrix1, worldMatrix2):
         self.segment1 = segment1
         self.segment2 = segment2
@@ -47,13 +49,13 @@ class BezierSegmentsIntersector:
         
         limitDistance = bpy.context.scene.curvetools.LimitDistance
         
-        for iSample1 in range(nrSamples1):
+        for iSample1 in xrange(nrSamples1):
             segPar10 = float(iSample1) / fltNrSamples1
             segPar11 = float(iSample1 + 1) / fltNrSamples1
             P0 = self.worldMatrix1 * self.segment1.CalcPoint(parameter = segPar10)
             P1 = self.worldMatrix1 * self.segment1.CalcPoint(parameter = segPar11)
             
-            for iSample2 in range(nrSamples2):
+            for iSample2 in xrange(nrSamples2):
                 segPar20 = float(iSample2) / fltNrSamples2
                 segPar21 = float(iSample2 + 1) / fltNrSamples2
                 Q0 = self.worldMatrix2 * self.segment2.CalcPoint(parameter = segPar20)
@@ -79,13 +81,13 @@ class BezierSegmentsIntersector:
         
         limitDistance = bpy.context.scene.curvetools.LimitDistance
         
-        for iSample1 in range(nrSamples1):
+        for iSample1 in xrange(nrSamples1):
             segPar10 = float(iSample1) / fltNrSamples1
             segPar11 = float(iSample1 + 1) / fltNrSamples1
             P0 = self.worldMatrix1 * self.segment1.CalcPoint(parameter = segPar10)
             P1 = self.worldMatrix1 * self.segment1.CalcPoint(parameter = segPar11)
             
-            for iSample2 in range(nrSamples2):
+            for iSample2 in xrange(nrSamples2):
                 segPar20 = float(iSample2) / fltNrSamples2
                 segPar21 = float(iSample2 + 1) / fltNrSamples2
                 Q0 = self.worldMatrix2 * self.segment2.CalcPoint(parameter = segPar20)
@@ -120,13 +122,13 @@ class BezierSegmentsIntersector:
         fltNrSamples1 = float(nrSamples1)
         fltNrSamples2 = float(nrSamples2)
         
-        for iSample1 in range(nrSamples1):
+        for iSample1 in xrange(nrSamples1):
             segPar10 = float(iSample1) / fltNrSamples1
             segPar11 = float(iSample1 + 1) / fltNrSamples1
             P0 = self.worldMatrix1 * self.segment1.CalcPoint(parameter = segPar10)
             P1 = self.worldMatrix1 * self.segment1.CalcPoint(parameter = segPar11)
             
-            for iSample2 in range(nrSamples2):
+            for iSample2 in xrange(nrSamples2):
                 segPar20 = float(iSample2) / fltNrSamples2
                 segPar21 = float(iSample2 + 1) / fltNrSamples2
                 Q0 = self.worldMatrix2 * self.segment2.CalcPoint(parameter = segPar20)
@@ -156,13 +158,13 @@ class BezierSegmentsIntersector:
         
         limitDistance = bpy.context.scene.curvetools.LimitDistance
         
-        for iSample1 in range(nrSamples1):
+        for iSample1 in xrange(nrSamples1):
             segPar10 = float(iSample1) / fltNrSamples1
             segPar11 = float(iSample1 + 1) / fltNrSamples1
             P0 = self.worldMatrix1 * self.segment1.CalcPoint(parameter = segPar10)
             P1 = self.worldMatrix1 * self.segment1.CalcPoint(parameter = segPar11)
             
-            for iSample2 in range(nrSamples2):
+            for iSample2 in xrange(nrSamples2):
                 segPar20 = float(iSample2) / fltNrSamples2
                 segPar21 = float(iSample2 + 1) / fltNrSamples2
                 Q0 = self.worldMatrix2 * self.segment2.CalcPoint(parameter = segPar20)
@@ -197,13 +199,13 @@ class BezierSegmentsIntersector:
         fltNrSamples1 = float(nrSamples1)
         fltNrSamples2 = float(nrSamples2)
         
-        for iSample1 in range(nrSamples1):
+        for iSample1 in xrange(nrSamples1):
             segPar10 = float(iSample1) / fltNrSamples1
             segPar11 = float(iSample1 + 1) / fltNrSamples1
             P0 = self.worldMatrix1 * self.segment1.CalcPoint(parameter = segPar10)
             P1 = self.worldMatrix1 * self.segment1.CalcPoint(parameter = segPar11)
             
-            for iSample2 in range(nrSamples2):
+            for iSample2 in xrange(nrSamples2):
                 segPar20 = float(iSample2) / fltNrSamples2
                 segPar21 = float(iSample2 + 1) / fltNrSamples2
                 Q0 = self.worldMatrix2 * self.segment2.CalcPoint(parameter = segPar20)
@@ -233,13 +235,13 @@ class BezierSegmentsIntersector:
         
         limitDistance = bpy.context.scene.curvetools.LimitDistance
         
-        for iSample1 in range(nrSamples1):
+        for iSample1 in xrange(nrSamples1):
             segPar10 = float(iSample1) / fltNrSamples1
             segPar11 = float(iSample1 + 1) / fltNrSamples1
             P0 = self.worldMatrix1 * self.segment1.CalcPoint(parameter = segPar10)
             P1 = self.worldMatrix1 * self.segment1.CalcPoint(parameter = segPar11)
             
-            for iSample2 in range(nrSamples2):
+            for iSample2 in xrange(nrSamples2):
                 segPar20 = float(iSample2) / fltNrSamples2
                 segPar21 = float(iSample2 + 1) / fltNrSamples2
                 Q0 = self.worldMatrix2 * self.segment2.CalcPoint(parameter = segPar20)
@@ -295,13 +297,13 @@ class BezierSegmentsIntersector:
         limitDistance = bpy.context.scene.curvetools.LimitDistance
         
         
-        for iSample1 in range(nrSamples1):
+        for iSample1 in xrange(nrSamples1):
             segPar10 = float(iSample1) / fltNrSamples1
             segPar11 = float(iSample1 + 1) / fltNrSamples1
             P0 = self.worldMatrix1 * self.segment1.CalcPoint(parameter = segPar10)
             P1 = self.worldMatrix1 * self.segment1.CalcPoint(parameter = segPar11)
             
-            for iSample2 in range(nrSamples2):
+            for iSample2 in xrange(nrSamples2):
                 segPar20 = float(iSample2) / fltNrSamples2
                 segPar21 = float(iSample2 + 1) / fltNrSamples2
                 Q0 = self.worldMatrix2 * self.segment2.CalcPoint(parameter = segPar20)
@@ -332,13 +334,13 @@ class BezierSegmentsIntersector:
         fltNrSamples1 = float(nrSamples1)
         fltNrSamples2 = float(nrSamples2)
         
-        for iSample1 in range(nrSamples1):
+        for iSample1 in xrange(nrSamples1):
             segPar10 = float(iSample1) / fltNrSamples1
             segPar11 = float(iSample1 + 1) / fltNrSamples1
             P0 = self.worldMatrix1 * self.segment1.CalcPoint(parameter = segPar10)
             P1 = self.worldMatrix1 * self.segment1.CalcPoint(parameter = segPar11)
             
-            for iSample2 in range(nrSamples2):
+            for iSample2 in xrange(nrSamples2):
                 segPar20 = float(iSample2) / fltNrSamples2
                 segPar21 = float(iSample2 + 1) / fltNrSamples2
                 Q0 = self.worldMatrix2 * self.segment2.CalcPoint(parameter = segPar20)
@@ -369,13 +371,13 @@ class BezierSegmentsIntersector:
         fltNrSamples1 = float(nrSamples1)
         fltNrSamples2 = float(nrSamples2)
         
-        for iSample1 in range(nrSamples1):
+        for iSample1 in xrange(nrSamples1):
             segPar10 = float(iSample1) / fltNrSamples1
             segPar11 = float(iSample1 + 1) / fltNrSamples1
             P0 = self.worldMatrix1 * self.segment1.CalcPoint(parameter = segPar10)
             P1 = self.worldMatrix1 * self.segment1.CalcPoint(parameter = segPar11)
             
-            for iSample2 in range(nrSamples2):
+            for iSample2 in xrange(nrSamples2):
                 segPar20 = float(iSample2) / fltNrSamples2
                 segPar21 = float(iSample2 + 1) / fltNrSamples2
                 Q0 = self.worldMatrix2 * self.segment2.CalcPoint(parameter = segPar20)
@@ -397,13 +399,13 @@ class BezierSegmentsIntersector:
         return [rvIntersections1, rvIntersections2]
 
 
-class BezierSplineIntersectionPoint:
+class BezierSplineIntersectionPoint(object):
     def __init__(self, spline, bezierSegmentIntersectionPoint):
         self.spline = spline
         self.bezierSegmentIntersectionPoint = bezierSegmentIntersectionPoint
         
         
-class BezierSplinesIntersector:
+class BezierSplinesIntersector(object):
     def __init__(self, spline1, spline2, worldMatrix1, worldMatrix2):
         self.spline1 = spline1
         self.spline2 = spline2
@@ -442,7 +444,7 @@ class BezierSplinesIntersector:
         return [rvIntersections1, rvIntersections2]
         
         
-class CurvesIntersector:
+class CurvesIntersector(object):
     @staticmethod
     def FromSelection():
         selObjects = bpy.context.selected_objects
@@ -475,60 +477,60 @@ class CurvesIntersector:
         if algo == 'From View':
             regionView3D = Util.GetFirstRegionView3D()
             if regionView3D is None: 
-                print("### ERROR: regionView3D is None. Stopping.")
+                print "### ERROR: regionView3D is None. Stopping."
                 return
                 
             viewPerspective = regionView3D.view_perspective
-            print("--", "viewPerspective:", viewPerspective)
+            print "--", "viewPerspective:", viewPerspective
             
             
             if viewPerspective == 'ORTHO':
                 viewMatrix = regionView3D.view_matrix
-                print("--", "viewMatrix:")
-                print(viewMatrix)
+                print "--", "viewMatrix:"
+                print viewMatrix
                 
                 global algoDIR
                 algoDIR = Vector((viewMatrix[2][0], viewMatrix[2][1], viewMatrix[2][2]))
-                print("--", "algoDIR:", algoDIR)
+                print "--", "algoDIR:", algoDIR
 
             # ## TODO: doesn't work properly
             if viewPerspective == 'PERSP':
                 viewMatrix = regionView3D.view_matrix
-                print("--", "viewMatrix:")
-                print(viewMatrix)
+                print "--", "viewMatrix:"
+                print viewMatrix
                 
                 global algoPOV
                 algoPOV = regionView3D.view_location.copy()
-                print("--", "algoPOV:", algoPOV)
+                print "--", "algoPOV:", algoPOV
                 
                 otherPOV = Vector((viewMatrix[0][3], viewMatrix[1][3], viewMatrix[2][3]))
-                print("--", "otherPOV:", otherPOV)
+                print "--", "otherPOV:", otherPOV
                 
                 localPOV = Vector((0, 0, 0))
                 globalPOV = viewMatrix * localPOV
-                print("--", "globalPOV:", globalPOV)
+                print "--", "globalPOV:", globalPOV
 
                 
                 perspMatrix = regionView3D.perspective_matrix
-                print("--", "perspMatrix:")
-                print(perspMatrix)
+                print "--", "perspMatrix:"
+                print perspMatrix
                 
                 globalPOVPersp = perspMatrix * localPOV
-                print("--", "globalPOVPersp:", globalPOVPersp)
+                print "--", "globalPOVPersp:", globalPOVPersp
                 
             if viewPerspective == 'CAMERA':
                 camera = bpy.context.scene.camera
                 if camera is None: 
-                    print("### ERROR: camera is None. Stopping.")
+                    print "### ERROR: camera is None. Stopping."
                     return
                     
-                print("--", "camera:", camera)
+                print "--", "camera:", camera
                 cameraData = camera.data
-                print("--", "cameraData.type:", cameraData.type)
+                print "--", "cameraData.type:", cameraData.type
                 
                 cameraMatrix = camera.matrix_world
-                print("--", "cameraMatrix:")
-                print(cameraMatrix)
+                print "--", "cameraMatrix:"
+                print cameraMatrix
 
                 if cameraData.type == 'ORTHO':
                     cameraMatrix = camera.matrix_world
@@ -536,12 +538,12 @@ class CurvesIntersector:
                     global algoDIR
                     #algoDIR = Vector((cameraMatrix[2][0], cameraMatrix[2][1], cameraMatrix[2][2]))
                     algoDIR = Vector((- cameraMatrix[0][2], - cameraMatrix[1][2], - cameraMatrix[2][2]))
-                    print("--", "algoDIR:", algoDIR)
+                    print "--", "algoDIR:", algoDIR
 
                 if cameraData.type == 'PERSP':
                     global algoPOV
                     algoPOV = camera.location.copy()
-                    print("--", "algoPOV:", algoPOV)
+                    print "--", "algoPOV:", algoPOV
 
         
     def __init__(self, activeCurve, otherCurve):
@@ -617,12 +619,12 @@ class CurvesIntersector:
         affectO = (affect == 'Both') or (affect == 'Other')
         
         
-        for iSplineA in range(len(self.activeCurve.splines)):
+        for iSplineA in xrange(len(self.activeCurve.splines)):
             splineA = self.activeCurve.splines[iSplineA]
             nrSegmentsA = len(splineA.segments)
             resPerSegA = splineA.resolutionPerSegment
         
-            for iSplineO in range(len(self.otherCurve.splines)):
+            for iSplineO in xrange(len(self.otherCurve.splines)):
                 splineO = self.otherCurve.splines[iSplineO]
                 nrSegmentsO = len(splineO.segments)
                 resPerSegO = splineO.resolutionPerSegment
@@ -714,7 +716,7 @@ class CurvesIntersector:
                             if (not intPointA is None) and (not intPointO is None):    # else does something weird if 1 of them is None.. 
                                 if affectA:
                                     if not intPointA is None:
-                                        print("--", "splineA.Split():")
+                                        print "--", "splineA.Split():"
                                         newSplinesA = splineA.Split(segA, intPointA.parameter)
                                         if not newSplinesA is None:
                                             newResolutions = splineA.CalcDivideResolution(segA, intPointA.parameter)
@@ -729,7 +731,7 @@ class CurvesIntersector:
                                             
                                 if affectO:
                                     if not intPointO is None:
-                                        print("--", "splineO.Split():")
+                                        print "--", "splineO.Split():"
                                         newSplinesO = splineO.Split(segO, intPointO.parameter)
                                         if not newSplinesO is None:
                                             newResolutions = splineO.CalcDivideResolution(segO, intPointO.parameter)
@@ -760,12 +762,12 @@ class CurvesIntersector:
             if not (iSplineA < nrSplinesA): break
         
         if affectA:
-            print("")
-            print("--", "self.activeCurve.RebuildInScene():")
+            print ""
+            print "--", "self.activeCurve.RebuildInScene():"
             self.activeCurve.RebuildInScene()
         if affectO: 
-            print("")
-            print("--", "self.otherCurve.RebuildInScene():")
+            print ""
+            print "--", "self.otherCurve.RebuildInScene():"
             self.otherCurve.RebuildInScene()
         
         return [nrActive, nrOther]

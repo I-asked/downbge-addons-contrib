@@ -18,6 +18,7 @@
 
 # <pep8 compliant>
 
+from __future__ import absolute_import
 import bpy, time, sys
 from math import *
 
@@ -34,14 +35,14 @@ def round_sigfigs(num, sig_figs):
     else:
         return 0  # Can't take the log of 0
 
-class OperatorCallContext():
+class OperatorCallContext(object):
     def __enter__(self):
         scene = bpy.context.scene
         prefs = bpy.context.user_preferences
 
         # store active/selected state to restore it after operator execution
         self.curact = scene.objects.active
-        self.cursel = { ob : ob.select for ob in scene.objects }
+        self.cursel = dict(( ob, ob.select) for ob in scene.objects)
         
         # undo can store files a lot when running operators internally,
         # disable since we only need one undo step after main operators anyway

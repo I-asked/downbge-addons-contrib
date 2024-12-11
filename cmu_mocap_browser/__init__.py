@@ -22,6 +22,7 @@
 # Science and Technology of Portugal, under the grant SFRH/BD/66452/2009.
 
 
+from __future__ import absolute_import
 bl_info = {
     "name": "Carnegie Mellon University Mocap Library Browser",
     "author": "Daniel Monteiro Basso <daniel@basso.inf.br>",
@@ -57,7 +58,7 @@ class CMUMocapSubjectBrowser(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
     bl_category = 'Animation'
-    bl_options = {'DEFAULT_CLOSED'}
+    bl_options = set(['DEFAULT_CLOSED'])
 
     def draw(self, context):
         data.initialize_subjects(context)
@@ -96,7 +97,7 @@ class CMUMocapMotionBrowser(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
     bl_category = 'Animation'
-    bl_options = {'DEFAULT_CLOSED'}
+    bl_options = set(['DEFAULT_CLOSED'])
 
     def draw(self, context):
         layout = self.layout
@@ -149,7 +150,7 @@ class CMUMocapToMakeHuman(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
     bl_category = 'Animation'
-    bl_options = {'DEFAULT_CLOSED'}
+    bl_options = set(['DEFAULT_CLOSED'])
 
     def draw(self, context):
         layout = self.layout

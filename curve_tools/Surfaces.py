@@ -1,3 +1,5 @@
+from __future__ import division
+from __future__ import absolute_import
 import bpy
 import bmesh
 
@@ -6,7 +8,7 @@ from . import Curves
 
 
 
-class LoftedSplineSurface:
+class LoftedSplineSurface(object):
     def __init__(self, activeSpline, otherSpline, bMesh, vert0Index, resolution):
         self.splineA = activeSpline
         self.splineO = otherSpline
@@ -26,7 +28,7 @@ class LoftedSplineSurface:
         self.bMesh.verts[self.vert0Index + 1].co = pointO
         
         fltResm1 = float(self.resolution - 1)
-        for i in range(1, self.resolution):
+        for i in xrange(1, self.resolution):
             par = float(i) / fltResm1
         
             pointA = worldMatrixA * self.splineA.CalcPoint(par)
@@ -42,7 +44,7 @@ class LoftedSplineSurface:
         bmVerts = self.bMesh.verts
         bmVerts.ensure_lookup_table()
 
-        for i in range(1, self.resolution):
+        for i in xrange(1, self.resolution):
             nextIndexA = self.vert0Index + 2 * i
             nextIndexO = nextIndexA + 1
             
@@ -52,7 +54,7 @@ class LoftedSplineSurface:
             currIndexO = nextIndexO
             
 
-class LoftedSurface:
+class LoftedSurface(object):
     @staticmethod
     def FromSelection():
         selObjects = bpy.context.selected_objects
@@ -89,14 +91,14 @@ class LoftedSurface:
         rvSplineSurfaces = []
         
         currV0Index = 0
-        for i in range(self.nrSplines):
+        for i in xrange(self.nrSplines):
             splineA = self.curveA.splines[i]
             splineO = self.curveO.splines[i]
             
             res = splineA.resolution
             if splineO.resolution < res: res = splineO.resolution
             
-            for iv in range(2 * res): self.bMesh.verts.new()
+            for iv in xrange(2 * res): self.bMesh.verts.new()
             
             splSurf = LoftedSplineSurface(splineA, splineO, self.bMesh, currV0Index, res)
             splSurf.AddFaces()
@@ -124,7 +126,7 @@ class LoftedSurface:
 
 
 # active spline is swept over other spline (rail)
-class SweptSplineSurface:
+class SweptSplineSurface(object):
     def __init__(self, activeSpline, otherSpline, bMesh, vert0Index, resolutionA, resolutionO):
         self.splineA = activeSpline
         self.splineO = otherSpline
@@ -138,7 +140,7 @@ class SweptSplineSurface:
     def Apply(self, worldMatrixA, worldMatrixO):
         localPointsA = []
         fltResAm1 = float(self.resolutionA - 1)
-        for i in range(self.resolutionA):
+        for i in xrange(self.resolutionA):
             par = float(i) / fltResAm1
             pointA = self.splineA.CalcPoint(par)
             localPointsA.append(pointA)
@@ -147,7 +149,7 @@ class SweptSplineSurface:
         worldPointsO = []
         localDerivativesO = []
         fltResOm1 = float(self.resolutionO - 1)
-        for i in range(self.resolutionO):
+        for i in xrange(self.resolutionO):
             par = float(i) / fltResOm1
             
             pointO = self.splineO.CalcPoint(par)
@@ -160,23 +162,23 @@ class SweptSplineSurface:
         currWorldMatrixA = worldMatrixA
         worldMatrixOInv = worldMatrixO.inverted()
         prevDerivativeO = localDerivativesO[0]
-        for iO in range(self.resolutionO):
+        for iO in xrange(self.resolutionO):
             currDerivativeO = localDerivativesO[iO]
             localRotMatO = Math.CalcRotationMatrix(prevDerivativeO, currDerivativeO)
             
             currLocalAToLocalO = worldMatrixOInv * currWorldMatrixA       
             worldPointsA = []
-            for iA in range(self.resolutionA):
+            for iA in xrange(self.resolutionA):
                 pointALocalToO = currLocalAToLocalO * localPointsA[iA]
                 rotatedPointA = localRotMatO * pointALocalToO
                 worldPointsA.append(worldMatrixO * rotatedPointA)
                 
             worldOffsetsA = []
             worldPoint0A = worldPointsA[0]
-            for i in range(self.resolutionA): worldOffsetsA.append(worldPointsA[i] - worldPoint0A)
+            for i in xrange(self.resolutionA): worldOffsetsA.append(worldPointsA[i] - worldPoint0A)
             
             
-            for iA in range(self.resolutionA):
+            for iA in xrange(self.resolutionA):
                 iVert = self.vert0Index + (self.resolutionA * iO) + iA
                 currVert = worldPointsO[iO] + worldOffsetsA[iA]
                 self.bMesh.verts[iVert].co = currVert
@@ -189,8 +191,8 @@ class SweptSplineSurface:
         bmVerts = self.bMesh.verts
         bmVerts.ensure_lookup_table()
         
-        for iO in range(self.resolutionO - 1):
-            for iA in range(self.resolutionA - 1):
+        for iO in xrange(self.resolutionO - 1):
+            for iA in xrange(self.resolutionA - 1):
                 currIndexA1 = self.vert0Index + (self.resolutionA * iO) + iA
                 currIndexA2 = currIndexA1 + 1
                 nextIndexA1 = self.vert0Index + (self.resolutionA * (iO + 1)) + iA
@@ -200,7 +202,7 @@ class SweptSplineSurface:
         
         
 
-class SweptSurface:
+class SweptSurface(object):
     @staticmethod
     def FromSelection():
         selObjects = bpy.context.selected_objects
@@ -237,14 +239,14 @@ class SweptSurface:
         rvSplineSurfaces = []
         
         currV0Index = 0
-        for i in range(self.nrSplines):
+        for i in xrange(self.nrSplines):
             splineA = self.curveA.splines[i]
             splineO = self.curveO.splines[i]
             
             resA = splineA.resolution
             resO = splineO.resolution
             
-            for iv in range(resA * resO): self.bMesh.verts.new()
+            for iv in xrange(resA * resO): self.bMesh.verts.new()
             
             splSurf = SweptSplineSurface(splineA, splineO, self.bMesh, currV0Index, resA, resO)
             splSurf.AddFaces()
@@ -272,7 +274,7 @@ class SweptSurface:
 
 
 # profileSpline is swept over rail1Spline and scaled/rotated to have its endpoint on rail2Spline
-class BirailedSplineSurface:
+class BirailedSplineSurface(object):
     def __init__(self, rail1Spline, rail2Spline, profileSpline, bMesh, vert0Index, resolutionRails, resolutionProfile):
         self.rail1Spline = rail1Spline
         self.rail2Spline = rail2Spline
@@ -287,7 +289,7 @@ class BirailedSplineSurface:
     def Apply(self, worldMatrixRail1, worldMatrixRail2, worldMatrixProfile):
         localPointsProfile = []
         fltResProfilem1 = float(self.resolutionProfile - 1)
-        for i in range(self.resolutionProfile):
+        for i in xrange(self.resolutionProfile):
             par = float(i) / fltResProfilem1
             pointProfile = self.profileSpline.CalcPoint(par)
             localPointsProfile.append(pointProfile)
@@ -297,7 +299,7 @@ class BirailedSplineSurface:
         localDerivativesRail1 = []
         worldPointsRail2 = []
         fltResRailsm1 = float(self.resolutionRails - 1)
-        for i in range(self.resolutionRails):
+        for i in xrange(self.resolutionRails):
             par = float(i) / fltResRailsm1
             
             pointRail1 = self.rail1Spline.CalcPoint(par)
@@ -313,20 +315,20 @@ class BirailedSplineSurface:
         currWorldMatrixProfile = worldMatrixProfile
         worldMatrixRail1Inv = worldMatrixRail1.inverted()
         prevDerivativeRail1 = localDerivativesRail1[0]
-        for iRail in range(self.resolutionRails):
+        for iRail in xrange(self.resolutionRails):
             currDerivativeRail1 = localDerivativesRail1[iRail]
             localRotMatRail1 = Math.CalcRotationMatrix(prevDerivativeRail1, currDerivativeRail1)
             
             currLocalProfileToLocalRail1 = worldMatrixRail1Inv * currWorldMatrixProfile       
             worldPointsProfileRail1 = []
-            for iProfile in range(self.resolutionProfile):
+            for iProfile in xrange(self.resolutionProfile):
                 pointProfileLocalToRail1 = currLocalProfileToLocalRail1 * localPointsProfile[iProfile]
                 rotatedPointProfile = localRotMatRail1 * pointProfileLocalToRail1
                 worldPointsProfileRail1.append(worldMatrixRail1 * rotatedPointProfile)
                 
             worldOffsetsProfileRail1 = []
             worldPoint0ProfileRail1 = worldPointsProfileRail1[0]
-            for iProfile in range(self.resolutionProfile): worldOffsetsProfileRail1.append(worldPointsProfileRail1[iProfile] - worldPoint0ProfileRail1)
+            for iProfile in xrange(self.resolutionProfile): worldOffsetsProfileRail1.append(worldPointsProfileRail1[iProfile] - worldPoint0ProfileRail1)
                 
             worldStartPointProfileRail1 = worldPointsRail1[iRail]
             worldEndPointProfileRail1 = worldStartPointProfileRail1 + worldOffsetsProfileRail1[-1]
@@ -336,12 +338,12 @@ class BirailedSplineSurface:
             rotMatRail2 = Math.CalcRotationMatrix(v3From, v3To)
             
             worldOffsetsProfileRail2 = []
-            for iProfile in range(self.resolutionProfile):
+            for iProfile in xrange(self.resolutionProfile):
                 offsetProfileRail1 = worldOffsetsProfileRail1[iProfile]
                 worldOffsetsProfileRail2.append(rotMatRail2 * (offsetProfileRail1 * scaleFactorRail2))
             
             
-            for iProfile in range(self.resolutionProfile):
+            for iProfile in xrange(self.resolutionProfile):
                 iVert = self.vert0Index + (self.resolutionProfile * iRail) + iProfile
                 currVert = worldPointsRail1[iRail] + worldOffsetsProfileRail2[iProfile]
                 self.bMesh.verts[iVert].co = currVert
@@ -354,8 +356,8 @@ class BirailedSplineSurface:
         bmVerts = self.bMesh.verts
         bmVerts.ensure_lookup_table()
         
-        for iRail in range(self.resolutionRails - 1):
-            for iProfile in range(self.resolutionProfile - 1):
+        for iRail in xrange(self.resolutionRails - 1):
+            for iProfile in xrange(self.resolutionProfile - 1):
                 currIndex1 = self.vert0Index + (self.resolutionProfile * iRail) + iProfile
                 currIndex2 = currIndex1 + 1
                 nextIndex1 = self.vert0Index + (self.resolutionProfile * (iRail + 1)) + iProfile
@@ -365,7 +367,7 @@ class BirailedSplineSurface:
         
         
 
-class BirailedSurface:
+class BirailedSurface(object):
     @staticmethod
     def FromSelection():
         nrSelectedObjects = bpy.context.scene.curvetools.NrSelectedObjects
@@ -424,7 +426,7 @@ class BirailedSurface:
         rvSplineSurfaces = []
         
         currV0Index = 0
-        for i in range(self.nrSplines):
+        for i in xrange(self.nrSplines):
             splineRail1 = self.rail1Curve.splines[i]
             splineRail2 = self.rail2Curve.splines[i]
             splineProfile = self.profileCurve.splines[i]
@@ -433,7 +435,7 @@ class BirailedSurface:
             resRails = splineRail1.resolution
             if splineRail2.resolution < resRails: resRails = splineRail2.resolution
             
-            for iv in range(resProfile * resRails): self.bMesh.verts.new()
+            for iv in xrange(resProfile * resRails): self.bMesh.verts.new()
             
             splSurf = BirailedSplineSurface(splineRail1, splineRail2, splineProfile, self.bMesh, currV0Index, resRails, resProfile)
             splSurf.AddFaces()

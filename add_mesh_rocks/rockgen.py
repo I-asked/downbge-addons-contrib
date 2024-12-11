@@ -110,6 +110,8 @@
 
 # <pep8 compliant>
 
+from __future__ import division
+from __future__ import absolute_import
 import bpy
 import math
 import time
@@ -135,7 +137,7 @@ try:
                               uniform,
                               seed,
                               weibull)
-    print("Rock Generator: Numpy found.")
+    print "Rock Generator: Numpy found."
     numpy = True
 except:
     from random import (randint,
@@ -144,7 +146,7 @@ except:
                         seed)
     from random import betavariate as beta
     from random import weibullvariate as weibull
-    print("Rock Generator: Numpy not found.  Using Python's random.")
+    print "Rock Generator: Numpy not found.  Using Python's random."
     numpy = False
 
 # Global variables:
@@ -336,7 +338,7 @@ def randomizeMaterial(material, color, dif_int, rough, spec_int, spec_hard,
         skew = True
     material.roughness = skewedGauss(rough, stddev, (0.0, 3.14), skew)
 
-    for i in range(3):
+    for i in xrange(3):
         if color[i] > 0.9 or color[i] < 0.1:
             baseColor.append(skewedGauss(color[i], color[i] / 30,
                                          (0, 1), color[i] > 0.9))
@@ -397,7 +399,7 @@ def randomizeMaterial(material, color, dif_int, rough, spec_int, spec_hard,
     textureTypes = ['MUSGRAVE', 'CLOUDS', 'DISTORTED_NOISE',
                     'STUCCI', 'VORONOI']
 
-    for i in range(numTex):
+    for i in xrange(numTex):
         texColor = []
 
         # Set the active material slot:
@@ -413,7 +415,7 @@ def randomizeMaterial(material, color, dif_int, rough, spec_int, spec_hard,
             slot.texture.type = textureTypes[randint(0, 3)]
 
             # Set the texture's color (RGB):
-            for j in range(3):
+            for j in xrange(3):
                 if color[j] > 0.9 or color[j] < 0.1:
                     texColor.append(skewedGauss(color[j], color[j] / 30,
                                                 (0, 1), color[j] > 0.9))
@@ -529,7 +531,7 @@ def generateObject(context, muX, sigmaX, scaleX, upperSkewX, muY, sigmaY,
     # Use parameters to re-scale cube:
     # Reversed if/for nesting.  Should be a little faster.
     if shape == 0:
-        for j in range(8):
+        for j in xrange(8):
             if sigmaX == 0:
                 x.append(scaleX[0] / 2)
             else:
@@ -543,7 +545,7 @@ def generateObject(context, muX, sigmaX, scaleX, upperSkewX, muY, sigmaY,
             else:
                 z.append(skewedGauss(muZ, sigmaZ, scaleZ, upperSkewZ) / 2)
     elif shape == 1:
-        for j in range(8):
+        for j in xrange(8):
             if j in [0, 1, 3, 4]:
                 if sigmaX == 0:
                     x.append(scaleX[0] / 2)
@@ -584,7 +586,7 @@ def generateObject(context, muX, sigmaX, scaleX, upperSkewX, muY, sigmaY,
                 else:
                     z.append(skewedGauss(muZ, sigmaZ, scaleZ, upperSkewZ) / 2)
     elif shape == 2:
-        for j in range(8):
+        for j in xrange(8):
             if j in [0, 2, 5, 7]:
                 if sigmaX == 0:
                     x.append(scaleX[0] / 4)
@@ -612,7 +614,7 @@ def generateObject(context, muX, sigmaX, scaleX, upperSkewX, muY, sigmaY,
                 else:
                     z.append(skewedGauss(muZ, sigmaZ, scaleZ, upperSkewZ) / 2)
     elif shape == 3:
-        for j in range(8):
+        for j in xrange(8):
             if j > 0:
                 if sigmaX == 0:
                     x.append(scaleX[0] / 2)
@@ -640,7 +642,7 @@ def generateObject(context, muX, sigmaX, scaleX, upperSkewX, muY, sigmaY,
                 else:
                     z.append(skewedGauss(0, sigmaZ, scaleZ, upperSkewZ) / 8)
     elif shape == 4:
-        for j in range(10):
+        for j in xrange(10):
             if j in [0, 9]:
                 if sigmaX == 0:
                     x.append(0)
@@ -694,7 +696,7 @@ def generateObject(context, muX, sigmaX, scaleX, upperSkewX, muY, sigmaY,
                 else:
                     z.append(skewedGauss(0, sigmaZ, scaleZ, upperSkewZ) / 6)
     elif shape == 5:
-        for j in range(10):
+        for j in xrange(10):
             if j == 0:
                 if sigmaX == 0:
                     x.append(0)
@@ -787,7 +789,7 @@ def generateObject(context, muX, sigmaX, scaleX, upperSkewX, muY, sigmaY,
                 else:
                     z.append(skewedGauss(muZ, sigmaZ, scaleZ, upperSkewZ) / 2)
     elif shape == 6:
-        for j in range(7):
+        for j in xrange(7):
             if j > 0:
                 if sigmaX == 0:
                     x.append(scaleX[0] / 2)
@@ -815,7 +817,7 @@ def generateObject(context, muX, sigmaX, scaleX, upperSkewX, muY, sigmaY,
                 else:
                     z.append(skewedGauss(muZ, sigmaZ, scaleZ, upperSkewZ) / 2)
     elif shape == 7:
-        for j in range(10):
+        for j in xrange(10):
             if j in [1, 3, 4, 5, 8, 9]:
                 if sigmaX == 0:
                     x.append(scaleX[0] / 2)
@@ -843,7 +845,7 @@ def generateObject(context, muX, sigmaX, scaleX, upperSkewX, muY, sigmaY,
                 else:
                     z.append(skewedGauss(muZ, sigmaZ, scaleZ, upperSkewZ) / 2)
     elif shape == 8:
-        for j in range(7):
+        for j in xrange(7):
             if sigmaX == 0:
                 x.append(scaleX[0] / 2)
             else:
@@ -857,7 +859,7 @@ def generateObject(context, muX, sigmaX, scaleX, upperSkewX, muY, sigmaY,
             else:
                 z.append(skewedGauss(muZ, sigmaZ, scaleZ, upperSkewZ) / 2)
     elif shape == 9:
-        for j in range(8):
+        for j in xrange(8):
             if sigmaX == 0:
                 x.append(scaleX[0] / 2)
             else:
@@ -871,7 +873,7 @@ def generateObject(context, muX, sigmaX, scaleX, upperSkewX, muY, sigmaY,
             else:
                 z.append(skewedGauss(muZ, sigmaZ, scaleZ, upperSkewZ) / 2)
     elif shape == 10:
-        for j in range(7):
+        for j in xrange(7):
             if sigmaX == 0:
                 x.append(scaleX[0] / 2)
             else:
@@ -885,7 +887,7 @@ def generateObject(context, muX, sigmaX, scaleX, upperSkewX, muY, sigmaY,
             else:
                 z.append(skewedGauss(muZ, sigmaZ, scaleZ, upperSkewZ) / 2)
     elif shape == 11:
-        for j in range(7):
+        for j in xrange(7):
             if sigmaX == 0:
                 x.append(scaleX[0] / 2)
             else:
@@ -903,13 +905,13 @@ def generateObject(context, muX, sigmaX, scaleX, upperSkewX, muY, sigmaY,
     # Scale the vertices so that their average is equal to 1 * scale factor.
     if scaleDisplace:
         averageX = (sum(x) / len(x)) * scale_fac[0]
-        for i in range(len(x)):
+        for i in xrange(len(x)):
             x[i] /= averageX
         averageY = (sum(y) / len(y)) * scale_fac[1]
-        for i in range(len(y)):
+        for i in xrange(len(y)):
             y[i] /= averageY
         averageZ = (sum(z) / len(z)) * scale_fac[2]
-        for i in range(len(z)):
+        for i in xrange(len(z)):
             z[i] /= averageZ
 
     # Build vertex and face arrays:
@@ -1002,7 +1004,7 @@ def generateObject(context, muX, sigmaX, scaleX, upperSkewX, muY, sigmaY,
 
     # Apply creasing:
     if shape == 0:
-        for i in range(12):
+        for i in xrange(12):
             # todo: "0.375 / 3"?  WTF?  That = 0.125. . . .
             #   *** Completed 7/15/2011: Changed second one ***
             mesh.edges[i].crease = gauss(0.125, 0.125)
@@ -1014,7 +1016,7 @@ def generateObject(context, muX, sigmaX, scaleX, upperSkewX, muY, sigmaY,
         for i in [5, 7, 15, 16]:
             mesh.edges[i].crease = gauss(0.125, 0.025)
     elif shape == 2:
-        for i in range(18):
+        for i in xrange(18):
             mesh.edges[i].crease = gauss(0.125, 0.025)
     elif shape == 3:
         for i in [0, 1, 6, 10, 13]:
@@ -1024,7 +1026,7 @@ def generateObject(context, muX, sigmaX, scaleX, upperSkewX, muY, sigmaY,
         for i in [5, 6, 7, 10, 14, 16, 19, 21]:
             mesh.edges[i].crease = gauss(0.5, 0.125)
     elif shape == 7:
-        for i in range(18):
+        for i in xrange(18):
             if i in [0, 1, 2, 3, 6, 7, 8, 9, 13, 16]:
                 mesh.edges[i].crease = gauss(0.5, 0.125)
             elif i in [11,17]:
@@ -1032,7 +1034,7 @@ def generateObject(context, muX, sigmaX, scaleX, upperSkewX, muY, sigmaY,
             else:
                 mesh.edges[i].crease = gauss(0.125, 0.025)
     elif shape == 8:
-        for i in range(12):
+        for i in xrange(12):
             if i in [0, 3, 8, 9, 10]:
                 mesh.edges[i].crease = gauss(0.5, 0.125)
             elif i == 11:
@@ -1040,13 +1042,13 @@ def generateObject(context, muX, sigmaX, scaleX, upperSkewX, muY, sigmaY,
             else:
                 mesh.edges[i].crease = gauss(0.125, 0.025)
     elif shape == 9:
-        for i in range(12):
+        for i in xrange(12):
             if i in [0, 3, 4, 11]:
                 mesh.edges[i].crease = gauss(0.5, 0.125)
             else:
                 mesh.edges[i].crease = gauss(0.25, 0.05)
     elif shape == 10:
-        for i in range(12):
+        for i in xrange(12):
             if i in [0, 2, 3, 4, 8, 11]:
                 mesh.edges[i].crease = gauss(0.5, 0.125)
             elif i in [1, 5, 7]:
@@ -1054,7 +1056,7 @@ def generateObject(context, muX, sigmaX, scaleX, upperSkewX, muY, sigmaY,
             else:
                 mesh.edges[i].crease = gauss(0.125, 0.025)
     elif shape == 11:
-        for i in range(11):
+        for i in xrange(11):
             if i in [1, 2, 3, 4, 8, 11]:
                 mesh.edges[i].crease = gauss(0.25, 0.05)
             else:
@@ -1177,7 +1179,7 @@ def generateRocks(context, scaleX, skewX, scaleY, skewY, scaleZ, skewZ,
 
         # Changed as material mapping is no longer needed.
         #   *** Complete 9/6/2011 ***
-        for i in range(numOfMats):
+        for i in xrange(numOfMats):
             newMat.append(bpy.data.materials.new(name = 'stone'))
             randomizeMaterial(newMat[i], color, mat_bright,
                               mat_rough, mat_spec, mat_hard, mat_use_trans,
@@ -1241,7 +1243,7 @@ def generateRocks(context, scaleX, skewX, scaleY, skewY, scaleZ, skewZ,
     else:
         muZ = scaleZ
 
-    for i in range(numOfRocks):
+    for i in xrange(numOfRocks):
         # todo: enable different random values for each (x,y,z) corrdinate for
         # each vertex.  This will add additional randomness to the shape of the
         # generated rocks.
@@ -1359,7 +1361,7 @@ class rocks(bpy.types.Operator):
     """Add rock objects"""
     bl_idname = "mesh.rocks"
     bl_label = "Add Rocks"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
     bl_description = "Add rocks"
 
     # Get the preset values from the XML file.
@@ -1380,7 +1382,7 @@ class rocks(bpy.types.Operator):
     # Build the presets list for the enum property.
     # This needs to be a for loop as the user might add presets to
     # the XML file and those should show here:
-    for i in range(len(presetsList)):
+    for i in xrange(len(presetsList)):
         value = str(i)
         name = presetsList[i][0]
         description = name + " preset values."
@@ -1605,4 +1607,4 @@ class rocks(bpy.types.Operator):
                           self.use_scale_dis,
                           self.use_random_seed)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])

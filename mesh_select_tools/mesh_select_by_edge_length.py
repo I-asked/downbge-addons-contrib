@@ -43,11 +43,12 @@ Additional links:
 	e-mail: dolf {at} macouno {dot} com
 """
 '''
+from __future__ import absolute_import
 import bpy, mathutils, math
 from bpy.props import FloatProperty, BoolProperty, EnumProperty
 
 
-class Select_by_edge_length():
+class Select_by_edge_length(object):
 
 	# Initialise the class
 	def __init__(self, context, edgeLength, bigger, smaller, extend, space):
@@ -192,7 +193,7 @@ class Select_init(bpy.types.Operator):
 	'''Select all items with normals facing a certain direction'''
 	bl_idname = 'mesh.select_by_edge_length'
 	bl_label = 'Select by edge length'
-	bl_options = {'REGISTER', 'UNDO'}
+	bl_options = set(['REGISTER', 'UNDO'])
 
 	edgeLength = FloatProperty(name='Edge length', description='The scale in Blender units', default=1.0, min=0.0, max=1000.0, soft_min=0.0, soft_max=100.0, step=100, precision=2)
 
@@ -214,5 +215,5 @@ class Select_init(bpy.types.Operator):
 
 	def execute(self, context):
 		SELECT_EDGES = Select_by_edge_length(context, self.edgeLength, self.bigger, self.smaller, self.extend, self.space)
-		return {'FINISHED'}
+		return set(['FINISHED'])
 

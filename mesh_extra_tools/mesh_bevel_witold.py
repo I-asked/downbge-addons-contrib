@@ -19,6 +19,8 @@
 Bevel add-on
 '''
 #--- ### Header
+from __future__ import absolute_import
+from itertools import ifilter
 bl_info = {
     "name": "Bevel witold",
     "author": "Witold Jaworski",
@@ -94,7 +96,7 @@ class bevel_help(bpy.types.Operator):
 		layout.label('may error if vert joins multiple edges/complex edge selection')
 
 	def execute(self, context):
-		return {'FINISHED'}
+		return set(['FINISHED'])
 
 	def invoke(self, context, event):
 		return context.window_manager.invoke_popup(self, width = 350)
@@ -104,7 +106,7 @@ class Bevel(bpy.types.Operator):
     bl_idname = "mesh.mbevel" #it is not named mesh.bevel, to not confuse with the standard bevel in the future...
     bl_label = "Bevel Selected"
     bl_description = "Bevels selected edges"
-    bl_options = {'REGISTER', 'UNDO'} #Set this options, if you want to update
+    bl_options = set(['REGISTER', 'UNDO']) #Set this options, if you want to update
     #                                  parameters of this operator interactively
     #                                  (in the Tools pane)
     #--- parameters
@@ -133,16 +135,16 @@ class Bevel(bpy.types.Operator):
         obj = context.object
         if obj.data.users > 1:
             self.report(type='ERROR', message="Make this mesh single-user, first")
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
         # 2. is there anything selected?
         self.use_vertices = context.scene.get(self.LAST_VERT_NAME, self.use_vertices)
 
         bpy.ops.object.editmode_toggle()
 
         if self.use_vertices :
-            selected = list(filter(lambda e: e.select, context.object.data.vertices))
+            selected = list(ifilter(lambda e: e.select, context.object.data.vertices))
         else:
-            selected = list(filter(lambda e: e.select, context.object.data.edges))
+            selected = list(ifilter(lambda e: e.select, context.object.data.edges))
 
         bpy.ops.object.editmode_toggle()
 
@@ -162,7 +164,7 @@ class Bevel(bpy.types.Operator):
             return self.execute(context)
         else:
             self.report(type='ERROR', message="Nothing is selected")
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
 
     def execute(self,context):
         #calculate the bevel width, for this object size and scale
@@ -175,7 +177,7 @@ class Bevel(bpy.types.Operator):
         context.scene[self.LAST_WIDTH_NAME] = self.width
         context.scene[self.LAST_EXP_NAME] = self.exponent
         context.object[self.LAST_SCALE_NAME] = self.use_scale
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 def menu_draw(self, context):
     self.layout.operator_context = 'INVOKE_REGION_WIN'
@@ -194,4 +196,4 @@ def unregister():
 if __name__ == '__main__':
     register()
 
-if DEBUG > 0: print("mesh_bevel.py loaded!")
+if DEBUG > 0: print "mesh_bevel.py loaded!"

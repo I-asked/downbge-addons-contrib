@@ -31,6 +31,7 @@
 
 
 #import blender stuff
+from __future__ import absolute_import
 from bpy import (
         ops,
         )
@@ -42,18 +43,18 @@ from os import (
         )
 
 
-class FpxUtilities:
+class FpxUtilities(object):
 
     ###########################################################################
     TAG_NAME = "raw_dump"
 
     @staticmethod
     def str_begin_tag(value):
-        print("<{}>".format(value))
+        print "<{}>".format(value)
 
     @staticmethod
     def str_end_tag(value):
-        print("</{}>".format(value))
+        print "</{}>".format(value)
 
     @staticmethod
     def dump_bin(dump, address=0, comment="", max_size=0x0000000FFFFF, sector_list=None, sector_size=None, add_tags=True):
@@ -114,7 +115,7 @@ class FpxUtilities:
             if index == 0 and view_address_16 != 0:
                 # fill gap between 'address' and  'data'
                 # and between 'data' and 'char'
-                for n in range(view_address_16):
+                for n in xrange(view_address_16):
                     view_output.append(gap_hex)
                     view_chr.append(" ")
 
@@ -127,7 +128,7 @@ class FpxUtilities:
             if index >= max_index or view_address_16 == 15:
                 if view_address_16 != 15:
                     # fill gap between 'data' and 'char'
-                    for n in range(view_address_16, 15):
+                    for n in xrange(view_address_16, 15):
                         view_output.append(gap_hex)
 
                 # merge all
@@ -138,7 +139,7 @@ class FpxUtilities:
                 if comment:
                     if view_address_16 != 15:
                         # fill gap between 'char' and 'comment'
-                        for n in range(view_address_16, 15):
+                        for n in xrange(view_address_16, 15):
                             view_output.append(" ")
                     view_output.append("  ")
                     view_output.append(comment)
@@ -150,7 +151,7 @@ class FpxUtilities:
                 if index >= max_index:
                     break
 
-        print("".join(view_output))
+        print "".join(view_output)
 
         if add_tags:
             FpxUtilities.str_end_tag(tag_name)
@@ -202,7 +203,7 @@ class FpxUtilities:
     ###########################################################################
     @staticmethod
     def enable_edit_mode(enable, blender_context):
-        if blender_context.active_object is None or not blender_context.active_object.type in {'CURVE', 'MESH', 'ARMATURE', }:
+        if blender_context.active_object is None or not blender_context.active_object.type in set(['CURVE', 'MESH', 'ARMATURE',]):
             return
 
         if enable:

@@ -36,6 +36,8 @@
 #  To do: change radii also for the sticks represented by the skin modifier
 #
 
+from __future__ import division
+from __future__ import absolute_import
 bl_info = {
     "name": "Atomic Blender - Utilities",
     "description": "Utilities for manipulating atom structures",
@@ -266,12 +268,12 @@ class DatafileApply(Operator):
         scn = bpy.context.scene.atom_blend
 
         if scn.datafile == "":
-            return {'FINISHED'}
+            return set(['FINISHED'])
 
         io_atomblend_utilities.custom_datafile(scn.datafile)
         io_atomblend_utilities.custom_datafile_change_atom_props()
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # Button for separating single atoms from a dupliverts structure
@@ -297,7 +299,7 @@ class DefaultAtom(Operator):
                                               None,
                                               None,
                                               None)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # Button for separating single atoms from a dupliverts structure
@@ -323,7 +325,7 @@ class ReplaceAtom(Operator):
                                               None,
                                               None,
                                               None)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # Button for separating single atoms from a dupliverts structure
@@ -346,7 +348,7 @@ class SeparateAtom(Operator):
 
         io_atomblend_utilities.separate_atoms(scn)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # Button for measuring the distance of active objects
@@ -361,7 +363,7 @@ class DistanceButton(Operator):
 
         # Put the distance into the string of the output field.
         scn.distance = dist
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # Button for increasing the radii of all selected atoms
@@ -379,7 +381,7 @@ class RadiusAllBiggerButton(Operator):
                                               None,
                                               None,
                                               None)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # Button for decreasing the radii of all selected atoms
@@ -397,7 +399,7 @@ class RadiusAllSmallerButton(Operator):
                                               None,
                                               None,
                                               None)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # Button for increasing the radii of all selected sticks
@@ -415,7 +417,7 @@ class SticksAllBiggerButton(Operator):
                                               None,
                                               None,
                                               scn.sticks_all)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # Button for decreasing the radii of all selected sticks
@@ -433,7 +435,7 @@ class SticksAllSmallerButton(Operator):
                                               None,
                                               None,
                                               1.0/scn.sticks_all)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 def register():

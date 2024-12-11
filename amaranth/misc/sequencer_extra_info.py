@@ -32,6 +32,7 @@ for the current frame, and it's [playhead].
 
 Find it on the VSE header.
 """
+from __future__ import absolute_import
 import bpy
 
 

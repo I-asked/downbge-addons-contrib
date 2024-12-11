@@ -17,6 +17,8 @@
 #
 # ***** END GPL LICENCE BLOCK *****
 
+from __future__ import absolute_import
+from io import open
 bl_info = {
     "name": "Intellisense for Text Editor",
     "author": "Mackraken",
@@ -97,7 +99,7 @@ class Intellisense(bpy.types.Operator):
 			else:
 				bpy.ops.wm.call_menu(name=Intellimenu.bl_idname)
 
-		return {'FINISHED'}
+		return set(['FINISHED'])
 
 #this operator completes the line with the options you choose from the menu
 class Intellioptions(bpy.types.Operator):
@@ -124,10 +126,10 @@ class Intellioptions(bpy.types.Operator):
 		#intersect text
 		intersect = [-1,-1]
 
-		for i in range(lcomp):
+		for i in xrange(lcomp):
 			val1 = comp[0:i+1]
 
-			for j in range(lline):
+			for j in xrange(lline):
 				val2 = line[lline-j-1::]
 				#print("	",j, val2)
 
@@ -146,7 +148,7 @@ class Intellioptions(bpy.types.Operator):
 		bpy.ops.text.move(type='LINE_END')
 
 
-		return {'FINISHED'}
+		return set(['FINISHED'])
 
 def send_console(context, all=0):
 
@@ -162,7 +164,7 @@ def send_console(context, all=0):
 			console = get_console(hash(area.regions[1]))[0]
 
 	if console==None:
-		return {'FINISHED'}
+		return set(['FINISHED'])
 
 	if all:
 
@@ -205,7 +207,7 @@ class TestLine(bpy.types.Operator):
 				console = get_console(hash(area.regions[1]))[0]
 
 		if console==None:
-			return {'FINISHED'}
+			return set(['FINISHED'])
 
 		command = ""
 
@@ -231,7 +233,7 @@ class TestLine(bpy.types.Operator):
 		bpy.ops.text.line_break()
 
 
-		return {'FINISHED'}
+		return set(['FINISHED'])
 class SetBreakPoint(bpy.types.Operator):
 	bl_idname = "text.set_breakpoint"
 	bl_label = "Set Breakpoint"
@@ -251,7 +253,7 @@ class SetBreakPoint(bpy.types.Operator):
 
 			line.body += br
 
-		return {'FINISHED'}
+		return set(['FINISHED'])
 
 class Debug(bpy.types.Operator):
 	bl_idname = "text.debug"
@@ -263,7 +265,7 @@ class Debug(bpy.types.Operator):
 
 		addonspath = binpath[0:binpath.rindex("\\")+1]+str(bpy.app.version[0])+"."+str(bpy.app.version[1])+"\\scripts\\addons\\"
 
-		print(addonspath)
+		print addonspath
 
 		sc = context.space_data
 		text = sc.text
@@ -302,7 +304,7 @@ class Debug(bpy.types.Operator):
 		pdb.runcall("debug")
 
 
-		return {'FINISHED'}
+		return set(['FINISHED'])
 
 
 class DebugPanel(bpy.types.Panel):
@@ -350,7 +352,7 @@ def assignKey(section, name, type, event, mods=[],propvalue = "",  overwrite=0):
 	#check section
 	validsections = [item.name for item in kconf.keymaps]
 	if not section in validsections:
-		print(section  + " is not a valid section.")
+		print section  + " is not a valid section."
 		#print(validsections)
 		return False
 
@@ -358,7 +360,7 @@ def assignKey(section, name, type, event, mods=[],propvalue = "",  overwrite=0):
 	type = type.upper()
 	validkeys = [item.identifier for item in bpy.types.KeyMapItem.bl_rna.properties['type'].enum_items]
 	if not type in validkeys:
-		print(type + " is not a valid key.")
+		print type + " is not a valid key."
 		#print(validkeys)
 		return False
 
@@ -367,7 +369,7 @@ def assignKey(section, name, type, event, mods=[],propvalue = "",  overwrite=0):
 	event = event.upper()
 	validevents = [item.identifier for item in bpy.types.KeyMapItem.bl_rna.properties['value'].enum_items]
 	if not event in validevents:
-		print(event + " is not a valid event.")
+		print event + " is not a valid event."
 		#print(validevents)
 
 	kmap = kconf.keymaps[section]
@@ -393,7 +395,7 @@ def assignKey(section, name, type, event, mods=[],propvalue = "",  overwrite=0):
 		keymods = [key.any, key.shift, key.ctrl, key.alt, key.oskey]
 		if key.type == type and keymods == kmod:
 			kexists = True
-			print(key,"key exists")
+			print key,"key exists"
 			break
 
 	if kexists:

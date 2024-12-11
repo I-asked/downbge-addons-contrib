@@ -18,6 +18,8 @@
 # ***** END GPL LICENCE BLOCK *****
 
 
+from __future__ import division
+from __future__ import absolute_import
 bl_info = {
     "name": "Render Time Estimation",
     "author": "Jason van Gumster (Fweeb)",
@@ -65,8 +67,8 @@ def end_timer(scene):
     else:
         timer["average"] = (timer["average"] + render_time) / 2
 
-    print("Total render time: " + str(timedelta(seconds = timer["total"])))
-    print("Estimated completion: " + str(timedelta(seconds = (timer["average"] * (scene.frame_end - scene.frame_current)))))
+    print "Total render time: " + str(timedelta(seconds = timer["total"]))
+    print "Estimated completion: " + str(timedelta(seconds = (timer["average"] * (scene.frame_end - scene.frame_current))))
 
 
 # UI
@@ -137,9 +139,9 @@ class RenderTimeHUD(bpy.types.Operator):
         #if event.type in {'ESC'}:
         if timer["hud"] == False:
             RenderTimeHUD.handle_remove()
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
 
-        return {'PASS_THROUGH'}
+        return set(['PASS_THROUGH'])
 
     def invoke(self, context, event):
         if context.area.type == 'IMAGE_EDITOR':
@@ -149,13 +151,13 @@ class RenderTimeHUD(bpy.types.Operator):
                 timer["hud"] = True
 
                 context.window_manager.modal_handler_add(self)
-                return {'RUNNING_MODAL'}
+                return set(['RUNNING_MODAL'])
             else:
                 timer["hud"] = False
-                return {'CANCELLED'}
+                return set(['CANCELLED'])
         else:
-            self.report({'WARNING'}, "UV/Image Editor not found, cannot run operator")
-            return {'CANCELLED'}
+            self.report(set(['WARNING']), "UV/Image Editor not found, cannot run operator")
+            return set(['CANCELLED'])
 
 def display_hud(self, context):
     layout = self.layout

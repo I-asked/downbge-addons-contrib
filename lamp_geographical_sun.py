@@ -27,6 +27,8 @@
 
 # System imports
 #-----------------------------------------------------------------------------
+from __future__ import division
+from __future__ import absolute_import
 import datetime, math, time
 today = datetime.datetime.now()
 
@@ -331,7 +333,6 @@ class sun_calculator(object):
 
 # Addon classes
 #----------------------------------------------------------------------------- 
-@GeoSunAddon.addon_register_class
 class OBJECT_OT_set_geographical_sun_now(bpy.types.Operator):
     bl_idname = 'object.set_geographical_sun_now'
     bl_label = 'Set time to NOW'
@@ -354,9 +355,10 @@ class OBJECT_OT_set_geographical_sun_now(bpy.types.Operator):
         GSP.tz = time.timezone
         GSP.dst = False
         
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
-@GeoSunAddon.addon_register_class
+OBJECT_OT_set_geographical_sun_now = GeoSunAddon.addon_register_class(OBJECT_OT_set_geographical_sun_now)
+
 class OBJECT_OT_set_geographical_sun_pos(bpy.types.Operator):
     bl_idname = 'object.set_geographical_sun_pos'
     bl_label = 'Set SUN position'
@@ -383,12 +385,13 @@ class OBJECT_OT_set_geographical_sun_pos(bpy.types.Operator):
             )
             
             context.object.rotation_euler = ( math.radians(90-el), 0, math.radians(-az) )
-            return {'FINISHED'}
-        except Exception as err:
-            self.report({'ERROR'}, str(err))
-            return {'CANCELLED'}
+            return set(['FINISHED'])
+        except Exception, err:
+            self.report(set(['ERROR']), str(err))
+            return set(['CANCELLED'])
 
-@GeoSunAddon.addon_register_class
+OBJECT_OT_set_geographical_sun_pos = GeoSunAddon.addon_register_class(OBJECT_OT_set_geographical_sun_pos)
+
 class OBJECT_OT_set_geographical_location_preset(bpy.types.Operator):
     bl_idname = 'object.set_geographical_location_preset'
     bl_label = 'Apply location preset'
@@ -403,9 +406,11 @@ class OBJECT_OT_set_geographical_location_preset(bpy.types.Operator):
     def execute(self, context):
         GSP = context.lamp.GeoSunProperties
         GSP.lat, GSP.long, GSP.tz = sun_calculator.location_data[self.properties.index]
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 # Dynamic submenu magic !
+
+OBJECT_OT_set_geographical_location_preset = GeoSunAddon.addon_register_class(OBJECT_OT_set_geographical_location_preset)
 
 def draw_generator(locations):
     def draw(self, context):
@@ -430,7 +435,6 @@ for label, locations in sun_calculator.location_list:
     GeoSunAddon.addon_register_class(submenu)
     submenus.append(submenu)
 
-@GeoSunAddon.addon_register_class
 class OBJECT_MT_geo_sun_location(bpy.types.Menu):
     bl_label = 'Location preset'
     
@@ -439,7 +443,8 @@ class OBJECT_MT_geo_sun_location(bpy.types.Menu):
         for sm in submenus:
             sl.menu(sm.bl_idname)
 
-@GeoSunAddon.addon_register_class
+OBJECT_MT_geo_sun_location = GeoSunAddon.addon_register_class(OBJECT_MT_geo_sun_location)
+
 class GeoSunProperties(declarative_property_group):
     ef_attach_to = ['Lamp']
     
@@ -559,8 +564,8 @@ class GeoSunProperties(declarative_property_group):
             'icon': 'WORLD_DATA'
         },
     ]
+GeoSunProperties = GeoSunAddon.addon_register_class(GeoSunProperties)
 
-@GeoSunAddon.addon_register_class
 class GeoSunPanel(property_group_renderer):
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'
@@ -578,4 +583,6 @@ class GeoSunPanel(property_group_renderer):
 
 # Bootstrap the Addon
 #----------------------------------------------------------------------------- 
+GeoSunPanel = GeoSunAddon.addon_register_class(GeoSunPanel)
+
 register, unregister = GeoSunAddon.init_functions()

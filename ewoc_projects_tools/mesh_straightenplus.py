@@ -37,6 +37,8 @@ Save as Default (Optional).
 """
 
 
+from __future__ import division
+from __future__ import absolute_import
 bl_info = {
 	"name": "StraightenPlus",
 	"author": "Gert De Roost",
@@ -64,7 +66,7 @@ class StraightenPlus(bpy.types.Operator):
 	bl_idname = "mesh.straightenplus"
 	bl_label = "StraightenPlus"
 	bl_description = "Straighten edgeslices"
-	bl_options = {'REGISTER', 'UNDO'}
+	bl_options = set(['REGISTER', 'UNDO'])
 
 	CancelAxis = bpy.props.BoolProperty(
 		name = "Restrict axis",
@@ -111,18 +113,18 @@ class StraightenPlus(bpy.types.Operator):
 			bpy.ops.object.editmode_toggle()
 			bpy.ops.object.editmode_toggle()
 			started = False
-			return {'FINISHED'}
+			return set(['FINISHED'])
 
 		context.window_manager.modal_handler_add(self)
 
-		return {'RUNNING_MODAL'}
+		return set(['RUNNING_MODAL'])
 
 
 	def modal(self, context, event):
 
 		global started
 
-		if event.type in {'RIGHTMOUSE', 'ESC'}:
+		if event.type in set(['RIGHTMOUSE', 'ESC']):
 			# cancel operation, reset mesh
 			del bpy.types.Scene.PreSelOff
 			context.area.header_text_set()
@@ -133,12 +135,12 @@ class StraightenPlus(bpy.types.Operator):
 			bpy.ops.object.editmode_toggle()
 			bpy.ops.object.editmode_toggle()
 			started = False
-			return {'CANCELLED'}
+			return set(['CANCELLED'])
 
-		elif event.type in {'MIDDLEMOUSE', 'WHEELDOWNMOUSE', 'WHEELUPMOUSE'}:
-			return {'PASS_THROUGH'}
+		elif event.type in set(['MIDDLEMOUSE', 'WHEELDOWNMOUSE', 'WHEELUPMOUSE']):
+			return set(['PASS_THROUGH'])
 
-		elif event.type in {'MOUSEMOVE', 'LEFTMOUSE'}:
+		elif event.type in set(['MOUSEMOVE', 'LEFTMOUSE']):
 			mxa = event.mouse_x
 			mya = event.mouse_y
 			self.region = None
@@ -152,7 +154,7 @@ class StraightenPlus(bpy.types.Operator):
 						self.region = r
 						break
 			if not(self.region) and not(self.tweaking):
-				return {'PASS_THROUGH'}
+				return set(['PASS_THROUGH'])
 
 		if event.type == 'LEFTMOUSE':
 			if event.value == 'PRESS':
@@ -160,7 +162,7 @@ class StraightenPlus(bpy.types.Operator):
 				self.oldmx = event.mouse_x
 			else:
 				self.tweaking = False
-			return {'RUNNING_MODAL'}
+			return set(['RUNNING_MODAL'])
 
 		if self.tweaking and event.type == 'MOUSEMOVE':
 			mx = event.mouse_x
@@ -172,11 +174,11 @@ class StraightenPlus(bpy.types.Operator):
 			self.Percentage = newperc
 			self.do_straighten()
 			self.oldmx = mx
-			return {'RUNNING_MODAL'}
+			return set(['RUNNING_MODAL'])
 
-		if event.type in {'RET', 'NUMPAD_ENTER'}:
+		if event.type in set(['RET', 'NUMPAD_ENTER']):
 			if not(self.region):
-				return {'PASS_THROUGH'}
+				return set(['PASS_THROUGH'])
 			context.area.header_text_set()
 			# Consolidate changes if ENTER pressed.
 			# Free the bmesh.
@@ -185,9 +187,9 @@ class StraightenPlus(bpy.types.Operator):
 			bpy.ops.object.editmode_toggle()
 			bpy.ops.object.editmode_toggle()
 			started = 0
-			return {'FINISHED'}
+			return set(['FINISHED'])
 
-		return {'RUNNING_MODAL'}
+		return set(['RUNNING_MODAL'])
 
 
 	def prepare_lists(self, context):

@@ -32,6 +32,7 @@ import blf
 import bgl
 from bgl import glRectf
 from .utils import get_matrix_element_square
+from itertools import izip
 
 
 
@@ -48,12 +49,12 @@ def check_view(quat, local_grid_rotation=None):
 			 (0.5, -0.5, 0.5, 0.5), (0., 0., si, si), (0., 1., 0., 0.)]
 	if local_grid_rotation:
 		view_quat = local_grid_rotation.inverted()
-		for i in range(6):
+		for i in xrange(6):
 			quats[i] = Quaternion(quats[i]).cross(view_quat)
-	for cnt in range(6):
-		if not [1 for i, j in zip(quat, quats[cnt]) if abs(i - j) > thr]:
+	for cnt in xrange(6):
+		if not [1 for i, j in izip(quat, quats[cnt]) if abs(i - j) > thr]:
 			return vs[cnt]
-		if not [1 for i, j in zip(quat, quats[cnt]) if abs(i + j) > thr]:
+		if not [1 for i, j in izip(quat, quats[cnt]) if abs(i + j) > thr]:
 			return vs[cnt]
 	else:
 		return vs[-1]
@@ -154,13 +155,13 @@ def snap_to_grid(vec, grid_distance,
 	local_grid = True if local_grid_rotation and local_grid_origin else False
 	if local_grid:
 		mat = local_grid_rotation.to_matrix().to_4x4()
-		for i in range(3):
+		for i in xrange(3):
 			mat[3][i] = local_grid_origin[i]
 		imat = mat.inverted()
 		vec = vec * imat
 	else:
 		vec = vec.copy()
-	for i in range(3):
+	for i in xrange(3):
 		vec[i] = grid_distance * math.floor(0.5 + vec[i] / grid_distance)
 	if local_grid:
 		vec = vec * mat
@@ -180,7 +181,7 @@ def values_snap_to_grid(item, context, shift=False, use_local_grid=False):
 		local_grid_origin = v3d.local_grid_origin
 		local_grid_rotation = v3d.local_grid_rotation
 		mat = local_grid_rotation.to_matrix().to_4x4()
-		for i in range(3):
+		for i in xrange(3):
 			mat[3][i] = local_grid_origin[i]
 		imat = mat.inverted()
 
@@ -321,7 +322,7 @@ def get_DPBU_dx_unit_pow(region):
 
 
 ### Input String ##############################################################
-class Shortcut:
+class Shortcut(object):
 	def __init__(self, name='', type='', press=True,
 				 shift=False, ctrl=False, alt=False, oskey=False,
 				 draw_shortcut=True, **kw):
@@ -365,7 +366,7 @@ class Shortcut:
 			return ''
 
 
-def check_shortcuts(shortcuts, event, name:'type:str'=None):
+def check_shortcuts(shortcuts, event, name=None):
 	for shortcut in shortcuts:
 		if shortcut.check(event):
 			if name is not None:
@@ -376,7 +377,7 @@ def check_shortcuts(shortcuts, event, name:'type:str'=None):
 	return None
 
 
-class InputExpression:
+class InputExpression(object):
 	'''
 	modal内に組み込み、キーボード入力を文字列として格納。
 	event: (type:Event)
@@ -410,7 +411,7 @@ class InputExpression:
 
 	def __init__(self, names=('Dist',)):
 		self.exp_names = list(names)
-		self.exp_strings = ['' for i in range(len(names))]
+		self.exp_strings = ['' for i in xrange(len(names))]
 		self.caret = [0, 0]
 
 	def __len__(self):
@@ -439,7 +440,7 @@ class InputExpression:
 		if event.type == 'X' and event.ctrl:  # all clear
 			if event.shift:
 				self.caret[:] = [0, 0]
-				for i in range(len(self.exp_strings)):
+				for i in xrange(len(self.exp_strings)):
 					self.exp_strings[i] = ''
 			else:
 				self.caret[1] = 0
@@ -494,7 +495,7 @@ class InputExpression:
 
 	def get_exp_values(self):
 		vals = []
-		for i in range(len(self.exp_strings)):
+		for i in xrange(len(self.exp_strings)):
 			vals.append(self.get_exp_value(i))
 		return vals
 
@@ -538,7 +539,7 @@ class InputExpression:
 				blf.draw(font_id, end)
 
 
-class MouseCoordinate:
+class MouseCoordinate(object):
 	'''
 	origin, current, shiftからrelativeを求める。
 	relativeをorigin -> lockのベクトルに正射影。
@@ -825,7 +826,7 @@ def adapt(selobj):
 def find_nearest_element_from_mouse(context, type='VERTEX', mode='ALL_EMALL'):
 	v3d = context.space_data
 	cursor = v3d.cursor_location.copy()
-	v3d.cursor_location = [float('nan') for i in range(3)]
+	v3d.cursor_location = [float('nan') for i in xrange(3)]
 	bpy.ops.view3d.snap_cursor_to_element('INVOKE_REGION_WIN',
 		type=type, use_mouse_cursor=True, mode=mode, redraw=False)
 	if not is_nan(v3d.cursor_location[0]):
@@ -864,8 +865,8 @@ def make_snap_matrix(sx, sy, persmat, snap_to='selected', \
 	#vmat = [[[] for j in range(subdivide)] for i in range(subdivide)]
 	colcnt = int(math.ceil(subdivide * sx / max(sx, sy)))
 	rowcnt = int(math.ceil(subdivide * sy / max(sx, sy)))
-	vmat = [[[] for c in range(colcnt)] for r in range(rowcnt)]
-	vwmat = [[[] for c in range(colcnt)] for r in range(rowcnt)]
+	vmat = [[[] for c in xrange(colcnt)] for r in xrange(rowcnt)]
+	vwmat = [[[] for c in xrange(colcnt)] for r in xrange(rowcnt)]
 
 	space = bpy.context.space_data
 	rv3d = space.region_3d
@@ -1054,7 +1055,7 @@ def get_vector_from_snap_maxrix(mouseco, max_size, subdivide, snap_vmat, \
 		for l in get_matrix_element_square(snap_vmat, snap_vwmat, center, r):
 			if not l:
 				continue
-			for idx in range(len(l[0])):
+			for idx in xrange(len(l[0])):
 				v = l[0][idx]
 				vw = l[1][idx]
 				vec = Vector([v[0] - mouseco[0], v[1] - mouseco[1]])
@@ -1145,3 +1146,6 @@ def get_viewmat_and_viewname(context):
 
 	return mat, view
 """
+
+from __future__ import division
+from __future__ import absolute_import

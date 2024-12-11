@@ -46,6 +46,7 @@
 
 
 
+from __future__ import absolute_import
 import bpy
 import bgl
 import math
@@ -72,16 +73,16 @@ class VIEW3D_OT_cursor_memory_save(bpy.types.Operator):
     """Save cursor location"""
     bl_idname = "view3d.cursor_memory_save"
     bl_label = "Save cursor location"
-    bl_options = {'REGISTER'}
+    bl_options = set(['REGISTER'])
 
     def modal(self, context, event):
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def execute(self, context):
         cc = context.scene.cursor_memory
         cc.savedLocation = CursorAccess.getCursor()
         CursorAccess.setCursor(cc.savedLocation)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 
@@ -89,17 +90,17 @@ class VIEW3D_OT_cursor_memory_swap(bpy.types.Operator):
     """Swap cursor location"""
     bl_idname = "view3d.cursor_memory_swap"
     bl_label = "Swap cursor location"
-    bl_options = {'REGISTER'}
+    bl_options = set(['REGISTER'])
 
     def modal(self, context, event):
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def execute(self, context):
         location = CursorAccess.getCursor().copy()
         cc = context.scene.cursor_memory
         CursorAccess.setCursor(cc.savedLocation)
         cc.savedLocation = location
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 
@@ -107,15 +108,15 @@ class VIEW3D_OT_cursor_memory_recall(bpy.types.Operator):
     """Recall cursor location"""
     bl_idname = "view3d.cursor_memory_recall"
     bl_label = "Recall cursor location"
-    bl_options = {'REGISTER'}
+    bl_options = set(['REGISTER'])
 
     def modal(self, context, event):
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def execute(self, context):
         cc = context.scene.cursor_memory
         CursorAccess.setCursor(cc.savedLocation)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 
@@ -123,16 +124,16 @@ class VIEW3D_OT_cursor_memory_show(bpy.types.Operator):
     """Show cursor memory"""
     bl_idname = "view3d.cursor_memory_show"
     bl_label = "Show cursor memory"
-    bl_options = {'REGISTER'}
+    bl_options = set(['REGISTER'])
 
     def modal(self, context, event):
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def execute(self, context):
         cc = context.scene.cursor_memory
         cc.savedLocationDraw = True
         BlenderFake.forceRedraw()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 
@@ -140,16 +141,16 @@ class VIEW3D_OT_cursor_memory_hide(bpy.types.Operator):
     """Hide cursor memory"""
     bl_idname = "view3d.cursor_memory_hide"
     bl_label = "Hide cursor memory"
-    bl_options = {'REGISTER'}
+    bl_options = set(['REGISTER'])
 
     def modal(self, context, event):
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def execute(self, context):
         cc = context.scene.cursor_memory
         cc.savedLocationDraw = False
         BlenderFake.forceRedraw()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 
@@ -157,7 +158,7 @@ class VIEW3D_PT_cursor_memory(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_label = "Cursor Memory"
-    bl_options = {'DEFAULT_CLOSED'}
+    bl_options = set(['DEFAULT_CLOSED'])
 
     @classmethod
     def poll(self, context):
@@ -200,7 +201,7 @@ class VIEW3D_PT_cursor_memory_init(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_label = "Register callback"
-    bl_options = {'DEFAULT_CLOSED'}
+    bl_options = set(['DEFAULT_CLOSED'])
 
     initDone = False
     _handle = None
@@ -221,17 +222,17 @@ class VIEW3D_PT_cursor_memory_init(bpy.types.Panel):
         if VIEW3D_PT_cursor_memory_init.initDone:
             return False
 
-        print ("Cursor Memory draw-callback registration...")
+        print "Cursor Memory draw-callback registration..."
         sce = context.scene
         if context.area.type == 'VIEW_3D':
             VIEW3D_PT_cursor_memory_init.handle_add(cls, context)
             VIEW3D_PT_cursor_memory_init.initDone = True
-            print ("Cursor Memory draw-callback registered")
+            print "Cursor Memory draw-callback registered"
             # Unregister to prevent double registration...
             # Started to fail after v2.57
             # bpy.types.unregister(VIEW3D_PT_cursor_memory_init)
         else:
-            print("View3D not found, cannot run operator")
+            print "View3D not found, cannot run operator"
         return False
 
     def draw_header(self, context):
@@ -285,7 +286,7 @@ def cursor_memory_draw(cls,context):
             [-9.783240669627993, -2.070797430976005],
             [-7.915909938224757, -6.110513059466818])
         bgl.glBegin(bgl.GL_LINE_LOOP)
-        for i in range(14):
+        for i in xrange(14):
             bgl.glColor4f(color[i][0], color[i][1], color[i][2], alpha)
             bgl.glVertex2f(location[0]+offset[i][0], location[1]+offset[i][1])
         bgl.glEnd()

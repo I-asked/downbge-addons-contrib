@@ -11,6 +11,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program; if not, write to the Free Software Foundation,
 #  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+from __future__ import absolute_import
 import bpy
 
 
@@ -68,26 +69,24 @@ class AMTH_OBJECT_OT_material_remove_unassigned(bpy.types.Operator):
         bpy.ops.object.mode_set(mode="OBJECT")
 
         if materials_removed:
-            print(
-                "\n* Removed %s Unassigned Materials \n" %
-                len(materials_removed))
+            print "\n* Removed %s Unassigned Materials \n" %
+                len(materials_removed)
 
             count_mr = 0
 
             for mr in materials_removed:
                 count_mr += 1
-                print(
-                    "%0.2d. %s" %
-                    (count_mr, materials_removed[count_mr - 1]))
+                print "%0.2d. %s" %
+                    (count_mr, materials_removed[count_mr - 1])
 
-            print("\n")
-            self.report({"INFO"}, "Removed %s Unassigned Materials" %
+            print "\n"
+            self.report(set(["INFO"]), "Removed %s Unassigned Materials" %
                         len(materials_removed))
 
         if not is_visible:
             scene.layers[n] = False
 
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 
 def ui_material_remove_unassigned(self, context):

@@ -24,12 +24,14 @@
 
 """
 
+from __future__ import division
+from __future__ import absolute_import
 import bpy
 from mathutils import Vector, Matrix
 from .cursor_utils import *
 
 
-class BlenderFake:
+class BlenderFake(object):
 
     @classmethod
     def forceUpdate(cls):

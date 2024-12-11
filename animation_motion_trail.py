@@ -19,6 +19,8 @@
 # <pep8 compliant>
 
 
+from __future__ import division
+from __future__ import absolute_import
 bl_info = {
     "name": "Motion Trail",
     "author": "Bart Crouch",
@@ -42,7 +44,7 @@ import mathutils
 
 
 # fake fcurve class, used if no fcurve is found for a path
-class fake_fcurve():
+class fake_fcurve(object):
     def __init__(self, object, index, rotation=False, scale=False):
         # location
         if not rotation and not scale:
@@ -347,7 +349,7 @@ def calc_callback(self, context):
             prev_loc = get_location(range_min-1, display_ob, offset_ob, curves)
             self.cached["path"][display_ob.name][range_min-1] = prev_loc
 
-        for frame in range(range_min, range_max + 1, step):
+        for frame in xrange(range_min, range_max + 1, step):
             if use_cache and frame in self.cached["path"][display_ob.name]:
                 loc = self.cached["path"][display_ob.name][frame]
             else:
@@ -484,7 +486,7 @@ def calc_callback(self, context):
                 if display_ob.name not in self.cached["timebeads_timing"]:
                     self.cached["timebeads_timing"][display_ob.name] = {}
 
-            for i in range(1, n+1):
+            for i in xrange(1, n+1):
                 frame = range_min + i * dframe
                 if use_cache and frame in \
                 self.cached["timebeads_timing"][display_ob.name]:
@@ -1332,11 +1334,11 @@ class MotionTrailOperator(bpy.types.Operator):
         if not context.window_manager.motion_trail.enabled:
             MotionTrailOperator.handle_remove()
             context.area.tag_redraw()
-            return {'FINISHED'}
+            return set(['FINISHED'])
 
         if not context.area or not context.region or event.type == 'NONE':
             context.area.tag_redraw()
-            return {'PASS_THROUGH'}
+            return set(['PASS_THROUGH'])
 
         select = context.user_preferences.inputs.select_mouse
         if (not context.active_object or
@@ -1358,12 +1360,12 @@ class MotionTrailOperator(bpy.types.Operator):
             event.alt and not event.ctrl and not event.shift:
                 if eval("bpy.ops."+self.left_action+".poll()"):
                     eval("bpy.ops."+self.left_action+"('INVOKE_DEFAULT')")
-            return {'PASS_THROUGH'}
+            return set(['PASS_THROUGH'])
         # check if event was generated within 3d-window, dragging is exception
         if not self.drag:
             if not (0 < event.mouse_region_x < context.region.width) or \
             not (0 < event.mouse_region_y < context.region.height):
-                return {'PASS_THROUGH'}
+                return set(['PASS_THROUGH'])
 
         if (event.type == self.transform_key and event.value == 'PRESS' and
            (self.active_keyframe or
@@ -1492,7 +1494,7 @@ class MotionTrailOperator(bpy.types.Operator):
         if context.area: # not available if other window-type is fullscreen
             context.area.tag_redraw()
 
-        return {'PASS_THROUGH'}
+        return set(['PASS_THROUGH'])
 
     def invoke(self, context, event):
         if context.area.type == 'VIEW_3D':
@@ -1554,7 +1556,7 @@ class MotionTrailOperator(bpy.types.Operator):
                     context.area.tag_redraw()
 
                 context.window_manager.modal_handler_add(self)
-                return {'RUNNING_MODAL'}
+                return set(['RUNNING_MODAL'])
 
             else:
                 # disable
@@ -1566,11 +1568,11 @@ class MotionTrailOperator(bpy.types.Operator):
                 if context.area:
                     context.area.tag_redraw()
 
-                return {'FINISHED'}
+                return set(['FINISHED'])
 
         else:
-            self.report({'WARNING'}, "View3D not found, cannot run operator")
-            return {'CANCELLED'}
+            self.report(set(['WARNING']), "View3D not found, cannot run operator")
+            return set(['CANCELLED'])
 
 
 class MotionTrailPanel(bpy.types.Panel):
@@ -1578,7 +1580,7 @@ class MotionTrailPanel(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
     bl_label = "Motion Trail"
-    bl_options = {'DEFAULT_CLOSED'}
+    bl_options = set(['DEFAULT_CLOSED'])
 
     @classmethod
     def poll(cls, context):

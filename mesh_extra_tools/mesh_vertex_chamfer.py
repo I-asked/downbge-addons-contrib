@@ -18,6 +18,8 @@
 
 # <pep8 compliant>
 
+from __future__ import division
+from __future__ import absolute_import
 bl_info = {
     "name": "Vertex Chamfer",
     "author": "Andrew Hale (TrumanBlending)",
@@ -38,7 +40,7 @@ class VertexChamfer(bpy.types.Operator):
     bl_idname = "mesh.vertex_chamfer"
     bl_label = "Chamfer Vertex"
     bl_description = "Tri chamfer selected vertices"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     factor = bpy.props.FloatProperty(name="Factor",
                                      default=0.1,
@@ -122,7 +124,7 @@ class VertexChamfer(bpy.types.Operator):
 
         me.calc_tessface()
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class chamfer_help(bpy.types.Operator):
 	bl_idname = 'help.vertexchamfer'
@@ -137,7 +139,7 @@ class chamfer_help(bpy.types.Operator):
 		layout.label('In some cases may need to press F to fill result.')
 	
 	def execute(self, context):
-		return {'FINISHED'}
+		return set(['FINISHED'])
 
 	def invoke(self, context, event):
 		return context.window_manager.invoke_popup(self, width = 300)

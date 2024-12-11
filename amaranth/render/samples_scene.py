@@ -26,6 +26,8 @@ Find it on the Sampling panel, on Render properties.
 Developed during Caminandes Open Movie Project
 """
 
+from __future__ import division
+from __future__ import absolute_import
 import bpy
 from amaranth import utils
 
@@ -49,9 +51,9 @@ class AMTH_RENDER_OT_cycles_samples_percentage_set(bpy.types.Operator):
             cycles.subsurface_samples,
             cycles.volume_samples]
 
-        self.report({"INFO"}, "Render Samples Saved")
+        self.report(set(["INFO"]), "Render Samples Saved")
 
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 
 class AMTH_RENDER_OT_cycles_samples_percentage(bpy.types.Operator):
@@ -86,7 +88,7 @@ class AMTH_RENDER_OT_cycles_samples_percentage(bpy.types.Operator):
             (cycles_samples_final[5] / 100) * percent)
         cycles.volume_samples = int((cycles_samples_final[6] / 100) * percent)
 
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 
 def render_cycles_scene_samples(self, context):

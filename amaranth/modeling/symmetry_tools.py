@@ -33,6 +33,7 @@ Search (spacebar) for "Find Asymmetric", and "Make Symmetric""Settings".
 > Developed during Caminandes Open Movie Project
 """
 
+from __future__ import absolute_import
 import bpy
 import bmesh
 from mathutils import Vector
@@ -46,7 +47,7 @@ class AMTH_MESH_OT_find_asymmetric(bpy.types.Operator):
 
     bl_idname = "mesh.find_asymmetric"
     bl_label = "Find Asymmetric"
-    bl_options = {"UNDO", "REGISTER"}
+    bl_options = set(["UNDO", "REGISTER"])
 
     @classmethod
     def poll(cls, context):
@@ -88,7 +89,7 @@ class AMTH_MESH_OT_find_asymmetric(bpy.types.Operator):
 
         bmesh.update_edit_mesh(object.data)
 
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 
 class AMTH_MESH_OT_make_symmetric(bpy.types.Operator):
@@ -99,7 +100,7 @@ class AMTH_MESH_OT_make_symmetric(bpy.types.Operator):
 
     bl_idname = "mesh.make_symmetric"
     bl_label = "Make Symmetric"
-    bl_options = {"UNDO", "REGISTER"}
+    bl_options = set(["UNDO", "REGISTER"])
 
     @classmethod
     def poll(cls, context):
@@ -163,7 +164,7 @@ class AMTH_MESH_OT_make_symmetric(bpy.types.Operator):
         bm.select_flush_mode()
         bmesh.update_edit_mesh(object.data)
 
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 
 def register():

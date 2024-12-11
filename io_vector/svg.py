@@ -21,6 +21,8 @@
 """Reading SVG file format.
 """
 
+from __future__ import division
+from __future__ import absolute_import
 __author__ = "howard.trickey@gmail.com"
 
 import re
@@ -147,9 +149,9 @@ def _ProcessPolygon(node, art, gs):
         coords = _ParseCoordPairList(node.getAttribute('points'))
         n = len(coords)
         if n > 0:
-            c = [gs.ctm.Apply(coords[i]) for i in range(n)]
+            c = [gs.ctm.Apply(coords[i]) for i in xrange(n)]
             sp = geom.Subpath()
-            sp.segments = [('L', c[i], c[i % n]) for i in range(n)]
+            sp.segments = [('L', c[i], c[i % n]) for i in xrange(n)]
             sp.closed = True
             path = geom.Path()
             _SetPathAttributes(path, node, gs)

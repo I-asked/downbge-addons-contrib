@@ -48,8 +48,8 @@ def AutoNodeOff():
     bpy.context.scene.render.engine = 'BLENDER_RENDER'
 
 def BakingText(tex, mode):
-    print('________________________________________')
-    print('INFO start bake texture ' + tex.name)
+    print '________________________________________'
+    print 'INFO start bake texture ' + tex.name
     bpy.ops.object.mode_set(mode='OBJECT')
     sc = bpy.context.scene
     tmat = ''
@@ -121,7 +121,7 @@ def BakingText(tex, mode):
     bpy.data.materials.remove(tmat)
 
     # print('INFO : end Bake ' + img.filepath_raw )
-    print('________________________________________')
+    print '________________________________________'
 
 def AutoNode(active=False):
     
@@ -189,7 +189,7 @@ def AutoNode(active=False):
 
             if cmat_is_transp and cmat.raytrace_transparency.ior == 1 and not cmat.raytrace_mirror.use  and sM:
                 if not shader.type == 'ShaderNodeBsdfTransparent':
-                    print("INFO:  Make TRANSPARENT shader node " + cmat.name)
+                    print "INFO:  Make TRANSPARENT shader node " + cmat.name
                     TreeNodes.nodes.remove(shader)
                     shader = TreeNodes.nodes.new('ShaderNodeBsdfTransparent')
                     shader.location = 0, 470
@@ -197,7 +197,7 @@ def AutoNode(active=False):
 
             if not cmat.raytrace_mirror.use and not cmat_is_transp:
                 if not shader.type == 'ShaderNodeBsdfDiffuse':
-                    print("INFO:  Make DIFFUSE shader node" + cmat.name)
+                    print "INFO:  Make DIFFUSE shader node" + cmat.name
                     TreeNodes.nodes.remove(shader)
                     shader = TreeNodes.nodes.new('ShaderNodeBsdfDiffuse')
                     shader.location = 0, 470
@@ -205,7 +205,7 @@ def AutoNode(active=False):
 
             if cmat.raytrace_mirror.use and cmat.raytrace_mirror.reflect_factor > 0.001 and cmat_is_transp:
                 if not shader.type == 'ShaderNodeBsdfGlass':
-                    print("INFO:  Make GLASS shader node" + cmat.name)
+                    print "INFO:  Make GLASS shader node" + cmat.name
                     TreeNodes.nodes.remove(shader)
                     shader = TreeNodes.nodes.new('ShaderNodeBsdfGlass')
                     shader.location = 0, 470
@@ -213,7 +213,7 @@ def AutoNode(active=False):
 
             if cmat.raytrace_mirror.use and not cmat_is_transp and cmat.raytrace_mirror.reflect_factor > 0.001 :
                 if not shader.type == 'ShaderNodeBsdfGlossy':
-                    print("INFO:  Make MIRROR shader node" + cmat.name)
+                    print "INFO:  Make MIRROR shader node" + cmat.name
                     TreeNodes.nodes.remove(shader)
                     shader = TreeNodes.nodes.new('ShaderNodeBsdfGlossy')
                     shader.location = 0, 520
@@ -221,14 +221,14 @@ def AutoNode(active=False):
 
             if cmat.emit > 0.001 :
                 if not shader.type == 'ShaderNodeEmission' and not cmat.raytrace_mirror.reflect_factor > 0.001 and not cmat_is_transp:
-                    print("INFO:  Mix EMISSION shader node" + cmat.name)
+                    print "INFO:  Mix EMISSION shader node" + cmat.name
                     TreeNodes.nodes.remove(shader)
                     shader = TreeNodes.nodes.new('ShaderNodeEmission')
                     shader.location = 0, 450
                     links.new(shader.outputs[0], shout.inputs[0])
                 else:
                     if not Add_Emission:
-                        print("INFO:  Add EMISSION shader node" + cmat.name)
+                        print "INFO:  Add EMISSION shader node" + cmat.name
                         shout.location = 550, 330
                         Add_Emission = TreeNodes.nodes.new('ShaderNodeAddShader')
                         Add_Emission.location = 370, 490
@@ -244,7 +244,7 @@ def AutoNode(active=False):
                         shem.inputs['Strength'].default_value = cmat.emit
 
             if cmat.translucency > 0.001 :
-                print("INFO:  Add BSDF_TRANSLUCENT shader node" + cmat.name)
+                print "INFO:  Add BSDF_TRANSLUCENT shader node" + cmat.name
                 shout.location = 770, 330
                 Add_Translucent = TreeNodes.nodes.new('ShaderNodeAddShader')
                 Add_Translucent.location = 580, 490
@@ -292,7 +292,7 @@ def AutoNode(active=False):
 
                         if not tex.texture.type == 'IMAGE':
                             if sc.EXTRACT_PTEX:
-                                print('INFO : Extract Procedural Texture  ')
+                                print 'INFO : Extract Procedural Texture  '
                                 if not os.path.exists(bpy.path.abspath(tex.texture.name + "_PTEXT.jpg")) or sc.EXTRACT_OW:
                                     BakingText(tex, 'PTEX')
 
@@ -307,7 +307,7 @@ def AutoNode(active=False):
 
                         if tex.use_map_emit:
                             if not Add_Emission:
-                                print("INFO:  Mix EMISSION + Texture shader node " + cmat.name)
+                                print "INFO:  Mix EMISSION + Texture shader node " + cmat.name
 
                                 intensity = 0.5 + (tex.emit_factor / 2)
 
@@ -333,7 +333,7 @@ def AutoNode(active=False):
 
                         if tex.use_map_translucency:
                             if not Add_Translucent:
-                                print("INFO:  Add Translucency + Texture shader node " + cmat.name)
+                                print "INFO:  Add Translucency + Texture shader node " + cmat.name
 
                                 intensity = 0.5 + (tex.emit_factor / 2)
 
@@ -359,7 +359,7 @@ def AutoNode(active=False):
 
                         if tex.use_map_alpha:
                             if not Mix_Alpha:
-                                print("INFO:  Mix Alpha + Texture shader node " + cmat.name)
+                                print "INFO:  Mix Alpha + Texture shader node " + cmat.name
 
                                 shout.location = 750, 330
                                 Mix_Alpha = TreeNodes.nodes.new('ShaderNodeMixShader')
@@ -419,7 +419,7 @@ class mllock(bpy.types.Operator):
                     n.label = ''
                 else:
                     n.label = 'Locked'
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class mlrefresh(bpy.types.Operator):
     bl_idname = "ml.refresh"
@@ -434,7 +434,7 @@ class mlrefresh(bpy.types.Operator):
     
     def execute(self, context):
         AutoNode()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class mlrefresh_active(bpy.types.Operator):
     bl_idname = "ml.refresh_active"
@@ -449,7 +449,7 @@ class mlrefresh_active(bpy.types.Operator):
     
     def execute(self, context):
         AutoNode(True)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class mlrestore(bpy.types.Operator):
     bl_idname = "ml.restore"
@@ -462,7 +462,7 @@ class mlrestore(bpy.types.Operator):
         return True
     def execute(self, context):
         AutoNodeOff()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 from bpy.props import *
 sc = bpy.types.Scene
@@ -507,6 +507,8 @@ class OBJECT_PT_scenemassive(bpy.types.Panel):
         except:
             pass
 '''
+from __future__ import division
+from __future__ import absolute_import
 def register():
     bpy.utils.register_module(__name__)
     pass

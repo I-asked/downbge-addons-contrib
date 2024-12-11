@@ -44,12 +44,13 @@ Additional links:
 	e-mail: dolf {at} macouno {dot} com
 """
 '''
+from __future__ import absolute_import
 import bpy
 from bpy.props import BoolProperty
 from . import mesh_extras
 
 # Grow stuff!
-class Select_innermost():
+class Select_innermost(object):
 
 	# Initialise the class
 	def __init__(self, context, invert):
@@ -123,7 +124,7 @@ class Select_innermost_init(bpy.types.Operator):
 	'''Select the innermost faces of the current selection'''
 	bl_idname = 'mesh.select_innermost'
 	bl_label = 'Select innermost'
-	bl_options = {'REGISTER', 'UNDO'}
+	bl_options = set(['REGISTER', 'UNDO'])
 
 	invert = BoolProperty(name='Invert', description='Invert the selection result (select outermost)', default=False)
 
@@ -134,5 +135,5 @@ class Select_innermost_init(bpy.types.Operator):
 
 	def execute(self, context):
 		innermost = Select_innermost(context, self.invert)
-		return {'FINISHED'}
+		return set(['FINISHED'])
 

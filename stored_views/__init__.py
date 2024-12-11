@@ -16,6 +16,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import absolute_import
 bl_info = {
     "name": "Stored Views",
     "description": "Save and restore User defined views, pov, layers and display configs.",
@@ -77,7 +78,7 @@ class VIEW3D_stored_views_initialize(bpy.types.Operator):
         scenes = bpy.data.scenes
         for scene in scenes:
             core.DataStore.sanitize_data(scene)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 def register():

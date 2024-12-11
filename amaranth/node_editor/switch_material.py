@@ -21,13 +21,14 @@ http://www.elysiun.com/forum/showthread.php?290097-Dynamic-Object-Dropdown-List&
 
 """
 
+from __future__ import absolute_import
 import bpy
 
 def ui_node_editor_material_select(self, context):
 
     act_ob = context.active_object
 
-    if act_ob and context.active_object.type in {'MESH', 'CURVE', 'SURFACE', 'META'} and \
+    if act_ob and context.active_object.type in set(['MESH', 'CURVE', 'SURFACE', 'META']) and \
         context.space_data.tree_type == 'ShaderNodeTree' and \
         context.space_data.shader_type == 'OBJECT':
 
@@ -57,7 +58,7 @@ class AMNodeEditorMaterialSelect(bpy.types.Operator):
     
     def execute(self,context):
         bpy.context.active_object.active_material_index = int(self.material_select)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 def register():
     bpy.utils.register_class(AMNodeEditorMaterialSelect)

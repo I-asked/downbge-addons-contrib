@@ -18,6 +18,7 @@
 
 # <pep8 compliant>
 
+from __future__ import absolute_import
 import bpy, os
 from bpy.types import Operator, PropertyGroup
 from bpy.props import *

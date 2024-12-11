@@ -1,4 +1,6 @@
 #werkt from geodesic_domes.vefm_270 import *
+from __future__ import division
+from __future__ import absolute_import
 from geodesic_domes.vefm_271 import mesh, vertex, edge, face
 
 import math
@@ -12,10 +14,10 @@ def check_contains(cl,name , print_value = False):
         else:
             if print_value:
                 tmp = getattr(cl,el)
-                print(name , " contains ==>",el," value = ", tmp)
+                print name, " contains ==>",el," value = ", tmp
             else:
-                print(name , " contains ==>",el)
-    print("\ncheck_contains finished\n\n")
+                print name, " contains ==>",el
+    print "\ncheck_contains finished\n\n"
 
 class geodesic(mesh):
     def __init__(self):
@@ -104,7 +106,7 @@ class geodesic(mesh):
         if not self.cart:
             self.sphericalize()    ##   Convert x,y,z positions into spherical u,v.
         self.sphere2cartesian()    ##   Convert spherical uv back into cartesian x,y,z for final shape.
-        for i in range(len( self.verts)):
+        for i in xrange(len( self.verts)):
             self.verts[i].index = i
         for edg in self.edges:
             edg.findvect()
@@ -115,15 +117,15 @@ class geodesic(mesh):
 #PKHG 23.1    def config(self, frequency = 1): #???PKHG frequency problem  20 oct.
     def config(self): #???PKHG frequency problem  20 oct.
 #PKHG_OK        print("\n20-11 >>>>>>>>>DBG geodesic_classes_270 config L117 called")
-        for i in range(len(self.vertskeleton)):
+        for i in xrange(len(self.vertskeleton)):
             self.vertskeleton[i].index = i
         for edges in self.edgeskeleton:
 #???PKHG TODO            s = skeletonrow(self.frequency, edges, 0, self) #self a geodesic
             s = skeletonrow(self.frequency, edges, 0, self) #self a geodesic
             self.skeleton.append(s)
-        for i in range(len( self.verts)):
+        for i in xrange(len( self.verts)):
             self.verts[i].index = i
-        for i in range(len(self.panelpoints)):
+        for i in xrange(len(self.panelpoints)):
             a = self.vertsdone[self.panelpoints[i][0]][1]
             b = self.vertsdone[self.panelpoints[i][1]][1]
             c = self.vertsdone[self.panelpoints[i][2]][1]
@@ -158,7 +160,7 @@ class geodesic(mesh):
 
     def sphere2cartesian(self):
 #PKHG_TODOnot_now        check_contains(self,"sphereto self",True)
-        for i in range(len(self.verts)):
+        for i in xrange(len(self.verts)):
             if self.cart:
 #PKHG test 20111030                        
 #                x = self.verts[i].x * self.radius * self.eccentricity
@@ -265,12 +267,12 @@ class geodesic(mesh):
 #         self.dovertface()
 #         self.dofaceedge()
 
-class edgerow:
+class edgerow(object):
     def __init__(self, count, anchor, leftindex, rightindex, stepvector, endflag, parentgeo):
         self.points = []
         self.edges = []
         ## Make a row of evenly spaced points.
-        for i in range(count + 1):
+        for i in xrange(count + 1):
             if i == 0:
                 self.points.append(leftindex)
             elif i == count and not endflag:
@@ -281,21 +283,21 @@ class edgerow:
                 self.points.append(vertcount)
                 newpoint.index = vertcount
                 parentgeo.verts.append(newpoint)
-        for i in range(count):
+        for i in xrange(count):
             a = parentgeo.verts[self.points[i]]
             b = parentgeo.verts[self.points[i + 1]]
             line = edge(a,b)
             self.edges.append(len(parentgeo.edges))
             parentgeo.edges.append(line)
 
-class skeletonrow:
+class skeletonrow(object):
     def __init__(self, count, skeletonedge, shortflag, parentgeo):
         self.points = []
         self.edges = []
         self.vect = skeletonedge.vect
         self.step = skeletonedge.vect / float(count)
         ## Make a row of evenly spaced points.
-        for i in range(count + 1):
+        for i in xrange(count + 1):
             vert1 = skeletonedge.a
             vert2 = skeletonedge.b
             if i == 0:
@@ -329,16 +331,16 @@ class skeletonrow:
                 self.points.append(vertcount)
                 newpoint.index = vertcount
                 parentgeo.verts.append(newpoint)
-        for i in range(count):
+        for i in xrange(count):
             a = parentgeo.verts[self.points[i]]
             b = parentgeo.verts[self.points[i + 1]]
             line = edge(a,b)
             self.edges.append(len(parentgeo.edges))
             parentgeo.edges.append(line)
 
-class facefill:
+class facefill(object):
     def __init__(self, upper, lower, reverseflag, parentgeo, finish):
-        for i in range(finish):
+        for i in xrange(finish):
             a,b,c = upper.points[i],lower.points[i + 1],lower.points[i]
             if reverseflag:
                 upface = face([parentgeo.verts[a],parentgeo.verts[c],parentgeo.verts[b]])
@@ -358,7 +360,7 @@ class facefill:
                 parentgeo.faces.append(downface)
                 parentgeo.edges.append(line)
                 parentgeo.edges.append(line2)
-class panel:
+class panel(object):
     def __init__(self, points, edges, reverseflag, parentgeo):
         self.cardinal = points[0]
         self.leftv = points[1]
@@ -386,14 +388,14 @@ class panel:
             self.baseedge.vect.negative()
 
     def createrows(self, parentgeo):
-        for i in range(len(self.leftedge.points)):
+        for i in xrange(len(self.leftedge.points)):
             if i == parentgeo.frequency:
                 newrow = self.baseedge
             else:
                 newrow = edgerow(i, parentgeo.verts[self.leftedge.points[i]], self.leftedge.points[i], self.rightedge.points[i], self.baseedge.step, 0, parentgeo )
             self.rows.append(newrow)
     def createfaces(self, parentgeo,reverseflag):
-        for i in range(len(self.leftedge.points) - 1):
+        for i in xrange(len(self.leftedge.points) - 1):
             facefill(self.rows[i], self.rows[i + 1], reverseflag, parentgeo, len(self.rows[i].points))
 #############################
 #############################
@@ -441,7 +443,7 @@ class tetraedge(geodesic):
                             edge(self.vertskeleton[1],self.vertskeleton[3]),
                             edge(self.vertskeleton[1],self.vertskeleton[2]),
                             edge(self.vertskeleton[2],self.vertskeleton[3])    ]
-        for i in range(len(self.vertskeleton)):
+        for i in xrange(len(self.vertskeleton)):
             self.vertskeleton[i].index = i
         self.panelpoints=[[0,1,2],[1,2,3],[0,1,3],[0,2,3]]
         self.paneledges=[[0,1,4],[4,3,5],[0,2,3],[1,2,5]]
@@ -484,7 +486,7 @@ class octahedron(geodesic):
                             vertex((0.0,-1.0,0.0)),
                             vertex((1.0,0.0,0.0)),
                             vertex((0.0,0.0,-1.0))    ]
-        for i in range(len(self.vertskeleton)):
+        for i in xrange(len(self.vertskeleton)):
             self.vertskeleton[i].index = i
         self.edgeskeleton=[    edge(self.vertskeleton[0],self.vertskeleton[1]),
                             edge(self.vertskeleton[0],self.vertskeleton[2]),

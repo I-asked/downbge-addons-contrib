@@ -37,24 +37,27 @@ It processes the script as a text file and not as a Python executable
 because of the incompatible Python APIs of Blender 2.4x/2.5x/2.6x.
 """
 
+from __future__ import division
+from __future__ import absolute_import
 import bpy
 from bpy.props import *
 import mathutils
 import os
 import string
 import math
+from io import open
 
 def voodoo_import(infile,ld_cam,ld_points):
 
     checktype = os.path.splitext(infile)[1]
 
     if checktype.upper() != '.PY':
-        print ("Selected file: ",infile)
+        print "Selected file: ",infile
         raise IOError("The selected input file is not a *.py file")
         return
 
-    print ("--------------------------------------------------")
-    print ("Importing Voodoo file: ", infile)
+    print "--------------------------------------------------"
+    print "Importing Voodoo file: ", infile
 
     file = open(infile,'rU')
     scene = bpy.context.scene
@@ -285,7 +288,7 @@ class ImportVoodooCamera(bpy.types.Operator):
     bl_idname = "import.voodoo_camera"
     bl_label = "Import Voodoo camera"
     bl_description = "Load a Blender export script from the Voodoo motion tracker"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     filepath = StringProperty(name="File Path",
         description="Filepath used for processing the script",
@@ -303,12 +306,12 @@ class ImportVoodooCamera(bpy.types.Operator):
 
     def execute(self, context):
         voodoo_import(self.filepath,self.load_camera,self.load_points)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def invoke(self, context, event):
         wm = context.window_manager
         wm.fileselect_add(self)
-        return {'RUNNING_MODAL'}
+        return set(['RUNNING_MODAL'])
 
 
 # Registering / Unregister

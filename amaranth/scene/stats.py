@@ -19,6 +19,7 @@ emitting meshes.
 On the Info header.
 """
 
+from __future__ import absolute_import
 import bpy
 from amaranth import utils
 

@@ -16,6 +16,8 @@
 
 #END GPL LICENCE BLOCK
 
+from __future__ import division
+from __future__ import absolute_import
 bl_info = {
     "name": "Btrace",
     "author": "liero, crazycourier, Atom, Meta-Androcto, MacKracken",
@@ -192,7 +194,7 @@ class addTracerObjectPanel(bpy.types.Panel):
     bl_context = 'objectmode'
     selected = "tool_objectTrace"
     bl_category = 'Create'
-    bl_options = {'DEFAULT_CLOSED'}
+    bl_options = set(['DEFAULT_CLOSED'])
 
 
     def draw(self, context):
@@ -619,12 +621,12 @@ class OBJECT_OT_objecttrace(bpy.types.Operator):
     bl_idname = "object.btobjecttrace"
     bl_label = "Btrace: Object Trace"
     bl_description = "Trace selected mesh object with a curve with the option to animate"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
 
     @classmethod
     def poll(cls, context):
-        return (context.object and context.object.type in {'MESH', 'FONT'})
+        return (context.object and context.object.type in set(['MESH', 'FONT']))
 
     def invoke(self, context, event):
         import bpy
@@ -649,7 +651,7 @@ class OBJECT_OT_objecttrace(bpy.types.Operator):
                 addtracemat(bpy.context.object.data)
             if Btrace.animate:
                 bpy.ops.curve.btgrow()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 ################## ################## ################## ############
@@ -662,7 +664,7 @@ class OBJECT_OT_objectconnect(bpy.types.Operator):
     bl_idname = "object.btobjectsconnect"
     bl_label = "Btrace: Objects Connect"
     bl_description = "Connect selected objects with a curve and add hooks to each node"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     @classmethod
     def poll(cls, context):
@@ -710,7 +712,7 @@ class OBJECT_OT_objectconnect(bpy.types.Operator):
         tracer.bevel_depth = Btrace.curve_depth  # Set bevel depth from Panel options
 
         # move nodes to objects
-        for i in range(len(list)):
+        for i in xrange(len(list)):
             p = spline.bezier_points[i]
             p.co = list[i].location
             p.handle_right_type = curve_handle
@@ -720,7 +722,7 @@ class OBJECT_OT_objectconnect(bpy.types.Operator):
         bpy.ops.object.mode_set(mode='OBJECT')
 
         # place hooks
-        for i in range(len(list)):
+        for i in xrange(len(list)):
             list[i].select = True
             curve.data.splines[0].bezier_points[i].select_control_point = True
             bpy.ops.object.mode_set(mode='EDIT')
@@ -737,7 +739,7 @@ class OBJECT_OT_objectconnect(bpy.types.Operator):
         bpy.ops.object.group_link(group="Btrace") # add to Btrace group
         if Btrace.animate:
             bpy.ops.curve.btgrow() # Add grow curve
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 ################## ################## ################## ############
@@ -764,7 +766,7 @@ class OBJECT_OT_particletrace(bpy.types.Operator):
     bl_idname = "particles.particletrace"
     bl_label = "Btrace: Particle Trace"
     bl_description = "Creates a curve from each particle of a system. Keeping particle amount under 250 will make this run faster"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     @classmethod
     def poll(cls, context):
@@ -794,7 +796,7 @@ class OBJECT_OT_particletrace(bpy.types.Operator):
                 tracer = curvetracer('Tracer.000', 'Spline.000')
             spline = tracer[0].splines.new('BEZIER')
             spline.bezier_points.add((x.lifetime - 1) // particle_step)  # add point to spline based on step size
-            for t in list(range(int(x.lifetime))):
+            for t in range(int(x.lifetime)):
                 bpy.context.scene.frame_set(t + x.birth_time)
                 if not t % particle_step:
                     p = spline.bezier_points[t // particle_step]
@@ -814,7 +816,7 @@ class OBJECT_OT_particletrace(bpy.types.Operator):
         if Btrace.animate:
             bpy.ops.curve.btgrow()  # Add grow curve
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 ###########################################################################
@@ -826,7 +828,7 @@ class OBJECT_OT_traceallparticles(bpy.types.Operator):
     bl_idname = 'particles.connect'
     bl_label = 'Connect Particles'
     bl_description = 'Create a continuous animated curve from particles in active system'
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     @classmethod
     def poll(cls, context):
@@ -840,8 +842,8 @@ class OBJECT_OT_traceallparticles(bpy.types.Operator):
 
         # Grids distribution not supported
         if set.distribution == 'GRID':
-            self.report({'INFO'},"Grid distribution mode for particles not supported.")
-            return{'FINISHED'}
+            self.report(set(['INFO']),"Grid distribution mode for particles not supported.")
+            returnset(['FINISHED'])
 
         Btrace = bpy.context.window_manager.curve_tracer
         particle_f_start = Btrace.particle_f_start # Get frame start
@@ -872,10 +874,10 @@ class OBJECT_OT_traceallparticles(bpy.types.Operator):
             f_start = particle_f_start
             f_end = particle_f_end
 
-        for bFrames in range(f_start, f_end):
+        for bFrames in xrange(f_start, f_end):
             bpy.context.scene.frame_set(bFrames)
             if not (bFrames-f_start) % Btrace.particle_step:
-                for bFrames in range(set.count):
+                for bFrames in xrange(set.count):
                     if ps.particles[bFrames].alive_state != 'UNBORN':
                         e = bFrames
                     bp = spline.bezier_points[bFrames]
@@ -895,7 +897,7 @@ class OBJECT_OT_traceallparticles(bpy.types.Operator):
         addtracemat(curve.data) #Add material
         if Btrace.animate:
             bpy.ops.curve.btgrow()
-        return{'FINISHED'}
+        returnset(['FINISHED'])
 
 ################## ################## ################## ############
 ## Writing Tool
@@ -906,7 +908,7 @@ class OBJECT_OT_writing(bpy.types.Operator):
     bl_idname = 'curve.btwriting'
     bl_label = 'Write'
     bl_description = 'Use Grease Pencil to write and convert to curves'
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     # @classmethod  ### Removed so panel still draws if nothing is selected
     # def poll(cls, context):
@@ -944,7 +946,7 @@ class OBJECT_OT_writing(bpy.types.Operator):
         # Return to first frame
         bpy.context.scene.frame_set(Btrace.anim_f_start)
 
-        return{'FINISHED'}
+        returnset(['FINISHED'])
 
 ################## ################## ################## ############
 ## Create Curve
@@ -956,7 +958,7 @@ class OBJECT_OT_convertcurve(bpy.types.Operator):
     bl_idname = "object.btconvertcurve"
     bl_label = "Btrace: Create Curve"
     bl_description = "Convert mesh to curve using either Continuous, All Edges, or Sharp Edges"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     def execute(self, context):
         import bpy, random, mathutils
@@ -978,7 +980,7 @@ class OBJECT_OT_convertcurve(bpy.types.Operator):
             # Add noise to mesh
             if Btrace.distort_curve:
                 for v in obj.data.vertices:
-                    for u in range(3):
+                    for u in xrange(3):
                         v.co[u] += Btrace.distort_noise * (random.uniform(-1,1))
 
             if Btrace.convert_edgetype == 'CONTI':
@@ -995,7 +997,7 @@ class OBJECT_OT_convertcurve(bpy.types.Operator):
                 for v in verts:
                     li.append(v.index)
                 li.remove(p1)
-                for z in range(len(li)):
+                for z in xrange(len(li)):
                     x = []
                     for px in li:
                         d = verts[p1].co - verts[px].co # find distance from first vert
@@ -1043,11 +1045,11 @@ class OBJECT_OT_convertcurve(bpy.types.Operator):
         if Btrace.distort_curve:
             scale = Btrace.distort_modscale
             if scale == 0:
-                return {'FINISHED'}
+                return set(['FINISHED'])
             for u in obj.data.splines:
                 for v in u.bezier_points:
                     v.radius = scale*round(random.random(),3)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 ################## ################## ################## ############
@@ -1060,12 +1062,12 @@ class OBJECT_OT_meshfollow(bpy.types.Operator):
     bl_idname = "object.btmeshfollow"
     bl_label = "Btrace: Vertex Trace"
     bl_description = "Trace Vertex or Face on an animated mesh"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
 
     @classmethod
     def poll(cls, context):
-        return (context.object and context.object.type in {'MESH'})
+        return (context.object and context.object.type in set(['MESH']))
 
     def execute(self, context):
         import bpy, random
@@ -1109,7 +1111,7 @@ class OBJECT_OT_meshfollow(bpy.types.Operator):
                         sel.append(i.index)
                     finalsel = int(len(sel) * Btrace.fol_perc_verts)
                     remove = len(sel) - finalsel
-                    for i in range(remove):
+                    for i in xrange(remove):
                         sel.pop(random.randint(0, len(sel) - 1))
                 if seloption == 'ALL':
                     for i in list(meshobjs):
@@ -1120,7 +1122,7 @@ class OBJECT_OT_meshfollow(bpy.types.Operator):
         def get_coord(objindex):
             obj_co = []  # list of vector coordinates to use
             frame_x = start_frame
-            for i in range(frames):  # create frame numbers list
+            for i in xrange(frames):  # create frame numbers list
                 scn.frame_set(frame_x)
                 if drawmethod != 'OBJECT':
                     followed_item = meshobjs[objindex]
@@ -1166,7 +1168,7 @@ class OBJECT_OT_meshfollow(bpy.types.Operator):
                 curve_handle = 'AUTO'
 
             # move bezier points to objects
-            for i in range(len(co_list)):
+            for i in xrange(len(co_list)):
                 p = spline.bezier_points[i]
                 p.co = co_list[i]
                 p.handle_right_type = curve_handle
@@ -1208,7 +1210,7 @@ class OBJECT_OT_meshfollow(bpy.types.Operator):
                 curveobject.select = False
 
         obj.select = False  # Deselect original object
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 ###################################################################
 #### Add Tracer Material
@@ -1261,7 +1263,7 @@ def addtracemat(matobj):
         else:  # Run color blender operator
             bpy.ops.object.colorblender()
 
-    return {'FINISHED'}
+    return set(['FINISHED'])
 
 ###################################################################
 #### Add Color Blender Material
@@ -1271,7 +1273,7 @@ def addtracemat(matobj):
 class OBJECT_OT_materialChango(bpy.types.Operator):
     bl_idname = 'object.colorblender'
     bl_label = 'Color Blender'
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     def execute(self, context):
 
@@ -1418,13 +1420,13 @@ class OBJECT_OT_materialChango(bpy.types.Operator):
 
                 # Increase frame number
                 start += skip
-        return{'FINISHED'}
+        returnset(['FINISHED'])
 
 ###### This clears the keyframes ######
 class OBJECT_OT_clearColorblender(bpy.types.Operator):
     bl_idname = 'object.colorblenderclear'
     bl_label = 'Clear colorblendness'
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     def invoke(self, context, event):
 
@@ -1449,7 +1451,7 @@ class OBJECT_OT_clearColorblender(bpy.types.Operator):
                 matCl.keyframe_delete('diffuse_color')
                 start += 1
 
-        return{'FINISHED'}
+        returnset(['FINISHED'])
 
 
 ################## ################## ################## ############
@@ -1462,7 +1464,7 @@ class OBJECT_OT_clearColorblender(bpy.types.Operator):
 class OBJECT_OT_fcnoise(bpy.types.Operator):
     bl_idname = "object.btfcnoise"
     bl_label = "Btrace: F-curve Noise"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     def execute(self, context):
         import bpy, random
@@ -1503,7 +1505,7 @@ class OBJECT_OT_fcnoise(bpy.types.Operator):
                             n.strength = amplitude
                             n.scale = time_scale
                             n.phase = random.randint(0,999)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 ################## ################## ################## ############
 ## Curve Grow Animation
@@ -1513,11 +1515,11 @@ class OBJECT_OT_curvegrow(bpy.types.Operator):
     bl_idname = 'curve.btgrow'
     bl_label = 'Run Script'
     bl_description = 'Keyframe points radius'
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     @classmethod
     def poll(cls, context):
-        return (context.object and context.object.type in {'CURVE'})
+        return (context.object and context.object.type in set(['CURVE']))
 
     def execute(self, context):
         Btrace = bpy.context.window_manager.curve_tracer
@@ -1557,7 +1559,7 @@ class OBJECT_OT_curvegrow(bpy.types.Operator):
                 ra = [p.radius for p in po]
 
                 # record the keyframes
-                for i in range(len(po)):
+                for i in xrange(len(po)):
                     po[i].radius = 0
                     po[i].keyframe_insert('radius', frame=actual)
                     actual += step
@@ -1571,7 +1573,7 @@ class OBJECT_OT_curvegrow(bpy.types.Operator):
                         po[i].keyframe_insert('radius', frame=(actual + Btrace.anim_delay + Btrace.anim_f_fade))
 
             bpy.context.scene.frame_set(Btrace.anim_f_start)
-        return{'FINISHED'}
+        returnset(['FINISHED'])
 
 ################## ################## ################## ############
 ## Remove animation and curve radius data
@@ -1580,7 +1582,7 @@ class OBJECT_OT_reset(bpy.types.Operator):
     bl_idname = 'object.btreset'
     bl_label = 'Clear animation'
     bl_description = 'Remove animation / curve radius data'
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     def execute(self, context):
         objs = bpy.context.selected_objects
@@ -1593,7 +1595,7 @@ class OBJECT_OT_reset(bpy.types.Operator):
                     po = [p for p in sp.points] + [p for p in sp.bezier_points]
                     for p in po:
                         p.radius = 1
-        return{'FINISHED'}
+        returnset(['FINISHED'])
 
 ### Define Classes to register
 classes = [

@@ -34,6 +34,7 @@ Save as Default (Optional).
 """
 
 
+from __future__ import absolute_import
 bl_info = {
 	"name": "FanConnect",
 	"author": "Gert De Roost",
@@ -57,7 +58,7 @@ class FanConnect(bpy.types.Operator):
 	bl_idname = "mesh.fanconnect"
 	bl_label = "Fan Connect"
 	bl_description = "Connects multiple selected verts to one single other vert"
-	bl_options = {"REGISTER", "UNDO"}
+	bl_options = set(["REGISTER", "UNDO"])
 
 	@classmethod
 	def poll(cls, context):
@@ -68,12 +69,12 @@ class FanConnect(bpy.types.Operator):
 
 		ret = self.do_fanconnect(context)
 		if ret == False:
-			return {'CANCELLED'}
+			return set(['CANCELLED'])
 		self.bm.free()
 		bpy.ops.object.editmode_toggle()
 		bpy.ops.object.editmode_toggle()
 
-		return {'FINISHED'}
+		return set(['FINISHED'])
 
 
 

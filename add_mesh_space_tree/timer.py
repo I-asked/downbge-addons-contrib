@@ -1,9 +1,10 @@
 # <pep8 compliant>
+from __future__ import absolute_import
 from collections import OrderedDict
 from time import time
 
 
-class Timer:
+class Timer(object):
     """an ordered collection of timestamps."""
 
     def __init__(self):
@@ -21,4 +22,4 @@ class Timer:
             return ""
         return "\n".join("%-20s: %6.1fs %6.1f" % (keys[i],
             self.od[keys[i]] - self.od[keys[i - 1]],
-            self.od[keys[i]] - self.od[keys[0]]) for i in range(1, len(keys)))
+            self.od[keys[i]] - self.od[keys[0]]) for i in xrange(1, len(keys)))

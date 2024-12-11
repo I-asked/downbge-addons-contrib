@@ -18,6 +18,7 @@
 
 # By CoDEmanX
 
+from __future__ import absolute_import
 import bpy
 from bpy.props import EnumProperty, BoolProperty
 
@@ -25,7 +26,7 @@ class DATA_OP_facetype_select(bpy.types.Operator):
     """Select all faces of a certain type"""
     bl_idname = "data.facetype_select"
     bl_label = "Select by face type"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     face_type = EnumProperty(name="Select faces:",
                              items = (("3","Triangles","Faces made up of 3 vertices"),
@@ -55,5 +56,5 @@ class DATA_OP_facetype_select(bpy.types.Operator):
         else:
             bpy.ops.mesh.select_face_by_sides(number=4, type='GREATER')
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 

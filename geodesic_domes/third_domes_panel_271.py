@@ -9,6 +9,7 @@ from bpy.props import EnumProperty, IntProperty, FloatProperty, StringProperty, 
 #PKHG>NEEDED??? import math
 from math import pi
 from mathutils import Vector #needed to check vertex.vector values
+from io import open
 """
 not in Blender 2.7*???
 try:
@@ -18,6 +19,7 @@ except:
 """        
 
 ########global######
+from __future__ import absolute_import
 last_generated_object = None
 last_imported_mesh = None
 basegeodesic = None
@@ -40,7 +42,7 @@ class Geodesic_Domes_Operator_Panel(bpy.types.Panel):
     bl_region_type = "TOOLS" #UI possible too
     bl_context = "objectmode"
     bl_category = "Create"
-    bl_options = {'DEFAULT_CLOSED'}
+    bl_options = set(['DEFAULT_CLOSED'])
 
 
     def draw(self,context):
@@ -54,7 +56,7 @@ class GenerateGeodesicDome(bpy.types.Operator):
     bl_label = "Modify Geodesic Objects"
     bl_idname = "mesh.generate_geodesic_dome"
     bl_description = "Create object dependent on selection"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
 #PKHG_NEW saving and loading parameters
     save_parameters = BoolProperty(name = "save params",\
@@ -678,10 +680,10 @@ class GenerateGeodesicDome(bpy.types.Operator):
             # text: is a list with each index representing a line of text
             
             def multi_label(text, ui,text_width=120):
-                for x in range(0,len(text)):
+                for x in xrange(0,len(text)):
                     el = textwrap.wrap(text[x], width = text_width )
             
-                    for y in range(0,len(el)):
+                    for y in xrange(0,len(el)):
                         ui.label(text=el[y])
 
             box = layout.box() 
@@ -772,8 +774,8 @@ class GenerateGeodesicDome(bpy.types.Operator):
                 if obj_name == "None":
                     message = "fill in a name \nof an existing mesh\nto be imported"
                     context.scene.error_message = message
-                    self.report({"INFO"}, message)
-                    print("***INFO*** you have to fill in the name of an existing mesh")
+                    self.report(set(["INFO"]), message)
+                    print "***INFO*** you have to fill in the name of an existing mesh"
                 else:
 #                    obj_in_scene = context.objects
                     names = [el.name for el in context.scene.objects]
@@ -790,8 +792,8 @@ class GenerateGeodesicDome(bpy.types.Operator):
                         message = obj_name +" does not exist \nor is not a MESH"
                         context.scene.error_message = message                
                         bpy.ops.object.dialog_operator('INVOKE_DEFAULT')
-                        self.report({'ERROR'}, message)
-                        print("***ERROR***" + obj_name +" does not exist or is not a MESH")
+                        self.report(set(['ERROR']), message)
+                        print "***ERROR***" + obj_name +" does not exist or is not a MESH"
         elif self.mainpages == "Hubs":
             hubtype = self.hubtype
             hubtoggle =  self.hubtoggle
@@ -807,13 +809,13 @@ class GenerateGeodesicDome(bpy.types.Operator):
 #PKHG_TODO_27-11 better info!??
             if not (hmeshname == "None") and not (hubimpmesh == "None") and  hubtoggle:                
                 try:                    
-                    print("\nDBG third_domes L799 hmeshname= ", hmeshname)
+                    print "\nDBG third_domes L799 hmeshname= ", hmeshname
                     hub_obj = vefm_271.importmesh(hmeshname,0)
-                    print("\nDBG third_domes L801 hub_obj = ", hub_obj.faces[:])
+                    print "\nDBG third_domes L801 hub_obj = ", hub_obj.faces[:]
                     hub = vefm_271.hub(hub_obj, True,\
                             hubwidth, hubheight, hublength,\
                               hwtog, hhtog, hstog, hubimpmesh)
-                    print("\nDBG third_domes L805 de hub: ", hub)
+                    print "\nDBG third_domes L805 de hub: ", hub
                     mesh = vefm_271.mesh("test")
                     vefm_271.finalfill(hub,mesh)
                     vefm_271.vefm_add_object(mesh)
@@ -822,11 +824,11 @@ class GenerateGeodesicDome(bpy.types.Operator):
                     message = "***ERROR third_domes_panel L811 *** \neither no mesh for hub\nor " + hmeshname +  " available"                    
                     context.scene.error_message = message
                     bpy.ops.object.dialog_operator('INVOKE_DEFAULT')
-                    print(message)                
+                    print message                
             else:
                 message = "***INFO***\nuse the hub toggle!"
                 context.scene.error_message = message
-                print("\n***INFO*** use the hub toggle!")
+                print "\n***INFO*** use the hub toggle!"
         elif self.mainpages == "Struts":
             struttype = self.struttype
             struttoggle = self.struttoggle
@@ -857,7 +859,7 @@ class GenerateGeodesicDome(bpy.types.Operator):
                     message = "***ERROR***\n" + strutimpmesh + "\nis not a MESH"
                     context.scene.error_message = message
                     bpy.ops.object.dialog_operator('INVOKE_DEFAULT')
-                    print("***ERROR*** strut obj is not a MESH")
+                    print "***ERROR*** strut obj is not a MESH"
             else:
                 vefm_271.vefm_add_object(basegeodesic)
         elif self.mainpages == "Faces":
@@ -885,8 +887,8 @@ class GenerateGeodesicDome(bpy.types.Operator):
                         message = "***ERROR***\nno imported message available\n" + "last geodesic used" 
                         context.scene.error_message = message
                         bpy.ops.object.dialog_operator('INVOKE_DEFAULT')
-                        print("\n***ERROR*** no imported mesh available")
-                        print("last geodesic used!")
+                        print "\n***ERROR*** no imported mesh available"
+                        print "last geodesic used!"
                         faceobject = vefm_271.facetype(basegeodesic,facedata,\
                                      self.facewidth,self.faceheight,self.fwtog)
                 facemesh = vefm_271.mesh()
@@ -911,7 +913,7 @@ class GenerateGeodesicDome(bpy.types.Operator):
                 try:
                     self.write_params(filename)
                     message = "***OK***\nparameters saved in\n" + filename
-                    print(message)
+                    print message
                 except:
                     message = "***ERRROR***\n" + "writing " + filename + "\nnot possible"
                 #bpy.context.scene.instant_filenames = filenames
@@ -932,7 +934,7 @@ class GenerateGeodesicDome(bpy.types.Operator):
                 #scriptpath + sep + "addons" + sep + "geodesic_domes" + sep + "tmp"                              
                 if not os.path.isdir(tmpdir):
                     message = "***ERROR***\n" + tmpdir + "\nnot available"  
-                    print(message)
+                    print message
                 filename = tmpdir + sep + "GD_0.GD"
 #        self.read_file(filename)
                 try:
@@ -940,7 +942,7 @@ class GenerateGeodesicDome(bpy.types.Operator):
                     for i,el in enumerate(self.name_list):
                         setattr(self,el,res[i])
                     message = "***OK***\nparameters read from\n" + filename
-                    print(message)
+                    print message
                 except:
                     message = "***ERRROR***\n" + "writing " + filename + "\nnot possible"
                     #bpy.context.scene.instant_filenames = filenames
@@ -948,7 +950,7 @@ class GenerateGeodesicDome(bpy.types.Operator):
                 message = "***ERROR***\n Contakt PKHG,\nsomething went wrong reading params happened"
             context.scene.error_message = message
             bpy.ops.object.dialog_operator('INVOKE_DEFAULT')
-        return {'FINISHED'}
+        return set(['FINISHED'])
     
     def invoke(self, context, event):
         global basegeodesic
@@ -957,7 +959,7 @@ class GenerateGeodesicDome(bpy.types.Operator):
         if tmp:            
             context.scene.geodesic_not_yet_called = False
         self.execute(context)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 def creategeo(polytype,orientation,parameters):
     geo = None
@@ -999,7 +1001,7 @@ def finalfill(source,target):
             newvert = vefm_271.average(facey.vertices).centroid()
             centre = vefm_271.vertex(newvert.vector)
             target.verts.append(centre)
-            for i in range(row):
+            for i in xrange(row):
                 if i == row - 1:
                     a = target.verts[facey.vertices[-1].index]
                     b = target.verts[facey.vertices[0].index]
@@ -1011,7 +1013,7 @@ def finalfill(source,target):
                 target.faces.append(f)
         else:
             f = []
-            for j in range(len(facey.vertices)):
+            for j in xrange(len(facey.vertices)):
 
                 a = facey.vertices[j]
                 f.append(target.verts[a.index])
@@ -1031,7 +1033,7 @@ class DialogOperator(bpy.types.Operator):
             col.label(el)
         
     def execute(self, context):
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def invoke(self, context, event):
         wm = context.window_manager

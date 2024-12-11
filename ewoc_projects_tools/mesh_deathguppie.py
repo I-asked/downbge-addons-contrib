@@ -41,6 +41,8 @@ Save as Default (Optional).
 """
 
 
+from __future__ import division
+from __future__ import absolute_import
 bl_info = {
 	"name": "DeathGuppie",
 	"author": "Gert De Roost",
@@ -74,7 +76,7 @@ class DeathGuppie(bpy.types.Operator):
 	bl_idname = "mesh.deathguppie"
 	bl_label = "DeathGuppie"
 	bl_description = "Deathguppie subdivision operation"
-	bl_options = {'REGISTER', 'UNDO'}
+	bl_options = set(['REGISTER', 'UNDO'])
 
 
 	@classmethod
@@ -86,7 +88,7 @@ class DeathGuppie(bpy.types.Operator):
 
 		self.do_deathguppie(context)
 
-		return {'FINISHED'}
+		return set(['FINISHED'])
 
 
 	def do_deathguppie(self, context):
@@ -183,7 +185,7 @@ class DeathGuppie(bpy.types.Operator):
 					self.vselset.add(vert2)
 					self.smoothset.add(vert1)
 					self.smoothset.add(vert2)
-				for idx in range(len(self.cornerlist)):
+				for idx in xrange(len(self.cornerlist)):
 					cv = self.cornerlist[idx]
 					for l in f.loops:
 						if l.vert == cv:
@@ -217,7 +219,7 @@ class DeathGuppie(bpy.types.Operator):
 							vprev = l.link_loop_prev.vert
 							vnextnext = l.link_loop_next.link_loop_next.vert
 							vprevprev = l.link_loop_prev.link_loop_prev.vert
-							for idx in range(4):
+							for idx in xrange(4):
 								if self.cornerlist[idx] == v1:
 									co1 = self.innerlist[idx].co + ((self.innerlist[idx].co - self.innerlist[idx-1].co) / 2)
 									co2 = self.innerlist[idx-3].co + ((self.innerlist[idx-3].co - self.innerlist[idx-2].co) / 2)
@@ -240,7 +242,7 @@ class DeathGuppie(bpy.types.Operator):
 							self.cornerlist[self.cornerlist.index(v1)] = None
 							self.cornerlist[self.cornerlist.index(vnext)] = None
 							break
-				for idx in range(len(self.cornerlist)):
+				for idx in xrange(len(self.cornerlist)):
 					cv = self.cornerlist[idx]
 					if cv != None:
 						for l in f.loops:
@@ -293,7 +295,7 @@ class DeathGuppie(bpy.types.Operator):
 									vprevprev = l.link_loop_prev.link_loop_prev.vert
 									vppp = l.link_loop_prev.link_loop_prev.link_loop_prev.vert
 									vpppp = l.link_loop_prev.link_loop_prev.link_loop_prev.link_loop_prev.vert
-									for idx in range(4):
+									for idx in xrange(4):
 										if self.cornerlist[idx] == v1:
 											delta1 = (self.innerlist[idx].co - self.innerlist[idx-1].co) / 2
 											co1 = self.innerlist[idx].co + delta1
@@ -363,7 +365,7 @@ class DeathGuppie(bpy.types.Operator):
 							vprevprev = l.link_loop_prev.link_loop_prev.vert
 							vppp = l.link_loop_prev.link_loop_prev.link_loop_prev.vert
 							vpppp = l.link_loop_prev.link_loop_prev.link_loop_prev.link_loop_prev.vert
-							for idx in range(4):
+							for idx in xrange(4):
 								if self.cornerlist[idx] == v1:
 									delta1 = (self.innerlist[idx].co - self.innerlist[idx-1].co) / 2
 									co1 = self.innerlist[idx].co + delta1
@@ -444,7 +446,7 @@ class DeathGuppie(bpy.types.Operator):
 						vprevprev = l.link_loop_prev.link_loop_prev.vert
 						vppp = l.link_loop_prev.link_loop_prev.link_loop_prev.vert
 						vpppp = l.link_loop_prev.link_loop_prev.link_loop_prev.link_loop_prev.vert
-						for idx in range(4):
+						for idx in xrange(4):
 							if self.cornerlist[idx] == v1:
 								delta1 = (self.innerlist[idx].co - self.innerlist[idx-1].co) / 2
 								co1 = self.innerlist[idx].co + delta1
@@ -501,7 +503,7 @@ class DeathGuppie(bpy.types.Operator):
 				vnext = l.link_loop_next.vert
 				vprev = l.link_loop_prev.vert
 				vnextnext = l.link_loop_next.link_loop_next.vert
-				for idx in range(4):
+				for idx in xrange(4):
 					if self.cornerlist[idx] == v1:
 						sidev1 = bm.verts.new((self.cornerlist[idx].co + self.innerlist[idx].co) / 2)
 						sidev2 = bm.verts.new((self.cornerlist[idx-3].co + self.innerlist[idx-3].co) / 2)

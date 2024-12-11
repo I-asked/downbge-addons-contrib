@@ -24,6 +24,7 @@ What is it about? Anything, whatever I think it can speedup workflow,
 I'll try to add it. Enjoy <3
 """
 
+from __future__ import absolute_import
 import sys
 
 # import amaranth's modules

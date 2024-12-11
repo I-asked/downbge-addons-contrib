@@ -20,6 +20,8 @@
 
 # <pep8-80 compliant>
 
+from __future__ import with_statement
+from __future__ import absolute_import
 import bpy
 import os
 import mathutils
@@ -27,6 +29,7 @@ from mathutils import Vector
 
 from contextlib import redirect_stdout
 import io
+from io import open
 stdout = io.StringIO()
 
 # TODO, make options
@@ -122,7 +125,7 @@ def doom_check_plane(done_planes, plane):
         elif doom_are_same_planes(Vector(p), plane):
             done_planes[p].add(p_key)
             return True
-    done_planes[p_key] = {p_key}
+    done_planes[p_key] = set([p_key])
     return False
 
 
@@ -344,7 +347,7 @@ def write_doom_brush(fw, ob, me):
         # reuse face vertices
         plane = poly_to_doom(me, p, radius)    
         if plane is None:
-            print("    ERROR: Could not create the plane from polygon!");
+            print "    ERROR: Could not create the plane from polygon!";
         elif doom_check_plane(done_planes, plane):
             #print("    WARNING: Polygon too similar to another one!");
             pass
@@ -399,7 +402,7 @@ def split_objects(context, objects):
 
     tot_ob = len(objects)
     for i, ob in enumerate(objects):
-        print("Splitting object: %d/%d" % (i, tot_ob))
+        print "Splitting object: %d/%d" % (i, tot_ob)
         ob.select = True
         
         if ob.type == "MESH":
@@ -444,7 +447,7 @@ def split_objects(context, objects):
 
         ob.select = False
 
-    print(final_objects)
+    print final_objects
     return final_objects
 
 
@@ -473,7 +476,7 @@ def export_map(context, filepath):
     from bpy_extras import mesh_utils
 
     t = time.time()
-    print("Map Exporter 0.0")
+    print "Map Exporter 0.0"
 
     scene = context.scene
     objects = context.selected_objects
@@ -513,11 +516,11 @@ def export_map(context, filepath):
             fw('{\n')
             fw('"classname" "worldspawn"\n')
 
-        print("\twriting cubes from meshes")
+        print "\twriting cubes from meshes"
 
         tot_ob = len(obs_mesh)
         for i, ob in enumerate(obs_mesh):
-            print("Exporting object: %d/%d" % (i, tot_ob))
+            print "Exporting object: %d/%d" % (i, tot_ob)
 
             dummy_mesh = ob.to_mesh(scene, True, 'PREVIEW')
 
@@ -620,15 +623,15 @@ def export_map(context, filepath):
                     # for p in nurb: print 'patch', p
 
                 else:
-                    print("Warning: not exporting patch",
-                          surf_name, u, v, 'Unsupported')
+                    print "Warning: not exporting patch",
+                          surf_name, u, v, 'Unsupported'
 
         if obs_mesh or obs_surf:
             fw('}\n')  # end worldspan
 
-        print("\twriting lamps")
+        print "\twriting lamps"
         for ob in obs_lamp:
-            print("\t\t%s" % ob.name)
+            print "\t\t%s" % ob.name
             lamp = ob.data
             fw('{\n')
             fw('"classname" "light"\n')
@@ -647,20 +650,20 @@ def export_map(context, filepath):
             fw('}\n')
             TOTLAMP += 1
 
-        print("\twriting empty objects as nodes")
+        print "\twriting empty objects as nodes"
         for ob in obs_empty:
             if write_node_map(fw, ob):
-                print("\t\t%s" % ob.name)
+                print "\t\t%s" % ob.name
                 TOTNODE += 1
             else:
-                print("\t\tignoring %s" % ob.name)
+                print "\t\tignoring %s" % ob.name
 
     for ob in obs_mesh:
         scene.objects.unlink(ob)
         bpy.data.objects.remove(ob)
 
-    print("Exported Map in %.4fsec" % (time.time() - t))
-    print("Brushes: %d  Nodes: %d  Lamps %d\n" % (TOTBRUSH, TOTNODE, TOTLAMP))
+    print "Exported Map in %.4fsec" % (time.time() - t)
+    print "Brushes: %d  Nodes: %d  Lamps %d\n" % (TOTBRUSH, TOTNODE, TOTLAMP)
 
 
 def save(operator,
@@ -695,4 +698,4 @@ def save(operator,
 
     export_map(context, filepath)
 
-    return {'FINISHED'}
+    return set(['FINISHED'])

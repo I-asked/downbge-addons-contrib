@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import time
 import threading
 
@@ -37,14 +38,14 @@ class OperatorSelectionInfo(bpy.types.Operator):
     def execute(self, context):
         nrSelectedObjects = bpy.context.scene.curvetools.NrSelectedObjects
         
-        self.report({'INFO'}, "Selection Info: nrSelectedObjects: %d" % nrSelectedObjects)
+        self.report(set(['INFO']), "Selection Info: nrSelectedObjects: %d" % nrSelectedObjects)
         
         selectedObjects = bpy.context.scene.curvetools.SelectedObjects
         selectedObjectValues = selectedObjects.values()
         for i, selectedObject in enumerate(selectedObjectValues):
-            print("--", "selected object %d of %d: %s" % (i + 1, nrSelectedObjects, selectedObject.name))
+            print "--", "selected object %d of %d: %s" % (i + 1, nrSelectedObjects, selectedObject.name)
         
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 
@@ -72,9 +73,9 @@ class OperatorCurveInfo(bpy.types.Operator):
             if spline.nrSegments < 1: nrEmptySplines += 1
         
         
-        self.report({'INFO'}, "nrSplines: %d; nrSegments: %d; nrEmptySplines: %d" % (nrSplines, nrSegments, nrEmptySplines))
+        self.report(set(['INFO']), "nrSplines: %d; nrSegments: %d; nrEmptySplines: %d" % (nrSplines, nrSegments, nrEmptySplines))
         
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 
@@ -94,7 +95,7 @@ class OperatorCurveLength(bpy.types.Operator):
         
         context.scene.curvetools.CurveLength = curve.length
         
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 
@@ -113,21 +114,21 @@ class OperatorSplinesInfo(bpy.types.Operator):
         curve = Curves.Curve(context.active_object)
         nrSplines = len(curve.splines)
         
-        print("")
-        print("OperatorSplinesInfo:", "nrSplines:", nrSplines)        
+        print ""
+        print "OperatorSplinesInfo:", "nrSplines:", nrSplines        
         
         nrEmptySplines = 0
         for iSpline, spline in enumerate(curve.splines):
-            print("--", "spline %d of %d: nrSegments: %d" % (iSpline + 1, nrSplines, spline.nrSegments))        
+            print "--", "spline %d of %d: nrSegments: %d" % (iSpline + 1, nrSplines, spline.nrSegments)        
             
             if spline.nrSegments < 1: 
                 nrEmptySplines += 1
-                print("--", "--", "## WARNING: spline has no segments and will therefor be ignored in any further calculations")        
+                print "--", "--", "## WARNING: spline has no segments and will therefor be ignored in any further calculations"        
         
         
-        self.report({'INFO'}, "nrSplines: %d; nrEmptySplines: %d" % (nrSplines, nrEmptySplines) + " -- more info: see console")
+        self.report(set(['INFO']), "nrSplines: %d; nrEmptySplines: %d" % (nrSplines, nrEmptySplines) + " -- more info: see console")
         
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 
@@ -147,28 +148,28 @@ class OperatorSegmentsInfo(bpy.types.Operator):
         nrSplines = len(curve.splines)
         nrSegments = 0
         
-        print("")
-        print("OperatorSegmentsInfo:", "nrSplines:", nrSplines)        
+        print ""
+        print "OperatorSegmentsInfo:", "nrSplines:", nrSplines        
         
         nrEmptySplines = 0
         for iSpline, spline in enumerate(curve.splines):
             nrSegmentsSpline = spline.nrSegments
-            print("--", "spline %d of %d: nrSegments: %d" % (iSpline + 1, nrSplines, nrSegmentsSpline))        
+            print "--", "spline %d of %d: nrSegments: %d" % (iSpline + 1, nrSplines, nrSegmentsSpline)        
             
             if nrSegmentsSpline < 1: 
                 nrEmptySplines += 1
-                print("--", "--", "## WARNING: spline has no segments and will therefor be ignored in any further calculations")
+                print "--", "--", "## WARNING: spline has no segments and will therefor be ignored in any further calculations"
                 continue
                 
             for iSegment, segment in enumerate(spline.segments):
-                print("--", "--", "segment %d of %d coefficients:" % (iSegment + 1, nrSegmentsSpline))        
-                print("--", "--", "--", "C0: %.6f, %.6f, %.6f" % (segment.coeff0.x, segment.coeff0.y, segment.coeff0.z))
+                print "--", "--", "segment %d of %d coefficients:" % (iSegment + 1, nrSegmentsSpline)        
+                print "--", "--", "--", "C0: %.6f, %.6f, %.6f" % (segment.coeff0.x, segment.coeff0.y, segment.coeff0.z)
                 
             nrSegments += nrSegmentsSpline
         
-        self.report({'INFO'}, "nrSplines: %d; nrSegments: %d; nrEmptySplines: %d" % (nrSplines, nrSegments, nrEmptySplines))
+        self.report(set(['INFO']), "nrSplines: %d; nrSegments: %d; nrEmptySplines: %d" % (nrSplines, nrSegments, nrEmptySplines))
         
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 
@@ -189,16 +190,16 @@ class OperatorOriginToSpline0Start(bpy.types.Operator):
         newOrigin = blCurve.matrix_world * blSpline.bezier_points[0].co
     
         origOrigin = bpy.context.scene.cursor_location.copy()
-        print("--", "origOrigin: %.6f, %.6f, %.6f" % (origOrigin.x, origOrigin.y, origOrigin.z))
-        print("--", "newOrigin: %.6f, %.6f, %.6f" % (newOrigin.x, newOrigin.y, newOrigin.z))
+        print "--", "origOrigin: %.6f, %.6f, %.6f" % (origOrigin.x, origOrigin.y, origOrigin.z)
+        print "--", "newOrigin: %.6f, %.6f, %.6f" % (newOrigin.x, newOrigin.y, newOrigin.z)
         
         bpy.context.scene.cursor_location = newOrigin
         bpy.ops.object.origin_set(type='ORIGIN_CURSOR')
         bpy.context.scene.cursor_location = origOrigin
         
-        self.report({'INFO'}, "TODO: OperatorOriginToSpline0Start")
+        self.report(set(['INFO']), "TODO: OperatorOriginToSpline0Start")
         
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
         
 
@@ -216,28 +217,28 @@ class OperatorIntersectCurves(bpy.types.Operator):
 
             
     def execute(self, context):
-        print("### TODO: OperatorIntersectCurves.execute()")
+        print "### TODO: OperatorIntersectCurves.execute()"
         
         algo = context.scene.curvetools.IntersectCurvesAlgorithm
-        print("-- algo:", algo)
+        print "-- algo:", algo
                     
             
         mode = context.scene.curvetools.IntersectCurvesMode
-        print("-- mode:", mode)
+        print "-- mode:", mode
         # if mode == 'Split':
             # self.report({'WARNING'}, "'Split' mode is not implemented yet -- <<STOPPING>>")
             # return {'CANCELLED'}
         
         affect = context.scene.curvetools.IntersectCurvesAffect
-        print("-- affect:", affect)
+        print "-- affect:", affect
         
         
         curveIntersector = CurveIntersections.CurvesIntersector.FromSelection()
         rvIntersectionNrs = curveIntersector.CalcAndApplyIntersections()
         
-        self.report({'INFO'}, "Active curve points: %d; other curve points: %d" % (rvIntersectionNrs[0], rvIntersectionNrs[1]))
+        self.report(set(['INFO']), "Active curve points: %d; other curve points: %d" % (rvIntersectionNrs[0], rvIntersectionNrs[1]))
         
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 
@@ -258,9 +259,9 @@ class OperatorLoftCurves(bpy.types.Operator):
         loftedSurface = Surfaces.LoftedSurface.FromSelection()
         loftedSurface.AddToScene()
         
-        self.report({'INFO'}, "OperatorLoftCurves.execute()")
+        self.report(set(['INFO']), "OperatorLoftCurves.execute()")
         
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 
@@ -281,9 +282,9 @@ class OperatorSweepCurves(bpy.types.Operator):
         sweptSurface = Surfaces.SweptSurface.FromSelection()
         sweptSurface.AddToScene()
         
-        self.report({'INFO'}, "OperatorSweepCurves.execute()")
+        self.report(set(['INFO']), "OperatorSweepCurves.execute()")
         
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
         
 
@@ -304,9 +305,9 @@ class OperatorBirail(bpy.types.Operator):
         birailedSurface = Surfaces.BirailedSurface.FromSelection()
         birailedSurface.AddToScene()
         
-        self.report({'INFO'}, "OperatorBirail.execute()")
+        self.report(set(['INFO']), "OperatorBirail.execute()")
         
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
         
@@ -331,7 +332,7 @@ class OperatorSplinesSetResolution(bpy.types.Operator):
             for spline in blCurve.data.splines:
                 spline.resolution_u = splRes
         
-        return {'FINISHED'}
+        return set(['FINISHED'])
         
         
         
@@ -362,9 +363,9 @@ class OperatorSplinesRemoveZeroSegment(bpy.types.Operator):
             
             if nrRemovedSplines > 0: curve.RebuildInScene()
             
-            self.report({'INFO'}, "Removed %d of %d splines" % (nrRemovedSplines, nrSplines))
+            self.report(set(['INFO']), "Removed %d of %d splines" % (nrRemovedSplines, nrSplines))
         
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 
@@ -390,9 +391,9 @@ class OperatorSplinesRemoveShort(bpy.types.Operator):
             nrRemovedSplines = curve.RemoveShortSplines(threshold)
             if nrRemovedSplines > 0: curve.RebuildInScene()
             
-            self.report({'INFO'}, "Removed %d of %d splines" % (nrRemovedSplines, nrSplines))
+            self.report(set(['INFO']), "Removed %d of %d splines" % (nrRemovedSplines, nrSplines))
         
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 
@@ -421,6 +422,6 @@ class OperatorSplinesJoinNeighbouring(bpy.types.Operator):
             nrJoins = curve.JoinNeighbouringSplines(startEnd, threshold, mode)
             if nrJoins > 0: curve.RebuildInScene()
             
-            self.report({'INFO'}, "Applied %d joins on %d splines; resulting nrSplines: %d" % (nrJoins, nrSplines, curve.nrSplines))
+            self.report(set(['INFO']), "Applied %d joins on %d splines; resulting nrSplines: %d" % (nrJoins, nrSplines, curve.nrSplines))
         
-        return {'FINISHED'}
+        return set(['FINISHED'])

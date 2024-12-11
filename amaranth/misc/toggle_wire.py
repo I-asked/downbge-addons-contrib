@@ -12,6 +12,7 @@
 #  along with this program; if not, write to the Free Software Foundation,
 #  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
+from __future__ import absolute_import
 import bpy
 
 
@@ -21,7 +22,7 @@ class AMTH_OBJECT_OT_wire_toggle(bpy.types.Operator):
     """Turn on/off wire display on mesh objects"""
     bl_idname = "object.amth_wire_toggle"
     bl_label = "Display Wireframe"
-    bl_options = {"REGISTER", "UNDO"}
+    bl_options = set(["REGISTER", "UNDO"])
 
     clear = bpy.props.BoolProperty(
         default=False, name="Clear Wireframe",
@@ -40,16 +41,16 @@ class AMTH_OBJECT_OT_wire_toggle(bpy.types.Operator):
             which = bpy.data.objects
         elif is_selected:
             if not context.selected_objects:
-                self.report({"INFO"}, "No selected objects")
+                self.report(set(["INFO"]), "No selected objects")
             which = context.selected_objects
         else:
             which = scene.objects
 
         if which:
             for ob in which:
-                if ob and ob.type in {
+                if ob and ob.type in set([
                         "MESH", "EMPTY", "CURVE",
-                        "META", "SURFACE", "FONT"}:
+                        "META", "SURFACE", "FONT"]):
 
                     ob.show_wire = False if clear else True
                     ob.show_all_edges = is_all_edges
@@ -58,7 +59,7 @@ class AMTH_OBJECT_OT_wire_toggle(bpy.types.Operator):
                         if mo and mo.type == "SUBSURF":
                             mo.show_only_control_edges = is_optimal
 
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 
 def ui_object_wire_toggle(self, context):

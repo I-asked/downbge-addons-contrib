@@ -16,6 +16,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import absolute_import
 bl_info = {
     "name": "Batch Rename Datablocks",
     "author": "tstscr",
@@ -93,7 +94,7 @@ class OBJECT_OT_batch_rename_datablocks(bpy.types.Operator):
     """Batch rename Datablocks"""
     bl_idname = "object.batch_rename_datablocks"
     bl_label = "Batch Rename Datablocks"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     name_origins = [
                     ('Object', 'Object', 'Object'),
@@ -169,12 +170,12 @@ class OBJECT_OT_batch_rename_datablocks(bpy.types.Operator):
 
         rename_datablocks_main(self, context)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def invoke(self, context, event):
         wm = context.window_manager
         wm.invoke_props_dialog(self, self.dialog_width)
-        return {'RUNNING_MODAL'}
+        return set(['RUNNING_MODAL'])
 
 
 def register():

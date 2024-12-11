@@ -43,7 +43,7 @@ class PolyRedux(bpy.types.Operator):
 	bl_idname = "mesh.polyredux"
 	bl_label = "PolyRedux"
 	bl_description = "predictable mesh simplifaction maintaining face loops"
-	bl_options = {"REGISTER", "UNDO"}
+	bl_options = set(["REGISTER", "UNDO"])
 	
 
 	@classmethod
@@ -60,7 +60,7 @@ class PolyRedux(bpy.types.Operator):
 		
 		do_polyredux(self)
 		
-		return {'FINISHED'}
+		return set(['FINISHED'])
 
 class redux_help(bpy.types.Operator):
 	bl_idname = 'help.polyredux'
@@ -75,7 +75,7 @@ class redux_help(bpy.types.Operator):
 		layout.label('Single operation, no parameters.')
 	
 	def execute(self, context):
-		return {'FINISHED'}
+		return set(['FINISHED'])
 
 	def invoke(self, context, event):
 		return context.window_manager.invoke_popup(self, width = 300)
@@ -103,6 +103,7 @@ if __name__ == "__main__":
 
 '''
 
+from __future__ import absolute_import
 def my_mesh_util():
 	bm_verts = bm.verts
 	
@@ -174,7 +175,7 @@ def my_mesh_util():
 	grid_data_dict = {}
 	
 	if not grid_data_ls:
-		print ("doing nothing")
+		print "doing nothing"
 		return
 	
 	# quick lookup for the opposing corner of a qiad
@@ -330,7 +331,7 @@ def my_mesh_util():
 		for idx in vertidxs:
 			verts.append(bm.verts[idx])
 		verts.append(verts[0])
-		for idx in range(len(verts) - 1):
+		for idx in xrange(len(verts) - 1):
 			verts.append(verts[0])
 			v1 = verts[idx]
 			v2 = verts[idx + 1]
@@ -381,7 +382,7 @@ def do_polyredux(self):
 		bpy.ops.object.editmode_toggle()
 	
 	# Timing the script is a good way to be aware on any speed hits when scripting
-	print ('My Script finished in %.2f seconds' % (time.time()-t))
+	print 'My Script finished in %.2f seconds' % (time.time()-t)
 	
 	
 

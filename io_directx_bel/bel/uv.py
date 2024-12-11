@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from mathutils import Vector
 from .__init__ import *
 from time import clock
@@ -31,7 +32,7 @@ def write(me, uvs, matimage = False) :
                 vi += 2
                 
         newuvs.append(uv)
-    print('uvs in ',clock() - t)
+    print 'uvs in ',clock() - t
     if nest : return newuvs
     return newuvs[0]
     
@@ -66,7 +67,7 @@ def row(vertices,faces,normals=True) :
         v0 = vertices[face[0]]
         v1 = vertices[face[1]]
         v2 = vertices[face[-1]]
-        print(v0,v1)
+        print v0,v1
         lx = (v1 - v0).length
         ly = (v2 - v0).length
         # init uv
@@ -94,7 +95,7 @@ def asVertsLocation(verts2d, faces) :
         for vi in f :
             uvface.extend(verts2d[vi])
         uv.append(uvface)
-    print('uvs convert in ',clock() - t)
+    print 'uvs convert in ',clock() - t
     return uv
 
 ## Dx to flat

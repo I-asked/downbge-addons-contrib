@@ -34,6 +34,7 @@
 
 
 # import io_scene_fpx stuff
+from __future__ import absolute_import
 from io_scene_fpx.fpx_strings import (
         fpx_str,
         )
@@ -78,14 +79,14 @@ from addon_utils import (
         )
 
 
-class FpxUI:
+class FpxUI(object):
     VERBOSE_MODE_NONE = 'NONE'
     VERBOSE_MODE_NORMAL = 'NORMAL'
     VERBOSE_MODE_MAXIMAL = 'MAXIMAL'
 
     VERBOSE_NONE = {}
-    VERBOSE_NORMAL = { VERBOSE_MODE_NORMAL, VERBOSE_MODE_MAXIMAL, }
-    VERBOSE_MAXIMAL = { VERBOSE_MODE_MAXIMAL, }
+    VERBOSE_NORMAL = set([ VERBOSE_MODE_NORMAL, VERBOSE_MODE_MAXIMAL,])
+    VERBOSE_MAXIMAL = set([ VERBOSE_MODE_MAXIMAL,])
 
     DEFAULT_VERBOSE = VERBOSE_MODE_NONE
 
@@ -124,7 +125,7 @@ class FpxUI:
     USE_MODEL_FILTER_MASK = 'MASK'
     USE_MODEL_FILTER_COLLISION = 'COLLISION'
     #PROP_DEFAULT_USE_MODEL_FILTER = { USE_MODEL_FILTER_SECONDARY, USE_MODEL_FILTER_REFLECTION, USE_MODEL_FILTER_MASK, USE_MODEL_FILTER_COLLISION, }
-    PROP_DEFAULT_USE_MODEL_FILTER = { USE_MODEL_FILTER_MASK, }
+    PROP_DEFAULT_USE_MODEL_FILTER = set([ USE_MODEL_FILTER_MASK,])
     #PROP_DEFAULT_USE_MODEL_FILTER = set()
 
     USE_LIBRARY_FILTER_DMDFONT = 'DMDFONT'
@@ -134,7 +135,7 @@ class FpxUI:
     USE_LIBRARY_FILTER_SCRIPT = 'SCRIPT'
     USE_LIBRARY_FILTER_SOUND = 'SOUND'
     #PROP_DEFAULT_USE_LIBRARY_FILTER = { USE_LIBRARY_FILTER_DMDFONT, USE_LIBRARY_FILTER_GRAPHIC, USE_LIBRARY_FILTER_MODEL, USE_LIBRARY_FILTER_MUSIC, USE_LIBRARY_FILTER_SCRIPT, USE_LIBRARY_FILTER_SOUND, }
-    PROP_DEFAULT_USE_LIBRARY_FILTER = { USE_LIBRARY_FILTER_MODEL, USE_LIBRARY_FILTER_GRAPHIC, }
+    PROP_DEFAULT_USE_LIBRARY_FILTER = set([ USE_LIBRARY_FILTER_MODEL, USE_LIBRARY_FILTER_GRAPHIC,])
 
     PROP_DEFAULT_ALL_LIBRARIES = False
 
@@ -181,7 +182,7 @@ class FptEmptyProperties(PropertyGroup):
     selected_model_index = IntProperty(
             default=-1,
             min=-1,
-            options={'HIDDEN', 'SKIP_SAVE', },
+            options=set(['HIDDEN', 'SKIP_SAVE',]),
             )
 
     def add_model(self, prop, model):
@@ -193,9 +194,9 @@ class FptEmptyProperties(PropertyGroup):
 
 class FptEmptyUILise(UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
-        if self.layout_type in {'DEFAULT', 'COMPACT', }:
+        if self.layout_type in set(['DEFAULT', 'COMPACT',]):
             layout.label(text=item.model, icon_value=icon)
-        elif self.layout_type in {'GRID', }:
+        elif self.layout_type in set(['GRID',]):
             layout.alignment = 'CENTER'
             layout.label(text="", icon_value=icon)
 
@@ -208,7 +209,7 @@ class FptEmptyPanel(Panel):
     @classmethod
     def poll(cls, blender_context):
         return (blender_context
-                and blender_context.object.type in {'EMPTY', }
+                and blender_context.object.type in set(['EMPTY',])
                 and blender_context.object.fpt is not None
                 and blender_context.object.fpt.name
                 )
@@ -244,13 +245,13 @@ class FpmImportOperator(Operator, ImportHelper):
     bl_idname = 'import_scene.fpm'
     bl_label = fpx_str['BL_LABEL_IMPORTER_FPM']
     bl_description = fpx_str['BL_DESCRIPTION_IMPORTER_FPM']
-    bl_options = {'PRESET', }
+    bl_options = set(['PRESET',])
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'
 
     filepath = StringProperty(
             subtype='FILE_PATH',
-            options={'HIDDEN', }
+            options=set(['HIDDEN',])
             )
 
 
@@ -327,7 +328,7 @@ class FpmImportOperator(Operator, ImportHelper):
                             ),
                     ),
             default=FpxUI.PROP_DEFAULT_USE_MODEL_FILTER,
-            options={'ENUM_FLAG', },
+            options=set(['ENUM_FLAG',]),
             )
 
     use_model_adjustment = BoolProperty(
@@ -341,7 +342,7 @@ class FpmImportOperator(Operator, ImportHelper):
 
     filter_glob = StringProperty(
             default=fpx_str['FILE_FILTER_FPM'],
-            options={'HIDDEN', }
+            options=set(['HIDDEN',])
             )
 
     # check add-on dependency
@@ -393,11 +394,11 @@ class FpmImportOperator(Operator, ImportHelper):
             scene.layers = (True, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False)
             scene.update()
 
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
     def invoke(self, blender_context, event):
         blender_context.window_manager.fileselect_add(self)
-        return {'RUNNING_MODAL', }
+        return set(['RUNNING_MODAL',])
 
     @staticmethod
     def menu_func(cls, blender_context):
@@ -423,13 +424,13 @@ class FplImportOperator(Operator, ImportHelper):
     bl_idname = 'import_scene.fpl'
     bl_label = fpx_str['BL_LABEL_IMPORTER_FPL']
     bl_description = fpx_str['BL_DESCRIPTION_IMPORTER_FPL']
-    bl_options = {'PRESET', }
+    bl_options = set(['PRESET',])
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'
 
     filepath = StringProperty(
             subtype='FILE_PATH',
-            options={'HIDDEN', }
+            options=set(['HIDDEN',])
             )
 
 
@@ -507,7 +508,7 @@ class FplImportOperator(Operator, ImportHelper):
                             ),
                     ),
             default=FpxUI.PROP_DEFAULT_USE_LIBRARY_FILTER,
-            options={'ENUM_FLAG', },
+            options=set(['ENUM_FLAG',]),
             )
 
     use_model_filter = EnumProperty(
@@ -540,7 +541,7 @@ class FplImportOperator(Operator, ImportHelper):
                             ),
                     ),
             default=FpxUI.PROP_DEFAULT_USE_MODEL_FILTER,
-            options={'ENUM_FLAG', },
+            options=set(['ENUM_FLAG',]),
             )
 
     use_model_adjustment = BoolProperty(
@@ -554,7 +555,7 @@ class FplImportOperator(Operator, ImportHelper):
 
     filter_glob = StringProperty(
             default=fpx_str['FILE_FILTER_FPL'],
-            options={'HIDDEN', }
+            options=set(['HIDDEN',])
             )
 
     # check add-on dependency
@@ -604,11 +605,11 @@ class FplImportOperator(Operator, ImportHelper):
             scene.layers = (True, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False)
             scene.update()
 
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
     def invoke(self, blender_context, event):
         blender_context.window_manager.fileselect_add(self)
-        return {'RUNNING_MODAL', }
+        return set(['RUNNING_MODAL',])
 
     @staticmethod
     def menu_func(cls, blender_context):
@@ -636,13 +637,13 @@ class FptImportOperator(Operator, ImportHelper):
     bl_idname = 'import_scene.fpt'
     bl_label = fpx_str['BL_LABEL_IMPORTER_FPT']
     bl_description = fpx_str['BL_DESCRIPTION_IMPORTER_FPT']
-    bl_options = {'PRESET', }
+    bl_options = set(['PRESET',])
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'
 
     filepath = StringProperty(
             subtype='FILE_PATH',
-            options={'HIDDEN', }
+            options=set(['HIDDEN',])
             )
 
 
@@ -792,7 +793,7 @@ class FptImportOperator(Operator, ImportHelper):
                             ),
                     ),
             default=FpxUI.PROP_DEFAULT_USE_LIBRARY_FILTER,
-            options={'ENUM_FLAG', },
+            options=set(['ENUM_FLAG',]),
             )
 
     use_model_filter = EnumProperty(
@@ -825,7 +826,7 @@ class FptImportOperator(Operator, ImportHelper):
                             ),
                     ),
             default=FpxUI.PROP_DEFAULT_USE_MODEL_FILTER,
-            options={'ENUM_FLAG', },
+            options=set(['ENUM_FLAG',]),
             )
 
     use_model_adjustment = BoolProperty(
@@ -839,7 +840,7 @@ class FptImportOperator(Operator, ImportHelper):
 
     filter_glob = StringProperty(
             default=fpx_str['FILE_FILTER_FPT'],
-            options={'HIDDEN', }
+            options=set(['HIDDEN',])
             )
 
     # check add-on dependency
@@ -916,11 +917,11 @@ class FptImportOperator(Operator, ImportHelper):
             scene.layers = (True, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False)
             scene.update()
 
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
     def invoke(self, blender_context, event):
         blender_context.window_manager.fileselect_add(self)
-        return {'RUNNING_MODAL', }
+        return set(['RUNNING_MODAL',])
 
     @staticmethod
     def menu_func(cls, blender_context):
@@ -955,7 +956,7 @@ class FpxSetSceneToMetricOperator(Operator):
     ###########################################################################
     def set_scene_to_metric(self, blender_context):
         FpxUtilities.set_scene_to_metric(blender_context)
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 
 ###############################################################################

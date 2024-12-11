@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import bpy
 from mathutils import *
 
@@ -64,19 +65,19 @@ def GetFirstRegionView3D():
     
     
 def LogFirstRegionView3D():
-    print("LogFirstRegionView3D()")
+    print "LogFirstRegionView3D()"
     regionView3D = GetFirstRegionView3D()
     if regionView3D is None:
-        print("--", "ERROR:", "regionView3D is None")
+        print "--", "ERROR:", "regionView3D is None"
         return
         
-    print("--", "view_matrix:")
-    print("--", "--", regionView3D.view_matrix)
-    print("--", "view_location:")
-    print("--", "--", regionView3D.view_location)
+    print "--", "view_matrix:"
+    print "--", "--", regionView3D.view_matrix
+    print "--", "view_location:"
+    print "--", "--", regionView3D.view_location
     
     
-class Intersection:
+class Intersection(object):
     # listIP: list of BezierSplineIntersectionPoint
     # return: list of splines
     @staticmethod

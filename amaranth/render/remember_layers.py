@@ -29,6 +29,7 @@ Now all you need to do before saving your file for rendering is press the
 "View Layers for Render". Find it on the Render Layers properties.
 """
 
+from __future__ import absolute_import
 import bpy
 
 
@@ -49,9 +50,9 @@ class AMTH_SCENE_OT_layers_render_save(bpy.types.Operator):
                 which.append(n)
 
         context.scene["amth_layers_for_render"] = which
-        self.report({"INFO"}, "Layers for Render Saved")
+        self.report(set(["INFO"]), "Layers for Render Saved")
 
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 
 class AMTH_SCENE_OT_layers_render_view(bpy.types.Operator):
@@ -92,11 +93,11 @@ class AMTH_SCENE_OT_layers_render_view(bpy.types.Operator):
                             nr=1,
                             extend=False,
                             toggle=False)
-                        self.report({"INFO"}, "No layers set for render")
+                        self.report(set(["INFO"]), "No layers set for render")
 
                     break
 
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 
 class AMTH_SCENE_OT_layers_render_set_individual(bpy.types.Operator):
@@ -127,7 +128,7 @@ class AMTH_SCENE_OT_layers_render_set_individual(bpy.types.Operator):
 
         bpy.ops.scene.amaranth_layers_render_view()
 
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 
 class AMTH_SCENE_OT_layers_render_clear(bpy.types.Operator):
@@ -141,7 +142,7 @@ class AMTH_SCENE_OT_layers_render_clear(bpy.types.Operator):
         if context.scene.get("amth_layers_for_render"):
             context.scene["amth_layers_for_render"] = []
 
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 
 def ui_layers_for_render(self, context):
@@ -177,13 +178,13 @@ def ui_layers_for_render(self, context):
             col = split.column(align=True)
             row = col.row(align=True)
 
-            for n in range(0, 5):
+            for n in xrange(0, 5):
                 row.operator(
                     AMTH_SCENE_OT_layers_render_set_individual.bl_idname,
                     text="",
                     icon="LAYER_ACTIVE" if n in lfr else "BLANK1").number = n
             row = col.row(align=True)
-            for n in range(10, 15):
+            for n in xrange(10, 15):
                 row.operator(
                     AMTH_SCENE_OT_layers_render_set_individual.bl_idname,
                     text="",
@@ -193,13 +194,13 @@ def ui_layers_for_render(self, context):
             col = split.column(align=True)
             row = col.row(align=True)
 
-            for n in range(5, 10):
+            for n in xrange(5, 10):
                 row.operator(
                     AMTH_SCENE_OT_layers_render_set_individual.bl_idname,
                     text="",
                     icon="LAYER_ACTIVE" if n in lfr else "BLANK1").number = n
             row = col.row(align=True)
-            for n in range(15, 20):
+            for n in xrange(15, 20):
                 row.operator(
                     AMTH_SCENE_OT_layers_render_set_individual.bl_idname,
                     text="",

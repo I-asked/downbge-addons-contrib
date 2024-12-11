@@ -17,7 +17,10 @@
 # ##### END GPL LICENSE BLOCK #####
 
 
+from __future__ import with_statement
+from __future__ import absolute_import
 import struct
+from io import open
 
 
 def encodeASCIILine(line):
@@ -25,7 +28,7 @@ def encodeASCIILine(line):
 
 
 
-class Point:
+class Point(object):
 
     def __init__(self):
         pass
@@ -40,7 +43,7 @@ class Point:
 class PointXYZ(Point):
 
     def __init__(self):
-        super().__init__()
+        super(PointXYZ, self).__init__()
         self.x = 0
         self.y = 0
         self.z = 0
@@ -58,7 +61,7 @@ class PointXYZ(Point):
 
 
 
-class PCDParser:
+class PCDParser(object):
 
     filepath = ''
     file = None
@@ -96,7 +99,7 @@ class PCDParser:
 
 
     def parserWarning(self, msg):
-        print("[WARNING] ", msg)
+        print "[WARNING] ", msg
     
 
     def rmComment(self, line):
@@ -151,7 +154,7 @@ class PCDParser_v0_7(PCDParser):
     fields = []
 
     def __init__(self, filepath, PointClass):
-        super().__init__(filepath, PointClass)
+        super(PCDParser_v0_7, self).__init__(filepath, PointClass)
         self.fields = []
 
 
@@ -180,7 +183,7 @@ class PCDParser_v0_7(PCDParser):
         elif keyword == 'DATA':
             self.parseDATA(split[1:])
         else:
-            super().parseHeaderLine(split)
+            super(PCDParser_v0_7, self).parseHeaderLine(split)
 
 
     def parseVERSION(self, split):
@@ -188,10 +191,10 @@ class PCDParser_v0_7(PCDParser):
 
 
     def parseFIELDS(self, split):
-        print("SPLIT FIELDS:", split)
+        print "SPLIT FIELDS:", split
         for field in split:
             self.fields.append([field, None, None, None])
-        print("FIELDS, after parsing:", self.fields)
+        print "FIELDS, after parsing:", self.fields
 
 
     def parseSIZE(self, split):
@@ -231,7 +234,7 @@ class PCDParser_v0_7(PCDParser):
 
     def finalizeHeader(self):
         self.numPoints = self.width * self.height
-        print("FIELDS - finalized", self.fields)
+        print "FIELDS - finalized", self.fields
 
 
     def parsePoints(self):
@@ -267,7 +270,7 @@ class PCDParser_v0_7(PCDParser):
                 fieldcount = field[3]
 
                 values = []
-                for i in range(fieldcount):
+                for i in xrange(fieldcount):
                     vs = split.pop(0)
                     if fieldtype == 'F':
                         values.append(float(vs))
@@ -280,7 +283,7 @@ class PCDParser_v0_7(PCDParser):
 
 
     def parseBINARY(self):
-        for pointi in range(self.numPoints):
+        for pointi in xrange(self.numPoints):
             point = self.PointClass()
 
             for field in self.fields:
@@ -290,7 +293,7 @@ class PCDParser_v0_7(PCDParser):
                 fieldcount = field[3]
 
                 values = []
-                for i in range(fieldcount):
+                for i in xrange(fieldcount):
 
                     fs = None
                     if fieldtype == 'F':
@@ -325,7 +328,7 @@ class PCDParser_v0_7(PCDParser):
 
 
 
-class PCDWriter:
+class PCDWriter(object):
 
     def __init__(self, points):
         self.points = points
@@ -369,7 +372,7 @@ def test():
         parser.parseFile()
         points = parser.getPoints()
         for point in points:
-            print(point.x, point.y, point.z)
+            print point.x, point.y, point.z
     else:
-        print("Can't create parser for this file")
+        print "Can't create parser for this file"
 

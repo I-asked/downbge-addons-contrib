@@ -40,6 +40,8 @@ Save as Default (Optional).
 """
 
 
+from __future__ import division
+from __future__ import absolute_import
 bl_info = {
 	"name": "EdgeGrow",
 	"author": "Gert De Roost",
@@ -68,7 +70,7 @@ class EdgeGrow(bpy.types.Operator):
 	bl_idname = "mesh.edgegrow"
 	bl_label = "EdgeGrow"
 	bl_description = "Growing edgeloops with arrowkeys"
-	bl_options = {"REGISTER", "UNDO"}
+	bl_options = set(["REGISTER", "UNDO"])
 
 	@classmethod
 	def poll(cls, context):
@@ -83,23 +85,23 @@ class EdgeGrow(bpy.types.Operator):
 
 		self._handle = bpy.types.SpaceView3D.draw_handler_add(self.redraw, (), 'WINDOW', 'POST_PIXEL')
 
-		return {'RUNNING_MODAL'}
+		return set(['RUNNING_MODAL'])
 
 
 	def modal(self, context, event):
 
-		if event.type in {'MIDDLEMOUSE', 'WHEELDOWNMOUSE', 'WHEELUPMOUSE'}:
+		if event.type in set(['MIDDLEMOUSE', 'WHEELDOWNMOUSE', 'WHEELUPMOUSE']):
 			# User transforms view
-			return {'PASS_THROUGH'}
+			return set(['PASS_THROUGH'])
 
-		elif event.type in {'RET', 'NUMPAD_ENTER'}:
+		elif event.type in set(['RET', 'NUMPAD_ENTER']):
 			# Consolidate changes if ENTER pressed.
 			# Free the bmesh.
 			self.bm.free()
 			bpy.types.SpaceView3D.draw_handler_remove(self._handle, 'WINDOW')
 			bpy.ops.object.editmode_toggle()
 			bpy.ops.object.editmode_toggle()
-			return {'FINISHED'}
+			return set(['FINISHED'])
 
 		elif event.type == 'LEFT_ARROW':
 			# REINIT: when user returns to begin position: display self.cursor edges on both sides
@@ -107,7 +109,7 @@ class EdgeGrow(bpy.types.Operator):
 			# END: add to END of lists
 			# INIT: first INITialization state: self.cursor on both sides
 			# set self.cursor to correct edge
-			for posn in range(len(self.edgelist)):
+			for posn in xrange(len(self.edgelist)):
 				if event.value == 'PRESS':
 					if self.state[posn] == 'REINIT':
 						self.check[posn] = False
@@ -141,12 +143,12 @@ class EdgeGrow(bpy.types.Operator):
 						self.addedge(posn)
 					else:
 						self.removeedge(posn)
-			return {'RUNNING_MODAL'}
+			return set(['RUNNING_MODAL'])
 
 		elif event.type == 'RIGHT_ARROW':
 			# check LEFT_ARROW
 			if event.value == 'PRESS':
-				for posn in range(len(self.edgelist)):
+				for posn in xrange(len(self.edgelist)):
 					if self.state[posn] == 'REINIT':
 						self.check[posn] = False
 						if self.oldstate[posn] == 'START':
@@ -185,23 +187,23 @@ class EdgeGrow(bpy.types.Operator):
 						self.addedge(posn)
 					else:
 						self.removeedge(posn)
-			return {'RUNNING_MODAL'}
+			return set(['RUNNING_MODAL'])
 
 		elif event.type == 'UP_ARROW':
 			# next cursor possibility
 			if event.value == 'PRESS':
 				self.counter += 1
 				self.mesh.update()
-			return {'RUNNING_MODAL'}
+			return set(['RUNNING_MODAL'])
 
 		elif event.type == 'DOWN_ARROW':
 			# previous cursor possibility
 			if event.value == 'PRESS':
 				self.counter -= 1
 				self.mesh.update()
-			return {'RUNNING_MODAL'}
+			return set(['RUNNING_MODAL'])
 
-		return {'RUNNING_MODAL'}
+		return set(['RUNNING_MODAL'])
 
 	def addedge(self, posn):
 
@@ -335,7 +337,7 @@ class EdgeGrow(bpy.types.Operator):
 
 		#
 		# orient edge and vertlists parallel - reverse if necessary
-		for i in range(len(self.edgelist) - 1):
+		for i in xrange(len(self.edgelist) - 1):
 			bpy.ops.mesh.select_all(action='DESELECT')
 			# get first vert and edge for two adjacent snakes
 			for v in self.edgelist[i][0].verts:
@@ -481,9 +483,9 @@ class EdgeGrow(bpy.types.Operator):
 								break
 						break
 
-		for posn in range(len(self.edgelist)):
+		for posn in xrange(len(self.edgelist)):
 			if self.edgelist[posn][0] == self.actedge:
-				for posn in range(len(self.edgelist)):
+				for posn in xrange(len(self.edgelist)):
 					self.edgelist[posn].reverse()
 
 		bpy.ops.mesh.select_all(action='DESELECT')

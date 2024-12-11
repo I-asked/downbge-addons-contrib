@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import bpy
 
 from . import Operators
@@ -7,7 +8,7 @@ class Panel(bpy.types.Panel):
     bl_label = "Curve Tools 2"
     bl_space_type = "VIEW_3D"
     bl_region_type = "TOOLS"
-    bl_options = {'DEFAULT_CLOSED'}
+    bl_options = set(['DEFAULT_CLOSED'])
     bl_category = "Addons"
 
     

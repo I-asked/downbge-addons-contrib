@@ -17,6 +17,7 @@
 # END GPL LICENSE BLOCK #####
 
 
+from __future__ import absolute_import
 bl_info = {
     "name": "UV Utility",
     "author": "Paul Geraskin",
@@ -40,13 +41,13 @@ from bpy.props import (IntProperty,
                        )
 
 
-class UV_IC_Panel():
+class UV_IC_Panel(object):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
     bl_category = 'Tools'
     bl_label = "UV Utility"
     bl_context = "objectmode"
-    bl_options = {'DEFAULT_CLOSED'}
+    bl_options = set(['DEFAULT_CLOSED'])
 
 
 class UV_IC_TexIndex(PropertyGroup):
@@ -72,7 +73,7 @@ class UV_IC_TexIndex(PropertyGroup):
 class UV_IC_Base(UV_IC_Panel, Panel):
     bl_context = "objectmode"
     bl_label = "UV Utility"
-    bl_options = {"DEFAULT_CLOSED"}
+    bl_options = set(["DEFAULT_CLOSED"])
 
     def draw(self, context):
 
@@ -132,7 +133,7 @@ class UV_IC_ChangeIndex(Operator):
                     # if scene.UVTexRenderActive == True:
                       # droppedUV.active_render = True
 
-        return{'FINISHED'}
+        returnset(['FINISHED'])
 
 
 class UV_IC_SelectIndex(Operator):
@@ -153,7 +154,7 @@ class UV_IC_SelectIndex(Operator):
                     if scene.UVTexRenderActive:
                         meshData.uv_textures[indexNew].active_render = True
 
-        return{'FINISHED'}
+        returnset(['FINISHED'])
 
 
 class UV_IC_RenameActiveUV(Operator):
@@ -171,7 +172,7 @@ class UV_IC_RenameActiveUV(Operator):
                     activeIndex = meshData.uv_textures.active_index
                     meshData.uv_textures[activeIndex].name = scene.UVTexGetName
 
-        return{'FINISHED'}
+        returnset(['FINISHED'])
 
 
 class UV_IC_RemoveUVByName(Operator):
@@ -189,7 +190,7 @@ class UV_IC_RemoveUVByName(Operator):
                     tmpuvmap = meshData.uv_textures[scene.UVTexGetName]
                     meshData.uv_textures.remove(tmpuvmap)
 
-        return{'FINISHED'}
+        returnset(['FINISHED'])
 
 
 class UV_IC_SelectName(Operator):
@@ -213,7 +214,7 @@ class UV_IC_SelectName(Operator):
                         if scene.UVTexRenderActive:
                             uvToGet.active_render = True
 
-        return{'FINISHED'}
+        returnset(['FINISHED'])
 
 
 class UV_IC_RemoveActiveUV(Operator):
@@ -234,7 +235,7 @@ class UV_IC_RemoveActiveUV(Operator):
                         meshData.uv_textures.remove(
                             meshData.uv_textures[activeIndex])
 
-        return{'FINISHED'}
+        returnset(['FINISHED'])
 
 
 def register():

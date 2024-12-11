@@ -58,6 +58,8 @@ This script is an implementation of the concept of sliding vertices around
    HINT: EdgeTune is also multi-vertex-slide."""
 
 
+from __future__ import division
+from __future__ import absolute_import
 bl_info = {
 	"name": "EdgeTune",
 	"author": "Gert De Roost",
@@ -90,7 +92,7 @@ class EdgeTune(bpy.types.Operator):
 	bl_idname = "mesh.edgetune"
 	bl_label = "Tune Edge"
 	bl_description = "Tuning edgeloops by redrawing them manually, sliding verts"
-	bl_options = {"REGISTER", "UNDO"}
+	bl_options = set(["REGISTER", "UNDO"])
 
 	@classmethod
 	def poll(cls, context):
@@ -109,7 +111,7 @@ class EdgeTune(bpy.types.Operator):
 		context.window_manager.modal_handler_add(self)
 		self._handle = bpy.types.SpaceView3D.draw_handler_add(self.redraw, (), 'WINDOW', 'POST_PIXEL')
 
-		return {'RUNNING_MODAL'}
+		return set(['RUNNING_MODAL'])
 
 
 	def modal(self, context, event):
@@ -128,15 +130,15 @@ class EdgeTune(bpy.types.Operator):
 			bpy.ops.object.editmode_toggle()
 			self.bmundo.to_mesh(self.mesh)
 			bpy.ops.object.editmode_toggle()
-			return {'CANCELLED'}
+			return set(['CANCELLED'])
 		elif event.type == 'MIDDLEMOUSE':
 			# recalculate view parameters
 			self.viewchange = True
-			return {'PASS_THROUGH'}
-		elif event.type in {'WHEELDOWNMOUSE', 'WHEELUPMOUSE'}:
+			return set(['PASS_THROUGH'])
+		elif event.type in set(['WHEELDOWNMOUSE', 'WHEELUPMOUSE']):
 			# recalculate view parameters
 			self.viewchange = True
-			return {'PASS_THROUGH'}
+			return set(['PASS_THROUGH'])
 		elif event.type == 'Z':
 			if event.value == 'PRESS':
 				if event.ctrl:
@@ -149,7 +151,7 @@ class EdgeTune(bpy.types.Operator):
 						vert.co[2] = self.undocolist[0][3]
 						self.undocolist.pop(0)
 						self.mesh.update()
-			return {'RUNNING_MODAL'}
+			return set(['RUNNING_MODAL'])
 
 		elif event.type == 'RET':
 			# Consolidate changes.
@@ -157,7 +159,7 @@ class EdgeTune(bpy.types.Operator):
 			self.bmundo.free()
 			bpy.types.SpaceView3D.draw_handler_remove(self._handle, 'WINDOW')
 			self.region.tag_redraw()
-			return {'FINISHED'}
+			return set(['FINISHED'])
 
 		elif event.type == 'MOUSEMOVE':
 			mxa = event.mouse_x
@@ -174,7 +176,7 @@ class EdgeTune(bpy.types.Operator):
 						break
 
 			if not(self.region):
-				return {'RUNNING_MODAL'}
+				return set(['RUNNING_MODAL'])
 			mx = mxa - self.region.x
 			my = mya - self.region.y
 
@@ -293,7 +295,7 @@ class EdgeTune(bpy.types.Operator):
 				vert.co[2] = ((vz2 - vz1) * div ) + vz1
 				self.mesh.update()
 
-		return {'RUNNING_MODAL'}
+		return set(['RUNNING_MODAL'])
 
 
 
@@ -343,11 +345,11 @@ class EdgeTune(bpy.types.Operator):
 			self.getlayout(r)
 
 			# recalculate screencoords in lists
-			for posn in range(len(self.selverts[r])):
+			for posn in xrange(len(self.selverts[r])):
 				self.selcoords[r][posn] = [self.getscreencoords(Vector(self.vertd[self.selverts[r][posn][0]]), r)[:2], self.getscreencoords(Vector(self.vertd[self.selverts[r][posn][1]]), r)[:2]]
-			for posn in range(len(self.slideverts[r])):
+			for posn in xrange(len(self.slideverts[r])):
 				self.slidecoords[r][posn] = [self.getscreencoords(self.slideverts[r][posn][0].co, r)[:2],  self.getscreencoords(self.slideverts[r][posn][1].co, r)[:2]]
-			for posn in range(len(self.singles)):
+			for posn in xrange(len(self.singles)):
 				self.boxes[r][posn] = self.getscreencoords(Vector(self.vertd[self.singles[posn]]), r)[:2]
 
 
@@ -509,7 +511,7 @@ class EdgeTune(bpy.types.Operator):
 
 			# Accentuate selected edges.
 			glColor3f(1.0, 1.0, 0)
-			for posn in range(len(self.selcoords[drawregion])):
+			for posn in xrange(len(self.selcoords[drawregion])):
 				glBegin(GL_LINES)
 				x, y = self.selcoords[drawregion][posn][0]
 				glVertex2f(x, y)
@@ -519,7 +521,7 @@ class EdgeTune(bpy.types.Operator):
 
 			# Draw slide-edges.
 			glColor3f(1.0, 0, 0)
-			for posn in range(len(self.slidecoords[drawregion])):
+			for posn in xrange(len(self.slidecoords[drawregion])):
 				glBegin(GL_LINES)
 				x, y = self.slidecoords[drawregion][posn][0]
 				glVertex2f(x, y)

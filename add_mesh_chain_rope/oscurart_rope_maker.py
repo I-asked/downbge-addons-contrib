@@ -16,6 +16,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import division
+from __future__ import absolute_import
 bl_info = {
     "name": "Oscurart Rope Maker",
     "author": "Oscurart",
@@ -63,7 +65,7 @@ def makeRope (context, DISTPOS, curvaResU, radius, FE, CUERDAS, stResU,DIAMETRO)
     spline=crv.splines.new("NURBS")
     lencoord= len(coordenadas)
     #print("lencoord--> :"+str(lencoord))
-    rango=range(lencoord)
+    rango=xrange(lencoord)
     spline.points.add(lencoord-1)
     for punto in rango:
         spline.points[punto].co = coordenadas[punto]
@@ -86,7 +88,7 @@ def makeRope (context, DISTPOS, curvaResU, radius, FE, CUERDAS, stResU,DIAMETRO)
     DIVISION=360/CUERDAS
     TAJADA=0
 
-    for parte in range(0,CUERDAS):
+    for parte in xrange(0,CUERDAS):
         GRADOS.append(TAJADA)
         TAJADA+=DIVISION
 
@@ -136,7 +138,7 @@ def makeRope (context, DISTPOS, curvaResU, radius, FE, CUERDAS, stResU,DIAMETRO)
         spline=crv.splines.new("NURBS")
         lencoord= len(coordenadas)
         #print("lencoord--> :"+str(lencoord))
-        rango=range(lencoord)
+        rango=xrange(lencoord)
         spline.points.add(lencoord-1)
         for punto in rango:
             spline.points[punto].co = coordenadas[punto]
@@ -159,7 +161,7 @@ from bpy.props import *
 class OBJECT_OT_add_object(bpy.types.Operator):
     bl_idname="curve.primitive_osc_rope_add"
     bl_label="Oscurart Rope"
-    bl_options={'REGISTER','UNDO'}
+    bl_options=set(['REGISTER','UNDO'])
 
     strands = IntProperty (name="Strands", default=5 , min=1, max=1000, step=1)
     diameter = FloatProperty (name="Diameter", default=1 , min=0, max=1000)
@@ -172,7 +174,7 @@ class OBJECT_OT_add_object(bpy.types.Operator):
     def execute(self, context):
         makeRope(context,
             self.distPos,self.distResU,self.radio,self.vertices,self.strands, self.stResU,self.diameter)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 # Registration
 

@@ -55,6 +55,8 @@ Example usage::
                                          d["EXIF:DateTimeOriginal"]))
 """
 
+from __future__ import with_statement
+from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import sys
@@ -63,11 +65,13 @@ import os
 import json
 import warnings
 import codecs
+from io import open
+from itertools import imap
 
 try:        # Py3k compatibility
     basestring
 except NameError:
-    basestring = (bytes, str)
+    basestring = (str, str)
 
 executable = "exiftool"
 """The name of the executable to run.
@@ -78,7 +82,7 @@ If the executable is not located in one of the paths listed in the
 
 # Sentinel indicating the end of the output of a sequence of commands.
 # The standard value should be fine.
-sentinel = b"{ready}"
+sentinel = "{ready}"
 
 # The block size when reading from exiftool.  The standard value
 # should be fine, though other values might give better performance in
@@ -106,7 +110,7 @@ def _fscodec():
         handler, return bytes unchanged. On Windows, use 'strict' error handler
         if the file system encoding is 'mbcs' (which is the default encoding).
         """
-        if isinstance(filename, bytes):
+        if isinstance(filename, str):
             return filename
         else:
             return filename.encode(encoding, errors)
@@ -186,7 +190,7 @@ class ExifTool(object):
         """
         if not self.running:
             return
-        self._process.stdin.write(b"-stay_open\nFalse\n")
+        self._process.stdin.write("-stay_open\nFalse\n")
         self._process.stdin.flush()
         self._process.communicate()
         del self._process
@@ -223,9 +227,9 @@ class ExifTool(object):
         """
         if not self.running:
             raise ValueError("ExifTool instance not running.")
-        self._process.stdin.write(b"\n".join(params + (b"-execute\n",)))
+        self._process.stdin.write("\n".join(params + ("-execute\n",)))
         self._process.stdin.flush()
-        output = b""
+        output = ""
         fd = self._process.stdout.fileno()
         while not output[-32:].strip().endswith(sentinel):
             output += os.read(fd, block_size)
@@ -253,8 +257,8 @@ class ExifTool(object):
         respective Python version – as raw strings in Python 2.x and
         as Unicode strings in Python 3.x.
         """
-        params = map(fsencode, params)
-        return json.loads(self.execute(b"-j", *params).decode("utf-8"))
+        params = imap(fsencode, params)
+        return json.loads(self.execute("-j", *params).decode("utf-8"))
 
     def get_metadata_batch(self, filenames):
         """Return all meta-data for the given files.
@@ -318,7 +322,7 @@ class ExifTool(object):
         result = []
         for d in data:
             d.pop("SourceFile")
-            result.append(next(iter(d.values()), None))
+            result.append(iter(d.values()), None.next())
         return result
 
     def get_tag(self, tag, filename):

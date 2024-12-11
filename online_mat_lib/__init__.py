@@ -27,6 +27,9 @@
 #
 #  ***** END GPL LICENSE BLOCK *****
 
+from __future__ import division
+from __future__ import absolute_import
+from io import open
 bl_info = {
     "name": "Online Material Library",
     "author": "Peter Cassetta",
@@ -241,7 +244,7 @@ node_types = {
 import bpy
 from bpy_extras.io_utils import ExportHelper
 import os.path
-import http.client
+import httplib
 import xml.dom.minidom
 
 library = ""
@@ -251,7 +254,7 @@ update_data = ["Up-to-date.", ""]
 library_enum_items = [("peter.cassetta.info/material-library/release/", "Peter's Library - Release", "Stable library hosted on peter.cassetta.info (Default)"),
                       ("peter.cassetta.info/material-library/testing/", "Peter's Library - Testing", "Continually updated library hosted on peter.cassetta.info (Online only)"),
                       ("bundled", "Bundled Library", "The library bundled with this add-on (Offline only)")]
-bpy.types.Scene.mat_lib_library = bpy.props.EnumProperty(name = "Select library:", items = library_enum_items, description = "Choose a library", options = {'SKIP_SAVE'})
+bpy.types.Scene.mat_lib_library = bpy.props.EnumProperty(name = "Select library:", items = library_enum_items, description = "Choose a library", options = set(['SKIP_SAVE']))
 
 working_mode = "none"
 mat_lib_host = ""
@@ -326,28 +329,28 @@ mapping_curves = []
 group_scripts = []
 group_curves = []
 
-bpy.types.Scene.mat_lib_auto_preview = bpy.props.BoolProperty(name = "Auto-download previews", description = "Automatically download material previews in online mode", default = True, options = {'SKIP_SAVE'})
-bpy.types.Scene.mat_lib_show_osl_materials = bpy.props.BoolProperty(name = "Show OSL materials", description = "Enable to show materials with OSL shading scripts", default = False, options = {'SKIP_SAVE'})
-bpy.types.Scene.mat_lib_show_textured_materials = bpy.props.BoolProperty(name = "Show textured materials", description = "Enable to show materials with image textures", default = True, options = {'SKIP_SAVE'})
-bpy.types.Scene.mat_lib_osl_only_trusted = bpy.props.BoolProperty(name = "Use OSL scripts from trusted sources only", description = "Disable to allow downloading OSL scripts from anywhere on the web (Not recommended)", default = True, options = {'SKIP_SAVE'})
-bpy.types.Scene.mat_lib_images_only_trusted = bpy.props.BoolProperty(name = "Use image textures from trusted sources only", description = "Disable to allow downloading image textures from anywhere on the web (Not recommended)", default = True, options = {'SKIP_SAVE'})
-bpy.types.Scene.mat_lib_external_groups = bpy.props.BoolProperty(name = "Write nodegroups to separate files", description = "Enable to write nodegroups to separate .bcg files when saving materials to disk", default = False, options = {'SKIP_SAVE'})
+bpy.types.Scene.mat_lib_auto_preview = bpy.props.BoolProperty(name = "Auto-download previews", description = "Automatically download material previews in online mode", default = True, options = set(['SKIP_SAVE']))
+bpy.types.Scene.mat_lib_show_osl_materials = bpy.props.BoolProperty(name = "Show OSL materials", description = "Enable to show materials with OSL shading scripts", default = False, options = set(['SKIP_SAVE']))
+bpy.types.Scene.mat_lib_show_textured_materials = bpy.props.BoolProperty(name = "Show textured materials", description = "Enable to show materials with image textures", default = True, options = set(['SKIP_SAVE']))
+bpy.types.Scene.mat_lib_osl_only_trusted = bpy.props.BoolProperty(name = "Use OSL scripts from trusted sources only", description = "Disable to allow downloading OSL scripts from anywhere on the web (Not recommended)", default = True, options = set(['SKIP_SAVE']))
+bpy.types.Scene.mat_lib_images_only_trusted = bpy.props.BoolProperty(name = "Use image textures from trusted sources only", description = "Disable to allow downloading image textures from anywhere on the web (Not recommended)", default = True, options = set(['SKIP_SAVE']))
+bpy.types.Scene.mat_lib_external_groups = bpy.props.BoolProperty(name = "Write nodegroups to separate files", description = "Enable to write nodegroups to separate .bcg files when saving materials to disk", default = False, options = set(['SKIP_SAVE']))
 
 
 tools_enum_items = [("material", "Material Tools", "Material import-export tools"), ("nodegroup", "Nodegroup Tools", "Nodegroup import-export tools")]
 bpy.types.Scene.mat_lib_tools_view = bpy.props.EnumProperty(items = tools_enum_items, name = "View", description = "Change tools view")
 
-bpy.types.Scene.mat_lib_bcm_write = bpy.props.StringProperty(name = "Text Datablock", description = "Name of text datablock to write .bcm data to", default="bcm_file", options = {'SKIP_SAVE'})
-bpy.types.Scene.mat_lib_bcg_write = bpy.props.StringProperty(name = "Text Datablock", description = "Name of text datablock to write .bcg data to", default="bcg_file", options = {'SKIP_SAVE'})
-bpy.types.Scene.mat_lib_bcm_read = bpy.props.StringProperty(name = "Text Datablock", description = "Name of text datablock to read .bcm data from", default="bcm_file", options = {'SKIP_SAVE'})
-bpy.types.Scene.mat_lib_bcg_read = bpy.props.StringProperty(name = "Text Datablock", description = "Name of text datablock to read .bcg data from", default="bcg_file", options = {'SKIP_SAVE'})
-bpy.types.Scene.mat_lib_bcm_name = bpy.props.StringProperty(name = "Material Name", description = "Specify a name for the new material", default="Untitled", options = {'SKIP_SAVE'})
-bpy.types.Scene.mat_lib_bcg_name = bpy.props.StringProperty(name = "Nodegroup Name", description = "Specify a name for the new nodegroup", default="Untitled", options = {'SKIP_SAVE'})
+bpy.types.Scene.mat_lib_bcm_write = bpy.props.StringProperty(name = "Text Datablock", description = "Name of text datablock to write .bcm data to", default="bcm_file", options = set(['SKIP_SAVE']))
+bpy.types.Scene.mat_lib_bcg_write = bpy.props.StringProperty(name = "Text Datablock", description = "Name of text datablock to write .bcg data to", default="bcg_file", options = set(['SKIP_SAVE']))
+bpy.types.Scene.mat_lib_bcm_read = bpy.props.StringProperty(name = "Text Datablock", description = "Name of text datablock to read .bcm data from", default="bcm_file", options = set(['SKIP_SAVE']))
+bpy.types.Scene.mat_lib_bcg_read = bpy.props.StringProperty(name = "Text Datablock", description = "Name of text datablock to read .bcg data from", default="bcg_file", options = set(['SKIP_SAVE']))
+bpy.types.Scene.mat_lib_bcm_name = bpy.props.StringProperty(name = "Material Name", description = "Specify a name for the new material", default="Untitled", options = set(['SKIP_SAVE']))
+bpy.types.Scene.mat_lib_bcg_name = bpy.props.StringProperty(name = "Nodegroup Name", description = "Specify a name for the new nodegroup", default="Untitled", options = set(['SKIP_SAVE']))
 
-bpy.types.Scene.mat_lib_bcm_save_location = bpy.props.StringProperty(name = "Save location", description = "Directory to save .bcm files in", default=matlibpath + os.sep + "my-materials" + os.sep, options = {'SKIP_SAVE'}, subtype="DIR_PATH")
-bpy.types.Scene.mat_lib_bcg_save_location = bpy.props.StringProperty(name = "Save location", description = "Directory to save .bcg files in", default=matlibpath + os.sep + "my-materials" + os.sep, options = {'SKIP_SAVE'}, subtype="DIR_PATH")
-bpy.types.Scene.mat_lib_bcm_open_location = bpy.props.StringProperty(name = "Open location", description = "Location of .bcm file to open", default=matlibpath + os.sep + "my-materials" + os.sep + "untitled.bcm", options = {'SKIP_SAVE'})
-bpy.types.Scene.mat_lib_bcg_open_location = bpy.props.StringProperty(name = "Open location", description = "Location of .bcg file to open", default=matlibpath + os.sep + "my-materials" + os.sep + "untitled.bcg", options = {'SKIP_SAVE'})
+bpy.types.Scene.mat_lib_bcm_save_location = bpy.props.StringProperty(name = "Save location", description = "Directory to save .bcm files in", default=matlibpath + os.sep + "my-materials" + os.sep, options = set(['SKIP_SAVE']), subtype="DIR_PATH")
+bpy.types.Scene.mat_lib_bcg_save_location = bpy.props.StringProperty(name = "Save location", description = "Directory to save .bcg files in", default=matlibpath + os.sep + "my-materials" + os.sep, options = set(['SKIP_SAVE']), subtype="DIR_PATH")
+bpy.types.Scene.mat_lib_bcm_open_location = bpy.props.StringProperty(name = "Open location", description = "Location of .bcm file to open", default=matlibpath + os.sep + "my-materials" + os.sep + "untitled.bcm", options = set(['SKIP_SAVE']))
+bpy.types.Scene.mat_lib_bcg_open_location = bpy.props.StringProperty(name = "Open location", description = "Location of .bcg file to open", default=matlibpath + os.sep + "my-materials" + os.sep + "untitled.bcg", options = set(['SKIP_SAVE']))
 
 #subcategory_enum_items = [("None0", "None", "No Subcategory Selected")]
 #bpy.types.Scene.mat_lib_material_subcategory = bpy.props.EnumProperty(name = "", items = subcategory_enum_items, description = "Choose a subcategory", options = {'SKIP_SAVE'})
@@ -870,13 +873,13 @@ class OnlineMaterialLibraryPanel(bpy.types.Panel):
             row = layout.row()
             row.label(text="Sorry, Cycles only at the moment.",icon='ERROR')
 
-class libraryCategory:
+class libraryCategory(object):
     def __init__(self, title, folder):
         self.title = title
         self.folder = folder
         self.materials = []
 
-class libraryMaterial:
+class libraryMaterial(object):
     def __init__(self, name, href, contrib, stars, fireflies, speed, complexity, groups, scripts, images, filesize, dimensions, tileable, lines):
         self.name = name
         self.href = href
@@ -904,7 +907,7 @@ def handleCategory(category, index):
         
         #Check this addon's compatibility with this category
         if needed_version > this_version:
-            print('\n\n-Category "' + category.attributes['title'].value + '" not used; its materials are for a newer version of this add-on.')
+            print '\n\n-Category "' + category.attributes['title'].value + '" not used; its materials are for a newer version of this add-on.'
             return
     
     if 'bl' in category.attributes:
@@ -918,7 +921,7 @@ def handleCategory(category, index):
             #look like the following: bl="2.64-"
             bl_lower = float(category.attributes['bl'].value[:-1])
             if bl_lower > bl_version:
-                print('\n\n-Category "' + category.attributes['title'].value + '" was not used; its materials are not compatible with this version of Blender.')
+                print '\n\n-Category "' + category.attributes['title'].value + '" was not used; its materials are not compatible with this version of Blender.'
                 return
             
         elif category.attributes['bl'].value[0] == "-":
@@ -927,7 +930,7 @@ def handleCategory(category, index):
             #look like the following: bl="-2.73"
             bl_upper = float(category.attributes['bl'].value[1:])
             if bl_upper < bl_version:
-                print('\n\n-Category "' + category.attributes['title'].value + '" was not used; its materials are not compatible with this version of Blender.')
+                print '\n\n-Category "' + category.attributes['title'].value + '" was not used; its materials are not compatible with this version of Blender.'
                 return
             
         else:
@@ -938,15 +941,15 @@ def handleCategory(category, index):
             bl_lower = float(category.attributes['bl'].value.split('-')[0])
             bl_upper = float(category.attributes['bl'].value.split('-')[1])
             if bl_upper < bl_version:
-                print('\n\n-Category "' + category.attributes['title'].value + '" was not used; its materials are not compatible with this version of Blender.')
+                print '\n\n-Category "' + category.attributes['title'].value + '" was not used; its materials are not compatible with this version of Blender.'
                 return
             elif bl_lower > bl_version:
-                print('\n\n-Category "' + category.attributes['title'].value + '" was not used; its materials are not compatible with this version of Blender.')
+                print '\n\n-Category "' + category.attributes['title'].value + '" was not used; its materials are not compatible with this version of Blender.'
                 return
     
     if library is not "bundled":
         if not os.path.exists(os.path.join(matlibpath, mat_lib_host, library, "cycles", category.attributes['folder'].value)):
-            print("Folder \"/" + category.attributes['folder'].value + "/\" does not exist; creating now.")
+            print "Folder \"/" + category.attributes['folder'].value + "/\" does not exist; creating now."
             if library == "composite":
                 os.mkdir(os.path.join(matlibpath, mat_lib_host, "cycles", category.attributes['folder'].value))
             else:
@@ -979,7 +982,7 @@ def handleCategory(category, index):
                     os.rmdir(os.path.join(matlibpath, mat_lib_host, library, "cycles", category.attributes['folder'].value))
                 return
     
-    print ('\n\n-Category "' + category.attributes['title'].value + '"; located in folder "/' + category.attributes['folder'].value + '/".')
+    print '\n\n-Category "' + category.attributes['title'].value + '"; located in folder "/' + category.attributes['folder'].value + '/".'
     library_data.append(libraryCategory(category.attributes['title'].value, category.attributes['folder'].value))
     if category.attributes['folder'].value == "groups":
         handleMaterials(category.getElementsByTagName("group"), index)
@@ -1001,7 +1004,7 @@ def handleMaterial(material, index):
         
         #Check this addon's compatibility with this material
         if needed_version > this_version:
-            print('\n  -Material "' + material.attributes['name'].value + '" was not used, and is for a newer version of this add-on.')
+            print '\n  -Material "' + material.attributes['name'].value + '" was not used, and is for a newer version of this add-on.'
             return
     
     if 'bl' in material.attributes:
@@ -1015,7 +1018,7 @@ def handleMaterial(material, index):
             #look like the following: bl="2.64-"
             bl_lower = float(material.attributes['bl'].value[:-1])
             if bl_lower > bl_version:
-                print('\n  -Material "' + material.attributes['name'].value + '" was not used, and is not compatible with this version of Blender.')
+                print '\n  -Material "' + material.attributes['name'].value + '" was not used, and is not compatible with this version of Blender.'
                 return
             
         elif material.attributes['bl'].value[0] == "-":
@@ -1024,7 +1027,7 @@ def handleMaterial(material, index):
             #look like the following: bl="-2.73"
             bl_upper = float(material.attributes['bl'].value[1:])
             if bl_upper < bl_version:
-                print('\n  -Material "' + material.attributes['name'].value + '" was not used, and is not compatible with this version of Blender.')
+                print '\n  -Material "' + material.attributes['name'].value + '" was not used, and is not compatible with this version of Blender.'
                 return
             
         else:
@@ -1035,10 +1038,10 @@ def handleMaterial(material, index):
             bl_lower = float(material.attributes['bl'].value.split('-')[0])
             bl_upper = float(material.attributes['bl'].value.split('-')[1])
             if bl_upper < bl_version:
-                print('\n  -Material "' + material.attributes['name'].value + '" was not used, and is not compatible with this version of Blender.')
+                print '\n  -Material "' + material.attributes['name'].value + '" was not used, and is not compatible with this version of Blender.'
                 return
             elif bl_lower > bl_version:
-                print('\n  -Material "' + material.attributes['name'].value + '" was not used, and is not compatible with this version of Blender.')
+                print '\n  -Material "' + material.attributes['name'].value + '" was not used, and is not compatible with this version of Blender.'
                 return
     
     if 'by' in material.attributes:
@@ -1118,13 +1121,13 @@ def handleMaterial(material, index):
         tileable,
         lines))
     
-    print ('\n  -Material "' + 
+    print '\n  -Material "' + 
         material.attributes['name'].value + 
         '"\n    -Filename: "' + 
         material.attributes['href'].value + 
         '.bcm"\n    -Rating: ' + stars + 
         ' stars\n    -Contributed by "' + 
-        contributor + '"')
+        contributor + '"'
 
 class LibraryConnect(bpy.types.Operator):
     '''Connect to selected material library'''
@@ -1159,8 +1162,8 @@ class LibraryConnect(bpy.types.Operator):
         if self.mode == "online":
             mat_lib_host = context.scene.mat_lib_library[:context.scene.mat_lib_library.index("/")]
             mat_lib_location = context.scene.mat_lib_library[(context.scene.mat_lib_library.index(mat_lib_host) + len(mat_lib_host)):]
-            print(mat_lib_host)
-            print(mat_lib_location)
+            print mat_lib_host
+            print mat_lib_location
         elif "bundled" not in context.scene.mat_lib_library:
             mat_lib_host = context.scene.mat_lib_library[:context.scene.mat_lib_library.index("/")]
         
@@ -1171,7 +1174,7 @@ class LibraryConnect(bpy.types.Operator):
         
         if self.mode == "online":
             #Connect and download
-            connection = http.client.HTTPConnection(mat_lib_host)
+            connection = httplib.HTTPConnection(mat_lib_host)
             connection.request("GET", mat_lib_location + "cycles/index.xml")
             
             if "release" in context.scene.mat_lib_library:
@@ -1235,9 +1238,9 @@ class LibraryConnect(bpy.types.Operator):
             
             #Check for connection errors
             if "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" not in mat_lib_contents:
-                self.report({'ERROR'}, "Error connecting; see console for details.")
-                print("Received following response from server:\n" + mat_lib_contents)
-                return {'CANCELLED'}
+                self.report(set(['ERROR']), "Error connecting; see console for details.")
+                print "Received following response from server:\n" + mat_lib_contents
+                return set(['CANCELLED'])
             
             #Format nicely
             mat_lib_contents = mat_lib_contents.replace("b'<?xml version=\"1.0\" encoding=\"UTF-8\"?>",'')
@@ -1253,8 +1256,8 @@ class LibraryConnect(bpy.types.Operator):
                     mat_lib_contents = library_file.read()
                     library_file.close()
                 else:
-                    self.report({'ERROR'}, "No cached library exists!")
-                    return {'CANCELLED'}
+                    self.report(set(['ERROR']), "No cached library exists!")
+                    return set(['CANCELLED'])
                 
                 #Create /groups/ folder
                 if not os.path.exists(os.path.join(matlibpath, mat_lib_host, "release", "cycles", "groups")):
@@ -1275,8 +1278,8 @@ class LibraryConnect(bpy.types.Operator):
                     mat_lib_contents = library_file.read()
                     library_file.close()
                 else:
-                    self.report({'ERROR'}, "Bundled library does not exist!")
-                    return {'CANCELLED'}
+                    self.report(set(['ERROR']), "Bundled library does not exist!")
+                    return set(['CANCELLED'])
                 library = "bundled"
             else:
                 #Check for cached index.xml file
@@ -1285,8 +1288,8 @@ class LibraryConnect(bpy.types.Operator):
                     mat_lib_contents = library_file.read()
                     library_file.close()
                 else:
-                    self.report({'ERROR'}, "No cached library exists!")
-                    return {'CANCELLED'}
+                    self.report(set(['ERROR']), "No cached library exists!")
+                    return set(['CANCELLED'])
                 
                 #Create /groups/ folder
                 if not os.path.exists(os.path.join(matlibpath, mat_lib_host, "cycles", "groups")):
@@ -1302,8 +1305,8 @@ class LibraryConnect(bpy.types.Operator):
                 library = "composite"
             
             if '<?xml version="1.0" encoding="UTF-8"?>' not in mat_lib_contents:
-                self.report({'ERROR'}, "Cached XML file is invalid!")
-                return {'CANCELLED'}
+                self.report(set(['ERROR']), "Cached XML file is invalid!")
+                return set(['CANCELLED'])
             
             #Format nicely
             mat_lib_contents = mat_lib_contents.replace('<?xml version="1.0" encoding="UTF-8"?>', '')
@@ -1334,7 +1337,7 @@ class LibraryConnect(bpy.types.Operator):
                 revision = int(rev_data[9:])
             else:
                 revision = -1
-                print("The revision_data.ini file is invalid; clearing cache and re-creating.")
+                print "The revision_data.ini file is invalid; clearing cache and re-creating."
             
             if revision is not int(dom.getElementsByTagName("library")[0].attributes['rev'].value):
                 bpy.ops.material.libraryclearcache()
@@ -1352,7 +1355,7 @@ class LibraryConnect(bpy.types.Operator):
                 if current_version > this_version:
                     update_data = ["Add-on is outdated.", dom.getElementsByTagName("library")[0].attributes['download'].value]
         
-        print ("\n\n---Material Library---")
+        print "\n\n---Material Library---"
         categories = dom.getElementsByTagName("category")
         handleCategories(categories)
         
@@ -1373,7 +1376,7 @@ class LibraryConnect(bpy.types.Operator):
         
         i = 0
         while i < mat_lib_categories:
-            print ("Adding category #%d" % (i + 1))
+            print "Adding category #%d" % (i + 1)
             category_enum_items.append(((mat_lib_category_names[i] + str(i + 1)), mat_lib_category_names[i], (mat_lib_category_names[i] + " category")))
             i = i + 1
         bpy.types.Scene.mat_lib_material_category = bpy.props.EnumProperty(items = category_enum_items, name = "", description = "Choose a category", update=libraryCategoryUpdate)
@@ -1382,9 +1385,9 @@ class LibraryConnect(bpy.types.Operator):
         #No errors - set working mode
         working_mode = self.mode
         
-        self.report({'INFO'}, "Retrieved library!")
+        self.report(set(['INFO']), "Retrieved library!")
         
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class LibraryInfo(bpy.types.Operator):
     '''Display add-on info'''
@@ -1396,7 +1399,7 @@ class LibraryInfo(bpy.types.Operator):
         
         category_type = "info"
         
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class LibraryTools(bpy.types.Operator):
     '''Display material tools'''
@@ -1408,7 +1411,7 @@ class LibraryTools(bpy.types.Operator):
         
         category_type = "tools"
         
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class LibrarySettings(bpy.types.Operator):
     '''Display add-on settings'''
@@ -1421,10 +1424,10 @@ class LibrarySettings(bpy.types.Operator):
         
         category_type = "settings"
         if library == "":
-            return {'FINISHED'}
+            return set(['FINISHED'])
         elif library == "bundled":
             mat_lib_cached_files = -2
-            return {'FINISHED'}
+            return set(['FINISHED'])
         elif library == "composite":
             cached_data_path = os.path.join(matlibpath, mat_lib_host, "cycles" + os.sep)
         else:
@@ -1445,7 +1448,7 @@ class LibrarySettings(bpy.types.Operator):
                 elif ".bcg" in name:
                     mat_lib_cached_files += 1
         
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class LibraryHome(bpy.types.Operator):
     '''Go back'''
@@ -1457,10 +1460,10 @@ class LibraryHome(bpy.types.Operator):
         
         category_type = "none"
         
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 def libraryCategoryUpdate(self, context):
-    print("Updating Material Category.")        
+    print "Updating Material Category."        
         
     global category_contents
     global category_name
@@ -1689,7 +1692,7 @@ class ViewMaterial(bpy.types.Operator):
         if self.material == -1:
             if bpy.app.version[0] + (bpy.app.version[1] / 100.0) >= 2.66 and context.active_object.material_slots[-1].material.name == "mat_lib_preview_material":
                 bpy.ops.material.libraryremovepreview()
-            return {'FINISHED'}
+            return set(['FINISHED'])
         
         if library == "composite":
             if os.path.exists(os.path.join(matlibpath, mat_lib_host, "cycles", category_filename, material_filenames[self.material] + ".bcm")):
@@ -1701,15 +1704,15 @@ class ViewMaterial(bpy.types.Operator):
         if context.scene.mat_lib_auto_preview == True:
             bpy.ops.material.librarypreview(name=material_names[self.material], filename=material_filenames[self.material])
             if len(preview_message) == 2:
-                self.report({preview_message[0]}, preview_message[1])
+                self.report(set([preview_message[0]]), preview_message[1])
         elif working_mode == "offline":
             bpy.ops.material.librarypreview(name=material_names[self.material], filename=material_filenames[self.material])
             if len(preview_message) == 2:
-                self.report({preview_message[0]}, preview_message[1])
+                self.report(set([preview_message[0]]), preview_message[1])
         elif library == "composite":
             if os.path.exists(os.path.join(matlibpath, mat_lib_host, "cycles", category_filename, material_filenames[self.material] + ".jpg")):
                 bpy.ops.material.librarypreview(name=material_names[self.material], filename=material_filenames[self.material])
-                self.report({preview_message[0]}, preview_message[1])
+                self.report(set([preview_message[0]]), preview_message[1])
             else:
                 bpy.data.images["mat_lib_preview_image.jpg"].source = 'GENERATED'
                 bpy.data.images["mat_lib_preview_image.jpg"].generated_width = 128
@@ -1722,7 +1725,7 @@ class ViewMaterial(bpy.types.Operator):
         else:
             if os.path.exists(os.path.join(matlibpath, mat_lib_host, library, "cycles", category_filename, material_filenames[self.material] + ".jpg")):
                 bpy.ops.material.librarypreview(name=material_names[self.material], filename=material_filenames[self.material])
-                self.report({preview_message[0]}, preview_message[1])
+                self.report(set([preview_message[0]]), preview_message[1])
             else:
                 bpy.data.images["mat_lib_preview_image.jpg"].source = 'GENERATED'
                 bpy.data.images["mat_lib_preview_image.jpg"].generated_width = 128
@@ -1732,7 +1735,7 @@ class ViewMaterial(bpy.types.Operator):
                 bpy.ops.wm.redraw_timer()
                 bpy.data.scenes[bpy.context.scene.name].update()
                 bpy.data.scenes[bpy.context.scene.name].frame_set(bpy.data.scenes[bpy.context.scene.name].frame_current)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class LibraryClearCache(bpy.types.Operator):
     '''Delete active library's cached previews, materials, textures, scripts, and node groups'''
@@ -1744,44 +1747,44 @@ class LibraryClearCache(bpy.types.Operator):
         findLibrary()
         
         if library == "bundled":
-            self.report({'ERROR'}, "The bundled library is local only and contains no cached online data.")
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "The bundled library is local only and contains no cached online data.")
+            return set(['CANCELLED'])
         elif library == "composite":
             cached_data_path = os.path.join(matlibpath, mat_lib_host, "cycles" + os.sep)
         elif library == "testing" or library == "release":
             cached_data_path = os.path.join(matlibpath, mat_lib_host, library, "cycles" + os.sep)
         elif library == "":
-            self.report({'ERROR'}, "No library selected!")
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "No library selected!")
+            return set(['CANCELLED'])
         else:
-            self.report({'ERROR'}, "Unrecognized library type!")
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "Unrecognized library type!")
+            return set(['CANCELLED'])
         
         for root, dirs, files in os.walk(cached_data_path):
             for name in files:
                 if name[-4:].lower() == ".jpg":
-                    print("Deleting \"" + os.path.join(root, name) + "\".")
+                    print "Deleting \"" + os.path.join(root, name) + "\"."
                     os.remove(os.path.join(root, name))
                 elif name[-4:].lower() == ".png":
-                    print("Deleting \"" + os.path.join(root, name) + "\".")
+                    print "Deleting \"" + os.path.join(root, name) + "\"."
                     os.remove(os.path.join(root, name))
                 elif name[-4:].lower() == ".osl":
-                    print("Deleting \"" + os.path.join(root, name) + "\".")
+                    print "Deleting \"" + os.path.join(root, name) + "\"."
                     os.remove(os.path.join(root, name))
                 elif name[-4:].lower() == ".oso":
-                    print("Deleting \"" + os.path.join(root, name) + "\".")
+                    print "Deleting \"" + os.path.join(root, name) + "\"."
                     os.remove(os.path.join(root, name))
                 elif name[-4:].lower() == ".bcg":
-                    print("Deleting \"" + os.path.join(root, name) + "\".")
+                    print "Deleting \"" + os.path.join(root, name) + "\"."
                     os.remove(os.path.join(root, name))
                 elif name[-4:].lower() == ".bcm":
-                    print("Deleting \"" + os.path.join(root, name) + "\".")
+                    print "Deleting \"" + os.path.join(root, name) + "\"."
                     os.remove(os.path.join(root, name))
         
         mat_lib_cached_files = 0
         
-        self.report({'INFO'}, "Preview cache cleared.")
-        return {'FINISHED'}
+        self.report(set(['INFO']), "Preview cache cleared.")
+        return set(['FINISHED'])
 
 class LibraryPreview(bpy.types.Operator):
     '''Preview material'''
@@ -1824,7 +1827,7 @@ class LibraryPreview(bpy.types.Operator):
                 
             elif working_mode == "online":
                 #This preview doesn't exist yet; let's download it.
-                connection = http.client.HTTPConnection(mat_lib_host)
+                connection = httplib.HTTPConnection(mat_lib_host)
                 connection.request("GET", mat_lib_location + "cycles/" + category_filename + "/" + self.filename + ".jpg")
                 response = connection.getresponse().read()
                 f = open(os.path.join(matlibpath, "mat_lib_preview_image.jpg"), 'w+b')
@@ -1900,7 +1903,7 @@ class LibraryPreview(bpy.types.Operator):
                 
             elif working_mode == "online":
                 #This preview doesn't exist yet; let's download it.
-                connection = http.client.HTTPConnection(mat_lib_host)
+                connection = httplib.HTTPConnection(mat_lib_host)
                 connection.request("GET", mat_lib_location + "cycles/" + category_filename + "/" + self.filename + ".jpg")
                 response = connection.getresponse().read()
                 f = open(os.path.join(matlibpath, "mat_lib_preview_image.jpg"), 'w+b')
@@ -1962,16 +1965,16 @@ class LibraryPreview(bpy.types.Operator):
         
         current_material_previewed = False
         if previewed == 'status_applied':
-            self.report({'INFO'}, "Preview applied.")
+            self.report(set(['INFO']), "Preview applied.")
             preview_message = ['INFO', "Preview applied."]
             current_material_previewed = True
         elif previewed == 'status_cannot_download':
-            self.report({'WARNING'}, "Preview does not exist; cannot download in offline mode.")
+            self.report(set(['WARNING']), "Preview does not exist; cannot download in offline mode.")
             preview_message = ['WARNING', "Preview does not exist; cannot download in offline mode."]
         else:
             preview_message = []
         
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class LibraryRemovePreview(bpy.types.Operator):
     '''Remove preview'''
@@ -1989,7 +1992,7 @@ class LibraryRemovePreview(bpy.types.Operator):
         
         current_material_previewed = False
         
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class AddLibraryMaterial(bpy.types.Operator):
     '''Add material to scene'''
@@ -2025,15 +2028,15 @@ class AddLibraryMaterial(bpy.types.Operator):
                 material_file_contents = bcm_file.read()
                 bcm_file.close()
             elif working_mode == "online":
-                connection = http.client.HTTPConnection(mat_lib_host)
+                connection = httplib.HTTPConnection(mat_lib_host)
                 connection.request("GET", mat_lib_location + "cycles/" + category_filename + "/" + self.filename + ".bcm")
                 response = connection.getresponse().read()
                 
                 #Check file for validitity
                 if '<?xml version="1.0" encoding="UTF-8"?>' not in str(response)[2:40]:
-                    self.report({'ERROR'}, "Material file is either outdated or invalid.")
+                    self.report(set(['ERROR']), "Material file is either outdated or invalid.")
                     self.filename = ""
-                    return {'CANCELLED'}
+                    return set(['CANCELLED'])
                 
                 #Cache material
                 if library == "composite":
@@ -2047,9 +2050,9 @@ class AddLibraryMaterial(bpy.types.Operator):
                 
                 material_file_contents = str(response)
             else:
-                self.report({'ERROR'}, "Material is not cached; cannot download in offline mode!")
-                return {'CANCELLED'}
-            print (material_file_contents)
+                self.report(set(['ERROR']), "Material is not cached; cannot download in offline mode!")
+                return set(['CANCELLED'])
+            print material_file_contents
             mat_name = self.mat_name
         elif self.open_location is not "":
             if ".bcm" in self.open_location:
@@ -2060,32 +2063,32 @@ class AddLibraryMaterial(bpy.types.Operator):
                 #Check file for validitity
                 if '<?xml version="1.0" encoding="UTF-8"?>' not in material_file_contents:
                     self.open_location = ""
-                    self.report({'ERROR'}, "Material file is either outdated or invalid.")
-                    return {'CANCELLED'}
+                    self.report(set(['ERROR']), "Material file is either outdated or invalid.")
+                    return set(['CANCELLED'])
                 mat_name = ""
                 for word in self.open_location.split(os.sep)[-1][:-4].split("_"):
                     if mat_name is not "":
                         mat_name += " "
                     mat_name += word.capitalize()
             else:
-                self.report({'ERROR'}, "Not a .bcm file.")
+                self.report(set(['ERROR']), "Not a .bcm file.")
                 self.open_location = ""
-                return {'CANCELLED'}
+                return set(['CANCELLED'])
         else:
             if self.text_block in bpy.data.texts:
                 #Read from a text datablock
                 material_file_contents = bpy.data.texts[self.text_block].as_string()
             else:
-                self.report({'ERROR'}, "Requested text block does not exist.")
+                self.report(set(['ERROR']), "Requested text block does not exist.")
                 self.text_block = ""
-                return {'CANCELLED'}
+                return set(['CANCELLED'])
                 
-            print(material_file_contents)
+            print material_file_contents
             #Check file for validitity
             if '<?xml version="1.0" encoding="UTF-8"?>' not in material_file_contents[0:40]:
-                self.report({'ERROR'}, "Material data is either outdated or invalid.")
+                self.report(set(['ERROR']), "Material data is either outdated or invalid.")
                 self.text_block = ""
-                return {'CANCELLED'}
+                return set(['CANCELLED'])
             mat_name = ""
             
             separator = ""
@@ -2115,9 +2118,9 @@ class AddLibraryMaterial(bpy.types.Operator):
             self.filename = ""
             self.text_block = ""
             self.open_location = ""
-            self.report({'ERROR'}, "Material file is either invalid or outdated.")
-            print(material_file_contents)
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "Material file is either invalid or outdated.")
+            print material_file_contents
+            return set(['CANCELLED'])
         
         #Create new material
         new_mat = bpy.data.materials.new(mat_name)
@@ -2162,14 +2165,14 @@ class AddLibraryMaterial(bpy.types.Operator):
         nodes = dom.getElementsByTagName("node")
         addNodes(nodes, new_mat.node_tree)
         if node_message:
-            self.report({node_message[0]}, node_message[1])
+            self.report(set([node_message[0]]), node_message[1])
             if node_message[0] == "ERROR":
                 node_message = []
                 self.mat_name = ""
                 self.filename = ""
                 self.open_location = ""
                 self.text_block = ""
-                return {'CANCELLED'}
+                return set(['CANCELLED'])
             node_message = []
         
         #Create links
@@ -2196,10 +2199,10 @@ class AddLibraryMaterial(bpy.types.Operator):
         self.filename = ""
         self.open_location = ""
         self.text_block = ""
-        self.report({'INFO'}, "Material added.")
+        self.report(set(['INFO']), "Material added.")
         current_material_cached = True
         
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class ApplyLibraryMaterial(bpy.types.Operator):
     '''Apply to active material'''
@@ -2228,8 +2231,8 @@ class ApplyLibraryMaterial(bpy.types.Operator):
             self.filename = ""
             self.open_location = ""
             self.text_block = ""
-            self.report({'ERROR'}, "No object selected!")
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "No object selected!")
+            return set(['CANCELLED'])
         
         if self.open_location == "" and self.text_block == "":
             if library == "composite" and os.path.exists(os.path.join(matlibpath, mat_lib_host, "cycles", category_filename, self.filename + ".bcm")):
@@ -2245,16 +2248,16 @@ class ApplyLibraryMaterial(bpy.types.Operator):
                 material_file_contents = bcm_file.read()
                 bcm_file.close()
             elif working_mode == "online":
-                connection = http.client.HTTPConnection(mat_lib_host)
+                connection = httplib.HTTPConnection(mat_lib_host)
                 connection.request("GET", mat_lib_location + "cycles/" + category_filename + "/" + self.filename + ".bcm")
                 response = connection.getresponse().read()
                 
                 #Check file for validitity
                 if '<?xml version="1.0" encoding="UTF-8"?>' not in str(response)[2:40]:
-                    self.report({'ERROR'}, "Material file is either outdated or invalid.")
+                    self.report(set(['ERROR']), "Material file is either outdated or invalid.")
                     self.mat_name = ""
                     self.filename = ""
-                    return {'CANCELLED'}
+                    return set(['CANCELLED'])
                 
                 #Cache material
                 if library == "composite":
@@ -2268,10 +2271,10 @@ class ApplyLibraryMaterial(bpy.types.Operator):
                 
                 material_file_contents = str(response)
             else:
-                self.report({'ERROR'}, "Material is not cached; cannot download in offline mode!")
+                self.report(set(['ERROR']), "Material is not cached; cannot download in offline mode!")
                 self.mat_name = ""
                 self.filename = ""
-                return {'CANCELLED'}
+                return set(['CANCELLED'])
             mat_name = self.mat_name
         elif self.open_location is not "":
             if ".bcm" in self.open_location:
@@ -2287,17 +2290,17 @@ class ApplyLibraryMaterial(bpy.types.Operator):
                     mat_name += word.capitalize()
             else:
                 self.open_location = ""
-                self.report({'ERROR'}, "Not a .bcm file.")
-                return {'CANCELLED'}
+                self.report(set(['ERROR']), "Not a .bcm file.")
+                return set(['CANCELLED'])
         else:
             if self.text_block in bpy.data.texts:
                 #Read from a text datablock
                 material_file_contents = ""
                 material_file_contents = bpy.data.texts[self.text_block].as_string()
             else:
-                self.report({'ERROR'}, "Requested text block does not exist.")
+                self.report(set(['ERROR']), "Requested text block does not exist.")
                 self.text_block = "";
-                return {'CANCELLED'}
+                return set(['CANCELLED'])
             
             if context.scene.mat_lib_bcm_name is "":
                 separator = ""
@@ -2338,9 +2341,9 @@ class ApplyLibraryMaterial(bpy.types.Operator):
             self.filename = ""
             self.text_block = ""
             self.open_location = ""
-            self.report({'ERROR'}, "Material file is either invalid or outdated.")
-            print(material_file_contents)
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "Material file is either invalid or outdated.")
+            print material_file_contents
+            return set(['CANCELLED'])
         
         #Parse file
         dom = xml.dom.minidom.parseString(material_file_contents)
@@ -2380,14 +2383,14 @@ class ApplyLibraryMaterial(bpy.types.Operator):
         nodes = dom.getElementsByTagName("node")
         addNodes(nodes, context.active_object.active_material.node_tree)
         if node_message:
-            self.report({node_message[0]}, node_message[1])
+            self.report(set([node_message[0]]), node_message[1])
             if node_message[0] == "ERROR":
                 node_message = []
                 self.mat_name = ""
                 self.filename = ""
                 self.open_location = ""
                 self.text_block = ""
-                return {'CANCELLED'}
+                return set(['CANCELLED'])
             node_message = []
             
         #Create links
@@ -2416,10 +2419,10 @@ class ApplyLibraryMaterial(bpy.types.Operator):
         self.filename = ""
         self.open_location = ""
         self.text_block = ""
-        self.report({'INFO'}, "Material applied.")
+        self.report(set(['INFO']), "Material applied.")
         current_material_cached = True
         
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class CacheLibraryMaterial(bpy.types.Operator):
     '''Cache material to disk'''
@@ -2434,20 +2437,20 @@ class CacheLibraryMaterial(bpy.types.Operator):
         findLibrary()
         
         if working_mode == "online":
-            connection = http.client.HTTPConnection(mat_lib_host)
+            connection = httplib.HTTPConnection(mat_lib_host)
             connection.request("GET", mat_lib_location + "cycles/" + category_filename + "/" + self.filename + ".bcm")
             response = connection.getresponse().read()
         else:
-            self.report({'ERROR'}, "Cannot cache material in offline mode.")
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "Cannot cache material in offline mode.")
+            return set(['CANCELLED'])
         
         material_file_contents = str(response)
         if '<?xml version="1.0" encoding="UTF-8"?>' in material_file_contents[2:40]:
             material_file_contents = material_file_contents[material_file_contents.index("<material"):(material_file_contents.rindex("</material>") + 11)]
         else:
-            self.report({'ERROR'}, "Invalid material file.")
-            print(material_file_contents)
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "Invalid material file.")
+            print material_file_contents
+            return set(['CANCELLED'])
         
         #Parse file
         dom = xml.dom.minidom.parseString(material_file_contents)
@@ -2459,9 +2462,9 @@ class CacheLibraryMaterial(bpy.types.Operator):
             if node_data['type'].value == "TEX_IMAGE" or node_data['type'].value == "TEX_ENVIRONMENT":
                 if node_data['image'].value and '.' in node_data['image'].value:
                     if "file://" in node_data['image'].value:
-                        self.report({'ERROR'}, "Cannot cache image texture located at %s." % node_data['image'].value)
+                        self.report(set(['ERROR']), "Cannot cache image texture located at %s." % node_data['image'].value)
                     elif "http://" in node_data['image'].value:
-                        self.report({'ERROR'}, "Cannot cache image texture hosted at %s." % node_data['image'].value)
+                        self.report(set(['ERROR']), "Cannot cache image texture hosted at %s." % node_data['image'].value)
                     else:
                         ext = "." + node_data['image'].value.split(".")[-1]
                         image_name = node_data['image'].value[:-4]
@@ -2477,7 +2480,7 @@ class CacheLibraryMaterial(bpy.types.Operator):
                         elif library == "bundled" and os.path.exists(os.path.join(matlibpath, "bundled", "cycles", "textures", image_name + ext)):
                             image_filepath = os.path.join(matlibpath, "bundled", "cycles", "textures", image_name + ext)
                         elif working_mode == "online":
-                            connection = http.client.HTTPConnection(mat_lib_host)
+                            connection = httplib.HTTPConnection(mat_lib_host)
                             connection.request("GET", mat_lib_location + "cycles/textures/" + image_name + ext)
                             response = connection.getresponse().read()
                             
@@ -2498,9 +2501,9 @@ class CacheLibraryMaterial(bpy.types.Operator):
             elif node_data['type'].value == "SCRIPT":
                 if node_data['script'].value and '.' in node_data['script'].value:
                     if "file://" in node_data['script'].value:
-                        self.report({'ERROR'}, "Cannot cache OSL script located at %s." % node_data['script'].value)
+                        self.report(set(['ERROR']), "Cannot cache OSL script located at %s." % node_data['script'].value)
                     elif "http://" in node_data['script'].value:
-                        self.report({'ERROR'}, "Cannot cache OSL script hosted at %s." % node_data['script'].value)
+                        self.report(set(['ERROR']), "Cannot cache OSL script hosted at %s." % node_data['script'].value)
                     else:
                         ext = "." + node_data['script'].value.split(".")[-1]
                         script_name = node_data['script'].value[:-4]
@@ -2516,7 +2519,7 @@ class CacheLibraryMaterial(bpy.types.Operator):
                         elif library == "bundled" and os.path.exists(os.path.join(matlibpath, "bundled", "cycles", "scripts", script_name + ext)):
                             script_filepath = os.path.join(matlibpath, "bundled", "cycles", "scripts", script_name + ext)
                         elif working_mode == "online":
-                            connection = http.client.HTTPConnection(mat_lib_host)
+                            connection = httplib.HTTPConnection(mat_lib_host)
                             connection.request("GET", mat_lib_location + "cycles/scripts/" + script_name + ext)
                             response = connection.getresponse().read()
                             
@@ -2537,9 +2540,9 @@ class CacheLibraryMaterial(bpy.types.Operator):
             elif node_data['type'].value == "GROUP":
                 if node_data['group'].value and '.' in node_data['group'].value:
                     if "file://" in node_data['group'].value:
-                        self.report({'ERROR'}, "Cannot cache nodegroup located at %s." % node_data['group'].value)
+                        self.report(set(['ERROR']), "Cannot cache nodegroup located at %s." % node_data['group'].value)
                     elif "http://" in node_data['group'].value:
-                        self.report({'ERROR'}, "Cannot cache nodegroup hosted at %s." % node_data['group'].value)
+                        self.report(set(['ERROR']), "Cannot cache nodegroup hosted at %s." % node_data['group'].value)
                     else:
                         group_name = node_data['group'].value[:-4]
                         
@@ -2554,7 +2557,7 @@ class CacheLibraryMaterial(bpy.types.Operator):
                         elif library == "bundled" and os.path.exists(os.path.join(matlibpath, "bundled", "cycles", "groups", group_name + ".bcg")):
                             group_filepath = os.path.join(matlibpath, "bundled", "cycles", "groups", group_name + ".bcg")
                         elif working_mode == "online":
-                            connection = http.client.HTTPConnection(mat_lib_host)
+                            connection = httplib.HTTPConnection(mat_lib_host)
                             connection.request("GET", mat_lib_location + "cycles/groups/" + group_name + ".bcg")
                             response = connection.getresponse().read()
                             
@@ -2583,12 +2586,12 @@ class CacheLibraryMaterial(bpy.types.Operator):
             bcm_file.write(response)
             bcm_file.close()
         else:
-            self.report({'ERROR'}, "Cannot cache materials from this library.")
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "Cannot cache materials from this library.")
+            return set(['CANCELLED'])
             
         current_material_cached = True
-        self.report({'INFO'}, "Material cached.")
-        return {'FINISHED'}
+        self.report(set(['INFO']), "Material cached.")
+        return set(['FINISHED'])
 
 class SaveLibraryMaterial(bpy.types.Operator, ExportHelper):
     '''Save material to disk'''
@@ -2602,7 +2605,7 @@ class SaveLibraryMaterial(bpy.types.Operator, ExportHelper):
 
     filter_glob = bpy.props.StringProperty(
             default="*.bcm",
-            options={'HIDDEN'},
+            options=set(['HIDDEN']),
             )
     
     def execute(self, context):
@@ -2625,7 +2628,7 @@ class SaveLibraryMaterial(bpy.types.Operator, ExportHelper):
             response = bcm_file.read()
             bcm_file.close()
         elif working_mode == "online":
-            connection = http.client.HTTPConnection(mat_lib_host)
+            connection = httplib.HTTPConnection(mat_lib_host)
             connection.request("GET", mat_lib_location + "cycles/" + category_filename + "/" + self.filename)
             response = connection.getresponse().read()
             
@@ -2639,8 +2642,8 @@ class SaveLibraryMaterial(bpy.types.Operator, ExportHelper):
                 bcm_file.write(response)
                 bcm_file.close()
         else:
-            self.report({'ERROR'}, "Material is not cached; cannot download in offline mode.")
-            return {'FINISHED'}
+            self.report(set(['ERROR']), "Material is not cached; cannot download in offline mode.")
+            return set(['FINISHED'])
         
         material_file_contents = str(response)
         
@@ -2651,9 +2654,9 @@ class SaveLibraryMaterial(bpy.types.Operator, ExportHelper):
         if '<?xml version="1.0" encoding="UTF-8"?>' in material_file_contents[0:40]:
             material_file_contents = material_file_contents[material_file_contents.index("<material"):(material_file_contents.rindex("</material>") + 11)]
         else:
-            self.report({'ERROR'}, "Invalid material file.")
-            print(material_file_contents)
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "Invalid material file.")
+            print material_file_contents
+            return set(['CANCELLED'])
         
         #Parse file
         dom = xml.dom.minidom.parseString(material_file_contents)
@@ -2684,7 +2687,7 @@ class SaveLibraryMaterial(bpy.types.Operator, ExportHelper):
                         else:
                             image_location = ""
                     elif "http://" in node_data['image'].value:
-                        self.report({'ERROR'}, "Cannot save image texture hosted at %s." % node_data['image'].value)
+                        self.report(set(['ERROR']), "Cannot save image texture hosted at %s." % node_data['image'].value)
                         image_location = ""
                     else:
                         ext = "." + node_data['image'].value.split(".")[-1]
@@ -2701,7 +2704,7 @@ class SaveLibraryMaterial(bpy.types.Operator, ExportHelper):
                         elif library == "bundled" and os.path.exists(os.path.join(matlibpath, "bundled", "cycles", "textures", image_name + ext)):
                             image_filepath = os.path.join(matlibpath, "bundled", "cycles", "textures", image_name + ext)
                         elif working_mode == "online":
-                            connection = http.client.HTTPConnection(mat_lib_host)
+                            connection = httplib.HTTPConnection(mat_lib_host)
                             connection.request("GET", mat_lib_location + "cycles/textures/" + image_name + ext)
                             response = connection.getresponse().read()
                             
@@ -2722,7 +2725,7 @@ class SaveLibraryMaterial(bpy.types.Operator, ExportHelper):
                         image_location = ("file://" + self.filepath[:-len(self.filename)] + node_data['image'].value)
                         
                         if image_filepath:
-                            print(image_filepath)
+                            print image_filepath
                             image_file = open(image_filepath, mode="r+b")
                             image_data = image_file.read()
                             image_file.close()
@@ -2748,7 +2751,7 @@ class SaveLibraryMaterial(bpy.types.Operator, ExportHelper):
                         else:
                             script_location = ""
                     elif "http://" in node_data['script'].value:
-                        self.report({'ERROR'}, "Cannot save OSL script hosted at %s." % node_data['script'].value)
+                        self.report(set(['ERROR']), "Cannot save OSL script hosted at %s." % node_data['script'].value)
                         script_location = ""
                     else:
                         ext = "." + node_data['script'].value.split(".")[-1]
@@ -2765,7 +2768,7 @@ class SaveLibraryMaterial(bpy.types.Operator, ExportHelper):
                         elif library == "bundled" and os.path.exists(os.path.join(matlibpath, "bundled", "cycles", "scripts", script_name + ext)):
                             script_filepath = os.path.join(matlibpath, "bundled", "cycles", "scripts", script_name + ext)
                         elif working_mode == "online":
-                            connection = http.client.HTTPConnection(mat_lib_host)
+                            connection = httplib.HTTPConnection(mat_lib_host)
                             connection.request("GET", mat_lib_location + "cycles/scripts/" + script_name + ext)
                             response = connection.getresponse().read()
                             
@@ -2785,7 +2788,7 @@ class SaveLibraryMaterial(bpy.types.Operator, ExportHelper):
                             script_filepath = ""
                         
                         if script_filepath:
-                            print(script_filepath)
+                            print script_filepath
                             script_file = open(script_filepath, mode="r+b")
                             script_data = script_file.read()
                             script_file.close()
@@ -2811,7 +2814,7 @@ class SaveLibraryMaterial(bpy.types.Operator, ExportHelper):
                         else:
                             group_location = ""
                     elif "http://" in node_data['group'].value:
-                        self.report({'ERROR'}, "Cannot save nodegroup hosted at %s." % node_data['group'].value)
+                        self.report(set(['ERROR']), "Cannot save nodegroup hosted at %s." % node_data['group'].value)
                         group_location = ""
                     else:
                         group_name = node_data['group'].value[:-4]
@@ -2827,7 +2830,7 @@ class SaveLibraryMaterial(bpy.types.Operator, ExportHelper):
                         elif library == "bundled" and os.path.exists(os.path.join(matlibpath, "bundled", "cycles", "groups", group_name + ".bcg")):
                             group_filepath = os.path.join(matlibpath, "bundled", "cycles", "groups", group_name + ".bcg")
                         elif working_mode == "online":
-                            connection = http.client.HTTPConnection(mat_lib_host)
+                            connection = httplib.HTTPConnection(mat_lib_host)
                             connection.request("GET", mat_lib_location + "cycles/groups/" + group_name + ".bcg")
                             response = connection.getresponse().read()
                             
@@ -2847,7 +2850,7 @@ class SaveLibraryMaterial(bpy.types.Operator, ExportHelper):
                             group_filepath = ""
                         
                         if group_filepath:
-                            print(group_filepath)
+                            print group_filepath
                             group_file = open(group_filepath, mode="r+b")
                             group_data = group_file.read()
                             group_file.close()
@@ -2862,10 +2865,10 @@ class SaveLibraryMaterial(bpy.types.Operator, ExportHelper):
         bcm_file.write(material_file_contents)
         bcm_file.close()
         
-        self.report({'INFO'}, "Material saved.")
+        self.report(set(['INFO']), "Material saved.")
         current_material_cached = True
         
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class AddLibraryGroup(bpy.types.Operator):
     '''Add nodegroup to scene'''
@@ -2900,15 +2903,15 @@ class AddLibraryGroup(bpy.types.Operator):
                 group_file_contents = bcg_file.read()
                 bcg_file.close()
             elif working_mode == "online":
-                connection = http.client.HTTPConnection(mat_lib_host)
+                connection = httplib.HTTPConnection(mat_lib_host)
                 connection.request("GET", mat_lib_location + "cycles/groups/" + self.filename + ".bcg")
                 response = connection.getresponse().read()
                 
                 #Check file for validitity
                 if '<?xml version="1.0" encoding="UTF-8"?>' not in str(response)[2:40]:
-                    self.report({'ERROR'}, "Nodegroup file is invalid.")
+                    self.report(set(['ERROR']), "Nodegroup file is invalid.")
                     self.filename = ""
-                    return {'CANCELLED'}
+                    return set(['CANCELLED'])
                 
                 #Cache nodegroup
                 if library == "composite":
@@ -2922,9 +2925,9 @@ class AddLibraryGroup(bpy.types.Operator):
                 
                 group_file_contents = str(response)
             else:
-                self.report({'ERROR'}, "Nodegroup is not cached; cannot download in offline mode!")
-                return {'CANCELLED'}
-            print (group_file_contents)
+                self.report(set(['ERROR']), "Nodegroup is not cached; cannot download in offline mode!")
+                return set(['CANCELLED'])
+            print group_file_contents
             group_name = self.group_name
         elif self.open_location is not "":
             if self.open_location[-4:] == ".bcg":
@@ -2935,31 +2938,31 @@ class AddLibraryGroup(bpy.types.Operator):
                 #Check file for validitity
                 if '<?xml version="1.0" encoding="UTF-8"?>' not in group_file_contents:
                     self.open_location = ""
-                    self.report({'ERROR'}, "Nodegroup file is invalid.")
-                    return {'CANCELLED'}
+                    self.report(set(['ERROR']), "Nodegroup file is invalid.")
+                    return set(['CANCELLED'])
                 group_name = ""
                 for word in self.open_location.split(os.sep)[-1][:-4].split("_"):
                     if group_name is not "":
                         group_name += " "
                     group_name += word.capitalize()
             else:
-                self.report({'ERROR'}, "Not a .bcg file.")
+                self.report(set(['ERROR']), "Not a .bcg file.")
                 self.open_location = ""
-                return {'CANCELLED'}
+                return set(['CANCELLED'])
         else:
             if self.text_block in bpy.data.texts:
                 #Read from a text datablock
                 group_file_contents = bpy.data.texts[self.text_block].as_string()
             else:
-                self.report({'ERROR'}, "Requested text block does not exist.")
+                self.report(set(['ERROR']), "Requested text block does not exist.")
                 self.text_block = ""
-                return {'CANCELLED'}
+                return set(['CANCELLED'])
                 
             #Check file for validitity
             if '<?xml version="1.0" encoding="UTF-8"?>' not in group_file_contents[0:38]:
-                self.report({'ERROR'}, "Nodegroup data is invalid.")
+                self.report(set(['ERROR']), "Nodegroup data is invalid.")
                 self.text_block = ""
-                return {'CANCELLED'}
+                return set(['CANCELLED'])
             group_name = ""
             
             separator = ""
@@ -2989,9 +2992,9 @@ class AddLibraryGroup(bpy.types.Operator):
             self.filename = ""
             self.text_block = ""
             self.open_location = ""
-            self.report({'ERROR'}, "Nodegroup file is invalid.")
-            print(group_file_contents)
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "Nodegroup file is invalid.")
+            print group_file_contents
+            return set(['CANCELLED'])
         
         #Parse file
         dom = xml.dom.minidom.parseString(group_file_contents)
@@ -3005,10 +3008,10 @@ class AddLibraryGroup(bpy.types.Operator):
         self.filename = ""
         self.open_location = ""
         self.text_block = ""
-        self.report({'INFO'}, "Nodegroup added.")
+        self.report(set(['INFO']), "Nodegroup added.")
         current_material_cached = True
         
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class InsertLibraryGroup(bpy.types.Operator):
     '''Insert nodegroup into active material'''
@@ -3032,24 +3035,24 @@ class InsertLibraryGroup(bpy.types.Operator):
             self.filename = ""
             self.open_location = ""
             self.text_block = ""
-            self.report({'ERROR'}, "No object selected!")
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "No object selected!")
+            return set(['CANCELLED'])
         
         if not context.active_object.active_material:
             self.group_name = ""
             self.filename = ""
             self.text_block = ""
             self.open_location = ""
-            self.report({'ERROR'}, "No material selected!")
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "No material selected!")
+            return set(['CANCELLED'])
             
         if not context.active_object.active_material.use_nodes:
             self.group_name = ""
             self.filename = ""
             self.text_block = ""
             self.open_location = ""
-            self.report({'ERROR'}, "Active material does not use nodes!")
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "Active material does not use nodes!")
+            return set(['CANCELLED'])
         
         if self.open_location == "" and self.text_block == "":
             if library == "composite" and os.path.exists(os.path.join(matlibpath, mat_lib_host, "cycles", "groups", self.filename + ".bcg")):
@@ -3067,15 +3070,15 @@ class InsertLibraryGroup(bpy.types.Operator):
                 group_file_contents = bcg_file.read()
                 bcg_file.close()
             elif working_mode == "online":
-                connection = http.client.HTTPConnection(mat_lib_host)
+                connection = httplib.HTTPConnection(mat_lib_host)
                 connection.request("GET", mat_lib_location + "cycles/groups/" + self.filename + ".bcg")
                 response = connection.getresponse().read()
                 
                 #Check file for validitity
                 if '<?xml version="1.0" encoding="UTF-8"?>' not in str(response)[2:40]:
-                    self.report({'ERROR'}, "Nodegroup file is invalid.")
+                    self.report(set(['ERROR']), "Nodegroup file is invalid.")
                     self.filename = ""
-                    return {'CANCELLED'}
+                    return set(['CANCELLED'])
                 
                 #Cache nodegroup
                 if library == "composite":
@@ -3089,9 +3092,9 @@ class InsertLibraryGroup(bpy.types.Operator):
                 
                 group_file_contents = str(response)
             else:
-                self.report({'ERROR'}, "Nodegroup is not cached; cannot download in offline mode!")
-                return {'CANCELLED'}
-            print (group_file_contents)
+                self.report(set(['ERROR']), "Nodegroup is not cached; cannot download in offline mode!")
+                return set(['CANCELLED'])
+            print group_file_contents
             group_name = self.group_name
         elif self.open_location is not "":
             if self.open_location[-4:] == ".bcg":
@@ -3102,31 +3105,31 @@ class InsertLibraryGroup(bpy.types.Operator):
                 #Check file for validitity
                 if '<?xml version="1.0" encoding="UTF-8"?>' not in group_file_contents:
                     self.open_location = ""
-                    self.report({'ERROR'}, "Nodegroup file is invalid.")
-                    return {'CANCELLED'}
+                    self.report(set(['ERROR']), "Nodegroup file is invalid.")
+                    return set(['CANCELLED'])
                 group_name = ""
                 for word in self.open_location.split(os.sep)[-1][:-4].split("_"):
                     if group_name is not "":
                         group_name += " "
                     group_name += word.capitalize()
             else:
-                self.report({'ERROR'}, "Not a .bcg file.")
+                self.report(set(['ERROR']), "Not a .bcg file.")
                 self.open_location = ""
-                return {'CANCELLED'}
+                return set(['CANCELLED'])
         else:
             if self.text_block in bpy.data.texts:
                 #Read from a text datablock
                 group_file_contents = bpy.data.texts[self.text_block].as_string()
             else:
-                self.report({'ERROR'}, "Requested text block does not exist.")
+                self.report(set(['ERROR']), "Requested text block does not exist.")
                 self.text_block = ""
-                return {'CANCELLED'}
+                return set(['CANCELLED'])
                 
             #Check file for validitity
             if '<?xml version="1.0" encoding="UTF-8"?>' not in group_file_contents[0:38]:
-                self.report({'ERROR'}, "Nodegroup data is invalid.")
+                self.report(set(['ERROR']), "Nodegroup data is invalid.")
                 self.text_block = ""
-                return {'CANCELLED'}
+                return set(['CANCELLED'])
             group_name = ""
             
             separator = ""
@@ -3156,9 +3159,9 @@ class InsertLibraryGroup(bpy.types.Operator):
             self.filename = ""
             self.text_block = ""
             self.open_location = ""
-            self.report({'ERROR'}, "Nodegroup file is invalid.")
-            print(group_file_contents)
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "Nodegroup file is invalid.")
+            print group_file_contents
+            return set(['CANCELLED'])
         
         #Parse file
         dom = xml.dom.minidom.parseString(group_file_contents)
@@ -3175,10 +3178,10 @@ class InsertLibraryGroup(bpy.types.Operator):
         self.filename = ""
         self.open_location = ""
         self.text_block = ""
-        self.report({'INFO'}, "Nodegroup inserted.")
+        self.report(set(['INFO']), "Nodegroup inserted.")
         current_material_cached = True
         
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class CacheLibraryGroup(bpy.types.Operator):
     '''Cache nodegroup to disk'''
@@ -3193,20 +3196,20 @@ class CacheLibraryGroup(bpy.types.Operator):
         findLibrary()
         
         if working_mode == "online":
-            connection = http.client.HTTPConnection(mat_lib_host)
+            connection = httplib.HTTPConnection(mat_lib_host)
             connection.request("GET", mat_lib_location + "cycles/groups/" + self.filename + ".bcg")
             response = connection.getresponse().read()
         else:
-            self.report({'ERROR'}, "Cannot cache nodegroup in offline mode.")
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "Cannot cache nodegroup in offline mode.")
+            return set(['CANCELLED'])
         
         group_file_contents = str(response)
         if '<?xml version="1.0" encoding="UTF-8"?>' in group_file_contents[2:40]:
             group_file_contents = group_file_contents[group_file_contents.index("<group"):(group_file_contents.rindex("</group>") + 8)]
         else:
-            self.report({'ERROR'}, "Invalid nodegroup file.")
-            print(group_file_contents)
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "Invalid nodegroup file.")
+            print group_file_contents
+            return set(['CANCELLED'])
         
         #Parse file
         dom = xml.dom.minidom.parseString(group_file_contents)
@@ -3218,9 +3221,9 @@ class CacheLibraryGroup(bpy.types.Operator):
             if node_data['type'].value == "TEX_IMAGE" or node_data['type'].value == "TEX_ENVIRONMENT":
                 if node_data['image'].value and '.' in node_data['image'].value:
                     if "file://" in node_data['image'].value:
-                        self.report({'ERROR'}, "Cannot cache image texture located at %s." % node_data['image'].value)
+                        self.report(set(['ERROR']), "Cannot cache image texture located at %s." % node_data['image'].value)
                     elif "http://" in node_data['image'].value:
-                        self.report({'ERROR'}, "Cannot cache image texture hosted at %s." % node_data['image'].value)
+                        self.report(set(['ERROR']), "Cannot cache image texture hosted at %s." % node_data['image'].value)
                     else:
                         ext = "." + node_data['image'].value.split(".")[-1]
                         image_name = node_data['image'].value[:-4]
@@ -3236,7 +3239,7 @@ class CacheLibraryGroup(bpy.types.Operator):
                         elif library == "bundled" and os.path.exists(os.path.join(matlibpath, "bundled", "cycles", "textures", image_name + ext)):
                             image_filepath = os.path.join(matlibpath, "bundled", "cycles", "textures", image_name + ext)
                         elif working_mode == "online":
-                            connection = http.client.HTTPConnection(mat_lib_host)
+                            connection = httplib.HTTPConnection(mat_lib_host)
                             connection.request("GET", mat_lib_location + "cycles/textures/" + image_name + ext)
                             response = connection.getresponse().read()
                             
@@ -3254,9 +3257,9 @@ class CacheLibraryGroup(bpy.types.Operator):
             elif node_data['type'].value == "SCRIPT":
                 if node_data['script'].value and '.' in node_data['script'].value:
                     if "file://" in node_data['script'].value:
-                        self.report({'ERROR'}, "Cannot cache OSL script located at %s." % node_data['script'].value)
+                        self.report(set(['ERROR']), "Cannot cache OSL script located at %s." % node_data['script'].value)
                     elif "http://" in node_data['script'].value:
-                        self.report({'ERROR'}, "Cannot cache OSL script hosted at %s." % node_data['script'].value)
+                        self.report(set(['ERROR']), "Cannot cache OSL script hosted at %s." % node_data['script'].value)
                     else:
                         ext = "." + node_data['script'].value.split(".")[-1]
                         script_name = node_data['script'].value[:-4]
@@ -3272,7 +3275,7 @@ class CacheLibraryGroup(bpy.types.Operator):
                         elif library == "bundled" and os.path.exists(os.path.join(matlibpath, "bundled", "cycles", "scripts", script_name + ext)):
                             script_filepath = os.path.join(matlibpath, "bundled", "cycles", "scripts", script_name + ext)
                         elif working_mode == "online":
-                            connection = http.client.HTTPConnection(mat_lib_host)
+                            connection = httplib.HTTPConnection(mat_lib_host)
                             connection.request("GET", mat_lib_location + "cycles/scripts/" + script_name + ext)
                             response = connection.getresponse().read()
                             
@@ -3297,12 +3300,12 @@ class CacheLibraryGroup(bpy.types.Operator):
             bcg_file.write(response)
             bcg_file.close()
         else:
-            self.report({'ERROR'}, "Cannot cache nodegroups from this library.")
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "Cannot cache nodegroups from this library.")
+            return set(['CANCELLED'])
             
         current_material_cached = True
-        self.report({'INFO'}, "Nodegroup cached.")
-        return {'FINISHED'}
+        self.report(set(['INFO']), "Nodegroup cached.")
+        return set(['FINISHED'])
 
 class SaveLibraryGroup(bpy.types.Operator, ExportHelper):
     '''Save nodegroup to disk'''
@@ -3316,7 +3319,7 @@ class SaveLibraryGroup(bpy.types.Operator, ExportHelper):
 
     filter_glob = bpy.props.StringProperty(
             default="*.bcg",
-            options={'HIDDEN'},
+            options=set(['HIDDEN']),
             )
     
     def execute(self, context):
@@ -3339,7 +3342,7 @@ class SaveLibraryGroup(bpy.types.Operator, ExportHelper):
             response = bcg_file.read()
             bcg_file.close()
         elif working_mode == "online":
-            connection = http.client.HTTPConnection(mat_lib_host)
+            connection = httplib.HTTPConnection(mat_lib_host)
             connection.request("GET", mat_lib_location + "cycles/groups/" + self.filename)
             response = connection.getresponse().read()
             
@@ -3353,8 +3356,8 @@ class SaveLibraryGroup(bpy.types.Operator, ExportHelper):
                 bcg_file.write(response)
                 bcg_file.close()
         else:
-            self.report({'ERROR'}, "Nodegroup is not cached; cannot download in offline mode.")
-            return {'FINISHED'}
+            self.report(set(['ERROR']), "Nodegroup is not cached; cannot download in offline mode.")
+            return set(['FINISHED'])
         
         group_file_contents = str(response)
         
@@ -3365,9 +3368,9 @@ class SaveLibraryGroup(bpy.types.Operator, ExportHelper):
         if '<?xml version="1.0" encoding="UTF-8"?>' in group_file_contents[0:40]:
             group_file_contents = group_file_contents[group_file_contents.index("<group"):(group_file_contents.rindex("</group>") + 8)]
         else:
-            self.report({'ERROR'}, "Invalid nodegroup file.")
-            print(group_file_contents)
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "Invalid nodegroup file.")
+            print group_file_contents
+            return set(['CANCELLED'])
         
         #Parse file
         dom = xml.dom.minidom.parseString(group_file_contents)
@@ -3398,7 +3401,7 @@ class SaveLibraryGroup(bpy.types.Operator, ExportHelper):
                         else:
                             image_location = ""
                     elif "http://" in node_data['image'].value:
-                        self.report({'ERROR'}, "Cannot save image texture hosted at %s." % node_data['image'].value)
+                        self.report(set(['ERROR']), "Cannot save image texture hosted at %s." % node_data['image'].value)
                         image_location = ""
                     else:
                         ext = "." + node_data['image'].value.split(".")[-1]
@@ -3415,7 +3418,7 @@ class SaveLibraryGroup(bpy.types.Operator, ExportHelper):
                         elif library == "bundled" and os.path.exists(os.path.join(matlibpath, "bundled", "cycles", "textures", image_name + ext)):
                             image_filepath = os.path.join(matlibpath, "bundled", "cycles", "textures", image_name + ext)
                         elif working_mode == "online":
-                            connection = http.client.HTTPConnection(mat_lib_host)
+                            connection = httplib.HTTPConnection(mat_lib_host)
                             connection.request("GET", mat_lib_location + "cycles/textures/" + image_name + ext)
                             response = connection.getresponse().read()
                             
@@ -3436,7 +3439,7 @@ class SaveLibraryGroup(bpy.types.Operator, ExportHelper):
                         image_location = ("file://" + self.filepath[:-len(self.filename)] + node_data['image'].value)
                         
                         if image_filepath:
-                            print(image_filepath)
+                            print image_filepath
                             image_file = open(image_filepath, mode="r+b")
                             image_data = image_file.read()
                             image_file.close()
@@ -3462,7 +3465,7 @@ class SaveLibraryGroup(bpy.types.Operator, ExportHelper):
                         else:
                             script_location = ""
                     elif "http://" in node_data['script'].value:
-                        self.report({'ERROR'}, "Cannot save OSL script hosted at %s." % node_data['script'].value)
+                        self.report(set(['ERROR']), "Cannot save OSL script hosted at %s." % node_data['script'].value)
                         script_location = ""
                     else:
                         ext = "." + node_data['script'].value.split(".")[-1]
@@ -3479,7 +3482,7 @@ class SaveLibraryGroup(bpy.types.Operator, ExportHelper):
                         elif library == "bundled" and os.path.exists(os.path.join(matlibpath, "bundled", "cycles", "scripts", script_name + ext)):
                             script_filepath = os.path.join(matlibpath, "bundled", "cycles", "scripts", script_name + ext)
                         elif working_mode == "online":
-                            connection = http.client.HTTPConnection(mat_lib_host)
+                            connection = httplib.HTTPConnection(mat_lib_host)
                             connection.request("GET", mat_lib_location + "cycles/scripts/" + script_name + ext)
                             response = connection.getresponse().read()
                             
@@ -3499,7 +3502,7 @@ class SaveLibraryGroup(bpy.types.Operator, ExportHelper):
                             script_filepath = ""
                         
                         if script_filepath:
-                            print(script_filepath)
+                            print script_filepath
                             script_file = open(script_filepath, mode="r+b")
                             script_data = script_file.read()
                             script_file.close()
@@ -3514,10 +3517,10 @@ class SaveLibraryGroup(bpy.types.Operator, ExportHelper):
         bcg_file.write(group_file_contents)
         bcg_file.close()
         
-        self.report({'INFO'}, "Nodegroup saved.")
+        self.report(set(['INFO']), "Nodegroup saved.")
         current_material_cached = True
         
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class AddLibraryImage(bpy.types.Operator):
     '''Add image to scene'''
@@ -3532,8 +3535,8 @@ class AddLibraryImage(bpy.types.Operator):
         findLibrary()
         
         if self.filename[-4:].lower() != ".jpg" and self.filename[-4:].lower() != ".png":
-            self.report({'ERROR'}, "The requested image file is not .jpg or .png; not downloading.")
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "The requested image file is not .jpg or .png; not downloading.")
+            return set(['CANCELLED'])
         
         if library == "composite" and os.path.exists(os.path.join(matlibpath, mat_lib_host, "cycles", "textures", self.filename)):
             image_path = os.path.join(matlibpath, mat_lib_host, "cycles", "textures", self.filename)
@@ -3542,7 +3545,7 @@ class AddLibraryImage(bpy.types.Operator):
         elif library == "bundled" and os.path.exists(os.path.join(matlibpath, "bundled", "cycles", "textures", self.filename)):
             image_path = os.path.join(matlibpath, "bundled", "cycles", "textures", self.filename)
         elif working_mode == "online":
-            connection = http.client.HTTPConnection(mat_lib_host)
+            connection = httplib.HTTPConnection(mat_lib_host)
             connection.request("GET", mat_lib_location + "cycles/textures/" + self.filename)
             response = connection.getresponse().read()
             
@@ -3558,15 +3561,15 @@ class AddLibraryImage(bpy.types.Operator):
                 img_file.close()
                 image_path = os.path.join(matlibpath, mat_lib_host, library, "cycles", "textures", self.filename)
         else:
-            self.report({'ERROR'}, "Image is not cached; cannot download in offline mode!")
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "Image is not cached; cannot download in offline mode!")
+            return set(['CANCELLED'])
         
         bpy.ops.image.open(filepath=image_path)
         
-        self.report({'INFO'}, "Image added.")
+        self.report(set(['INFO']), "Image added.")
         current_material_cached = True
         
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class InsertLibraryImage(bpy.types.Operator):
     '''Insert image into active material'''
@@ -3581,20 +3584,20 @@ class InsertLibraryImage(bpy.types.Operator):
         findLibrary()
         
         if not context.active_object:
-            self.report({'ERROR'}, "No object selected!")
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "No object selected!")
+            return set(['CANCELLED'])
         
         if not context.active_object.active_material:
-            self.report({'ERROR'}, "No material selected!")
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "No material selected!")
+            return set(['CANCELLED'])
             
         if not context.active_object.active_material.use_nodes:
-            self.report({'ERROR'}, "Active material does not use nodes!")
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "Active material does not use nodes!")
+            return set(['CANCELLED'])
         
         if self.filename[-4:].lower() != ".jpg" and self.filename[-4:].lower() != ".png":
-            self.report({'ERROR'}, "The requested image file is not .jpg or .png; not downloading.")
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "The requested image file is not .jpg or .png; not downloading.")
+            return set(['CANCELLED'])
         
         if library == "composite" and os.path.exists(os.path.join(matlibpath, mat_lib_host, "cycles", "textures", self.filename)):
             image_path = os.path.join(matlibpath, mat_lib_host, "cycles", "textures", self.filename)
@@ -3603,7 +3606,7 @@ class InsertLibraryImage(bpy.types.Operator):
         elif library == "bundled" and os.path.exists(os.path.join(matlibpath, "bundled", "cycles", "textures", self.filename)):
             image_path = os.path.join(matlibpath, "bundled", "cycles", "textures", self.filename)
         elif working_mode == "online":
-            connection = http.client.HTTPConnection(mat_lib_host)
+            connection = httplib.HTTPConnection(mat_lib_host)
             connection.request("GET", mat_lib_location + "cycles/textures/" + self.filename)
             response = connection.getresponse().read()
             
@@ -3619,8 +3622,8 @@ class InsertLibraryImage(bpy.types.Operator):
                 img_file.close()
                 image_path = os.path.join(matlibpath, mat_lib_host, library, "cycles", "textures", self.filename)
         else:
-            self.report({'ERROR'}, "Image is not cached; cannot download in offline mode!")
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "Image is not cached; cannot download in offline mode!")
+            return set(['CANCELLED'])
         
         new_image = bpy.ops.image.open(filepath=image_path)
         
@@ -3630,10 +3633,10 @@ class InsertLibraryImage(bpy.types.Operator):
         image_datablock.filepath = image_path
         new_node.image = image_datablock
         
-        self.report({'INFO'}, "Image texture node inserted.")
+        self.report(set(['INFO']), "Image texture node inserted.")
         current_material_cached = True
         
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class CacheLibraryImage(bpy.types.Operator):
     '''Cache image to disk'''
@@ -3648,14 +3651,14 @@ class CacheLibraryImage(bpy.types.Operator):
         
         if working_mode == "online":
             if self.filename[-4:].lower() != ".jpg" and self.filename[-4:].lower() != ".png":
-                self.report({'ERROR'}, "The requested image file is not .jpg or .png; not downloading.")
-                return {'CANCELLED'}
-            connection = http.client.HTTPConnection(mat_lib_host)
+                self.report(set(['ERROR']), "The requested image file is not .jpg or .png; not downloading.")
+                return set(['CANCELLED'])
+            connection = httplib.HTTPConnection(mat_lib_host)
             connection.request("GET", mat_lib_location + "cycles/textures/" + self.filename)
             response = connection.getresponse().read()
         else:
-            self.report({'ERROR'}, "Cannot cache image in offline mode.")
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "Cannot cache image in offline mode.")
+            return set(['CANCELLED'])
         
         if library == "composite":
             bcm_file = open(os.path.join(matlibpath, mat_lib_host, "cycles", "textures", self.filename), mode="w+b")
@@ -3666,12 +3669,12 @@ class CacheLibraryImage(bpy.types.Operator):
             bcm_file.write(response)
             bcm_file.close()
         else:
-            self.report({'ERROR'}, "Cannot cache images from this library.")
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "Cannot cache images from this library.")
+            return set(['CANCELLED'])
             
         current_material_cached = True
-        self.report({'INFO'}, "Image cached.")
-        return {'FINISHED'}
+        self.report(set(['INFO']), "Image cached.")
+        return set(['FINISHED'])
 
 class SaveLibraryImage(bpy.types.Operator, ExportHelper):
     '''Save image to disk'''
@@ -3685,7 +3688,7 @@ class SaveLibraryImage(bpy.types.Operator, ExportHelper):
 
     filter_glob = bpy.props.StringProperty(
             default="*.jpg",
-            options={'HIDDEN'},
+            options=set(['HIDDEN']),
             )
     
     def execute(self, context):
@@ -3695,8 +3698,8 @@ class SaveLibraryImage(bpy.types.Operator, ExportHelper):
         findLibrary()
         
         if self.filename[-4:].lower() != ".jpg" and self.filename[-4:].lower() != ".png":
-            self.report({'ERROR'}, "The requested image file is not .jpg or .png; not downloading.")
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "The requested image file is not .jpg or .png; not downloading.")
+            return set(['CANCELLED'])
         
         if library == "composite" and os.path.exists(os.path.join(matlibpath, mat_lib_host, "cycles", "textures", self.filename)):
             img_file = open(os.path.join(matlibpath, mat_lib_host, "cycles", "textures", self.filename), mode="r+b")
@@ -3711,7 +3714,7 @@ class SaveLibraryImage(bpy.types.Operator, ExportHelper):
             response = img_file.read()
             img_file.close()
         elif working_mode == "online":
-            connection = http.client.HTTPConnection(mat_lib_host)
+            connection = httplib.HTTPConnection(mat_lib_host)
             connection.request("GET", mat_lib_location + "cycles/textures/" + self.filename)
             response = connection.getresponse().read()
             
@@ -3725,17 +3728,17 @@ class SaveLibraryImage(bpy.types.Operator, ExportHelper):
                 img_file.write(response)
                 img_file.close()
         else:
-            self.report({'ERROR'}, "Image is not cached; cannot download in offline mode.")
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "Image is not cached; cannot download in offline mode.")
+            return set(['CANCELLED'])
         
         img_file = open(self.filepath, mode="w+b")
         img_file.write(response)
         img_file.close()
         
-        self.report({'INFO'}, "Image saved.")
+        self.report(set(['INFO']), "Image saved.")
         current_material_cached = True
         
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class AddLibraryScript(bpy.types.Operator):
     '''Add OSL script as a text datablock'''
@@ -3750,8 +3753,8 @@ class AddLibraryScript(bpy.types.Operator):
         findLibrary()
         
         if self.filename[-4:].lower() != ".osl" and self.filename[-4:].lower() != ".oso":
-            self.report({'ERROR'}, "The requested OSL script file is not .osl or .oso; not downloading.")
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "The requested OSL script file is not .osl or .oso; not downloading.")
+            return set(['CANCELLED'])
         
         if library == "composite" and os.path.exists(os.path.join(matlibpath, mat_lib_host, "cycles", "scripts", self.filename)):
             script_path = os.path.join(matlibpath, mat_lib_host, "cycles", "scripts", self.filename)
@@ -3760,7 +3763,7 @@ class AddLibraryScript(bpy.types.Operator):
         elif library == "bundled" and os.path.exists(os.path.join(matlibpath, "bundled", "cycles", "scripts", self.filename)):
             script_path = os.path.join(matlibpath, "bundled", "cycles", "scripts", self.filename)
         elif working_mode == "online":
-            connection = http.client.HTTPConnection(mat_lib_host)
+            connection = httplib.HTTPConnection(mat_lib_host)
             connection.request("GET", mat_lib_location + "cycles/scripts/" + self.filename)
             response = connection.getresponse().read()
             
@@ -3776,8 +3779,8 @@ class AddLibraryScript(bpy.types.Operator):
                 osl_file.close()
                 script_path = os.path.join(matlibpath, mat_lib_host, library, "cycles", "scripts", self.filename)
         else:
-            self.report({'ERROR'}, "OSL script is not cached; cannot download in offline mode!")
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "OSL script is not cached; cannot download in offline mode!")
+            return set(['CANCELLED'])
         
         script_datablock = bpy.data.texts.new(name=self.filename)
         osl_file = open(script_path, encoding="UTF-8")
@@ -3785,10 +3788,10 @@ class AddLibraryScript(bpy.types.Operator):
         osl_file.close()
         script_datablock.write(script_text)
         
-        self.report({'INFO'}, "OSL script added as a text datablock.")
+        self.report(set(['INFO']), "OSL script added as a text datablock.")
         current_material_cached = True
         
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class InsertLibraryScript(bpy.types.Operator):
     '''Insert OSL script into active material'''
@@ -3803,20 +3806,20 @@ class InsertLibraryScript(bpy.types.Operator):
         findLibrary()
         
         if not context.active_object:
-            self.report({'ERROR'}, "No object selected!")
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "No object selected!")
+            return set(['CANCELLED'])
         
         if not context.active_object.active_material:
-            self.report({'ERROR'}, "No material selected!")
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "No material selected!")
+            return set(['CANCELLED'])
             
         if not context.active_object.active_material.use_nodes:
-            self.report({'ERROR'}, "Active material does not use nodes!")
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "Active material does not use nodes!")
+            return set(['CANCELLED'])
         
         if self.filename[-4:].lower() != ".osl" and self.filename[-4:].lower() != ".oso":
-            self.report({'ERROR'}, "The requested OSL script file is not .osl or .oso; not downloading.")
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "The requested OSL script file is not .osl or .oso; not downloading.")
+            return set(['CANCELLED'])
         
         if library == "composite" and os.path.exists(os.path.join(matlibpath, mat_lib_host, "cycles", "scripts", self.filename)):
             script_path = os.path.join(matlibpath, mat_lib_host, "cycles", "scripts", self.filename)
@@ -3825,7 +3828,7 @@ class InsertLibraryScript(bpy.types.Operator):
         elif library == "bundled" and os.path.exists(os.path.join(matlibpath, "bundled", "cycles", "scripts", self.filename)):
             script_path = os.path.join(matlibpath, "bundled", "cycles", "scripts", self.filename)
         elif working_mode == "online":
-            connection = http.client.HTTPConnection(mat_lib_host)
+            connection = httplib.HTTPConnection(mat_lib_host)
             connection.request("GET", mat_lib_location + "cycles/scripts/" + self.filename)
             response = connection.getresponse().read()
             
@@ -3841,17 +3844,17 @@ class InsertLibraryScript(bpy.types.Operator):
                 osl_file.close()
                 script_path = os.path.join(matlibpath, mat_lib_host, library, "cycles", "scripts", self.filename)
         else:
-            self.report({'ERROR'}, "Image is not cached; cannot download in offline mode!")
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "Image is not cached; cannot download in offline mode!")
+            return set(['CANCELLED'])
         
         new_node = context.active_object.active_material.node_tree.nodes.new(node_types['SHADER']['SCRIPT'])
         new_node.mode = 'EXTERNAL'
         new_node.filepath = script_path
         
-        self.report({'INFO'}, "OSL script node inserted.")
+        self.report(set(['INFO']), "OSL script node inserted.")
         current_material_cached = True
         
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class CacheLibraryScript(bpy.types.Operator):
     '''Cache OSL script to disk'''
@@ -3866,14 +3869,14 @@ class CacheLibraryScript(bpy.types.Operator):
         
         if working_mode == "online":
             if self.filename[-4:].lower() != ".osl" and self.filename[-4:].lower() != ".oso":
-                self.report({'ERROR'}, "The requested OSL script file is not .osl or .oso; not downloading.")
-                return {'CANCELLED'}
-            connection = http.client.HTTPConnection(mat_lib_host)
+                self.report(set(['ERROR']), "The requested OSL script file is not .osl or .oso; not downloading.")
+                return set(['CANCELLED'])
+            connection = httplib.HTTPConnection(mat_lib_host)
             connection.request("GET", mat_lib_location + "cycles/scripts/" + self.filename)
             response = connection.getresponse().read()
         else:
-            self.report({'ERROR'}, "Cannot cache OSL script in offline mode.")
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "Cannot cache OSL script in offline mode.")
+            return set(['CANCELLED'])
         
         if library == "composite":
             osl_file = open(os.path.join(matlibpath, mat_lib_host, "cycles", "scripts", self.filename), mode="w+b")
@@ -3884,12 +3887,12 @@ class CacheLibraryScript(bpy.types.Operator):
             osl_file.write(response)
             osl_file.close()
         else:
-            self.report({'ERROR'}, "Cannot cache OSL scripts from this library.")
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "Cannot cache OSL scripts from this library.")
+            return set(['CANCELLED'])
             
         current_material_cached = True
-        self.report({'INFO'}, "OSL script cached.")
-        return {'FINISHED'}
+        self.report(set(['INFO']), "OSL script cached.")
+        return set(['FINISHED'])
 
 class SaveLibraryScript(bpy.types.Operator, ExportHelper):
     '''Save OSL script to disk'''
@@ -3903,7 +3906,7 @@ class SaveLibraryScript(bpy.types.Operator, ExportHelper):
 
     filter_glob = bpy.props.StringProperty(
             default="*.osl",
-            options={'HIDDEN'},
+            options=set(['HIDDEN']),
             )
     
     def execute(self, context):
@@ -3913,8 +3916,8 @@ class SaveLibraryScript(bpy.types.Operator, ExportHelper):
         findLibrary()
         
         if self.filename[-4:].lower() != ".osl" and self.filename[-4:].lower() != ".oso":
-            self.report({'ERROR'}, "The requested OSL script is not .osl or .oso; not downloading.")
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "The requested OSL script is not .osl or .oso; not downloading.")
+            return set(['CANCELLED'])
         
         if library == "composite" and os.path.exists(os.path.join(matlibpath, mat_lib_host, "cycles", "scripts", self.filename)):
             osl_file = open(os.path.join(matlibpath, mat_lib_host, "cycles", "scripts", self.filename), mode="r+b")
@@ -3929,7 +3932,7 @@ class SaveLibraryScript(bpy.types.Operator, ExportHelper):
             response = osl_file.read()
             osl_file.close()
         elif working_mode == "online":
-            connection = http.client.HTTPConnection(mat_lib_host)
+            connection = httplib.HTTPConnection(mat_lib_host)
             connection.request("GET", mat_lib_location + "cycles/scripts/" + self.filename)
             response = connection.getresponse().read()
             
@@ -3943,17 +3946,17 @@ class SaveLibraryScript(bpy.types.Operator, ExportHelper):
                 osl_file.write(response)
                 osl_file.close()
         else:
-            self.report({'ERROR'}, "Script is not cached; cannot download in offline mode.")
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "Script is not cached; cannot download in offline mode.")
+            return set(['CANCELLED'])
         
         osl_file = open(self.filepath, mode="w+b")
         osl_file.write(response)
         osl_file.close()
         
-        self.report({'INFO'}, "Script saved.")
+        self.report(set(['INFO']), "Script saved.")
         current_material_cached = True
         
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 def createLinks(links, node_tree):
     for dom_link in links:
@@ -3971,13 +3974,13 @@ def createLinks(links, node_tree):
         
         node_tree.links.new(input, output)
 
-class curvePoint:
+class curvePoint(object):
     def __init__(self, type, loc_x, loc_y):
         self.type = type
         self.loc_x = loc_x
         self.loc_y = loc_y
 
-class mappingCurve:
+class mappingCurve(object):
     def __init__(self, extend, points):
         self.extend = extend
         self.points = points
@@ -4079,30 +4082,30 @@ def addNodes(nodes, node_tree, group_mode = False):
         #This is totally crafty, but some of these nodes actually
         # store their values as their output's default value!
         if node_type == "ATTRIBUTE":
-            print ("ATTRIBUTE")
+            print "ATTRIBUTE"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
             node.attribute_name = node_data['attribute'].value
         
         elif node_type == "CAMERA":
-            print ("CAMERA")
+            print "CAMERA"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
         
         elif node_type == "FRESNEL":
-            print ("FRESNEL")
+            print "FRESNEL"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
             node.inputs['IOR'].default_value = float(node_data['ior'].value)
                 
         elif node_type == "LAYER_WEIGHT":
-            print ("LAYER_WEIGHT")
+            print "LAYER_WEIGHT"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
             node.inputs['Blend'].default_value = float(node_data['blend'].value)
                 
         elif node_type == "LIGHT_PATH":
-            print ("LIGHT_PATH")
+            print "LIGHT_PATH"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
         
         elif node_type == "NEW_GEOMETRY":
-            print ("NEW_GEOMETRY")
+            print "NEW_GEOMETRY"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
         
         elif node_type == "HAIR_INFO":
@@ -4111,24 +4114,24 @@ def addNodes(nodes, node_tree, group_mode = False):
 This node is not available in the Blender version you are currently using.
 You may need a newer version of Blender for this material to work properly.""" % node_type]
                 return
-            print ("HAIR_INFO")
+            print "HAIR_INFO"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
         
         elif node_type == "OBJECT_INFO":
-            print ("OBJECT_INFO")
+            print "OBJECT_INFO"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
         
         elif node_type == "PARTICLE_INFO":
-            print ("PARTICLE_INFO")
+            print "PARTICLE_INFO"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
         
         elif node_type == "RGB":
-            print ("RGB")
+            print "RGB"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
             node.outputs['Color'].default_value = color(node_data['color'].value)
         
         elif node_type == "TANGENT":
-            print ("TANGENT")
+            print "TANGENT"
             if bpy.app.version[0] + (bpy.app.version[1] / 100.0) < 2.65:
                 node_message = ['ERROR', """The material file contains the node \"%s\".
 This node is not available in the Blender version you are currently using.
@@ -4139,36 +4142,36 @@ You may need a newer version of Blender for this material to work properly.""" %
             node.axis = node_data['axis'].value
         
         elif node_type == "TEX_COORD":
-            print ("TEX_COORD")
+            print "TEX_COORD"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
             if bpy.app.version[0] + (bpy.app.version[1] / 100.0) > 2.64 and "dupli" in node_data:
                 node.from_dupli = boolean(node_data['dupli'].value)
         
         elif node_type == "VALUE":
-            print ("VALUE")
+            print "VALUE"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
             node.outputs['Value'].default_value = float(node_data['value'].value)
             
             #OUTPUT TYPES
         elif node_type == "OUTPUT_LAMP":
-            print ("OUTPUT_LAMP")
+            print "OUTPUT_LAMP"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
         
         elif node_type == "OUTPUT_MATERIAL":
-            print ("OUTPUT_MATERIAL")
+            print "OUTPUT_MATERIAL"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
         
         elif node_type == "OUTPUT_WORLD":
-            print ("OUTPUT_WORLD")
+            print "OUTPUT_WORLD"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
         
             #SHADER TYPES
         elif node_type == "ADD_SHADER":
-            print ("ADD_SHADER")
+            print "ADD_SHADER"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
             
         elif node_type == "AMBIENT_OCCLUSION":
-            print ("AMBIENT_OCCLUSION")
+            print "AMBIENT_OCCLUSION"
             if bpy.app.version[0] + (bpy.app.version[1] / 100.0) < 2.65:
                 node_message = ['ERROR', """The material file contains the node \"%s\".
 This node is not available in the Blender version you are currently using.
@@ -4178,13 +4181,13 @@ You may need a newer version of Blender for this material to work properly.""" %
             node.inputs['Color'].default_value = color(node_data['color'].value)
         
         elif node_type == "BACKGROUND":
-            print ("BACKGROUND")
+            print "BACKGROUND"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
             node.inputs['Color'].default_value = color(node_data['color'].value)
             node.inputs['Strength'].default_value = float(node_data['strength'].value)
             
         elif node_type == "BSDF_ANISOTROPIC":
-            print ("BSDF_ANISOTROPIC")
+            print "BSDF_ANISOTROPIC"
             if bpy.app.version[0] + (bpy.app.version[1] / 100.0) < 2.65:
                 node_message = ['ERROR', """The material file contains the node \"%s\".
 This node is not available in the Blender version you are currently using.
@@ -4197,13 +4200,13 @@ You may need a newer version of Blender for this material to work properly.""" %
             node.inputs['Rotation'].default_value = float(node_data['rotation'].value)
             
         elif node_type == "BSDF_DIFFUSE":
-            print ("BSDF_DIFFUSE")
+            print "BSDF_DIFFUSE"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
             node.inputs['Color'].default_value = color(node_data['color'].value)
             node.inputs['Roughness'].default_value = float(node_data['roughness'].value)
         
         elif node_type == "BSDF_GLASS":
-            print ("BSDF_GLASS")
+            print "BSDF_GLASS"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
             node.distribution = node_data['distribution'].value
             node.inputs['Color'].default_value = color(node_data['color'].value)
@@ -4211,14 +4214,14 @@ You may need a newer version of Blender for this material to work properly.""" %
             node.inputs['IOR'].default_value = float(node_data['ior'].value)
             
         elif node_type == "BSDF_GLOSSY":
-            print ("BSDF_GLOSSY")
+            print "BSDF_GLOSSY"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
             node.distribution = node_data['distribution'].value
             node.inputs['Color'].default_value = color(node_data['color'].value)
             node.inputs['Roughness'].default_value = float(node_data['roughness'].value)
         
         elif node_type == "BSDF_REFRACTION":
-            print ("BSDF_REFRACTION")
+            print "BSDF_REFRACTION"
             if bpy.app.version[0] + (bpy.app.version[1] / 100.0) < 2.65:
                 node_message = ['ERROR', """The material file contains the node \"%s\".
 This node is not available in the Blender version you are currently using.
@@ -4231,39 +4234,39 @@ You may need a newer version of Blender for this material to work properly.""" %
             node.inputs['IOR'].default_value = float(node_data['ior'].value)
         
         elif node_type == "BSDF_TRANSLUCENT":
-            print ("BSDF_TRANSLUCENT")
+            print "BSDF_TRANSLUCENT"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
             node.inputs['Color'].default_value = color(node_data['color'].value)
         
         elif node_type == "BSDF_TRANSPARENT":
-            print ("BSDF_TRANSPARENT")
+            print "BSDF_TRANSPARENT"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
             node.inputs['Color'].default_value = color(node_data['color'].value)
         
         elif node_type == "BSDF_VELVET":
-            print ("BSDF_VELVET")
+            print "BSDF_VELVET"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
             node.inputs['Color'].default_value = color(node_data['color'].value)
             node.inputs['Sigma'].default_value = float(node_data['sigma'].value)
         
         elif node_type == "EMISSION":
-            print ("EMISSION")
+            print "EMISSION"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
             node.inputs['Color'].default_value = color(node_data['color'].value)
             node.inputs['Strength'].default_value = float(node_data['strength'].value)
         
         elif node_type == "HOLDOUT":
-            print ("HOLDOUT")
+            print "HOLDOUT"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
         
         elif node_type == "MIX_SHADER":
-            print ("MIX_SHADER")
+            print "MIX_SHADER"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
             node.inputs['Fac'].default_value = float(node_data['fac'].value)
         
             #TEXTURE TYPES
         elif node_type == "TEX_BRICK":
-            print ("TEX_BRICK")
+            print "TEX_BRICK"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
             node.offset = float(node_data['offset'].value)
             node.offset_frequency = float(node_data['offset_freq'].value)
@@ -4279,14 +4282,14 @@ You may need a newer version of Blender for this material to work properly.""" %
             node.inputs['Row Height'].default_value = float(node_data['height'].value)
             
         elif node_type == "TEX_CHECKER":
-            print ("TEX_CHECKER")
+            print "TEX_CHECKER"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
             node.inputs['Color1'].default_value = color(node_data['color1'].value)
             node.inputs['Color2'].default_value = color(node_data['color2'].value)
             node.inputs['Scale'].default_value = float(node_data['scale'].value)
             
         elif node_type == "TEX_ENVIRONMENT":
-            print ("TEX_ENVIRONMENT")
+            print "TEX_ENVIRONMENT"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
             node.color_space = node_data['color_space'].value
             node.projection = node_data['projection'].value
@@ -4314,7 +4317,7 @@ You may need a newer version of Blender for this material to work properly.""" %
                         node_message = ['ERROR', "The image file referenced by this image texture node is not .jpg or .png; not downloading."]
                         return
                     
-                    connection = http.client.HTTPConnection(image_host)
+                    connection = httplib.HTTPConnection(image_host)
                     connection.request("GET", image_location)
                     response = connection.getresponse().read()
                     #Save image texture
@@ -4347,7 +4350,7 @@ You may need a newer version of Blender for this material to work properly.""" %
                     elif library == "bundled" and os.path.exists(os.path.join(matlibpath, "bundled", "cycles", "textures", image_name + ext)):
                         image_filepath = os.path.join(matlibpath, "bundled", "cycles", "textures", image_name + ext)
                     elif working_mode == "online":
-                        connection = http.client.HTTPConnection(mat_lib_host)
+                        connection = httplib.HTTPConnection(mat_lib_host)
                         connection.request("GET", mat_lib_location + "cycles/textures/" + image_name + ext)
                         response = connection.getresponse().read()
                         
@@ -4378,12 +4381,12 @@ You may need a newer version of Blender for this material to work properly.""" %
                             node.image_user.use_auto_refresh = boolean(node_data['auto_refresh'].value)
             
         elif node_type == "TEX_GRADIENT":
-            print ("TEX_GRADIENT")
+            print "TEX_GRADIENT"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
             node.gradient_type = node_data['gradient'].value
         
         elif node_type == "TEX_IMAGE":
-            print ("TEX_IMAGE")
+            print "TEX_IMAGE"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
             node.color_space = node_data['color_space'].value
             if "projection" in node_data:
@@ -4412,7 +4415,7 @@ You may need a newer version of Blender for this material to work properly.""" %
                         node_message = ['ERROR', "The image file referenced by this image texture node is not .jpg or .png; not downloading."]
                         return
                     
-                    connection = http.client.HTTPConnection(image_host)
+                    connection = httplib.HTTPConnection(image_host)
                     connection.request("GET", image_location)
                     response = connection.getresponse().read()
                     #Save image texture
@@ -4445,7 +4448,7 @@ You may need a newer version of Blender for this material to work properly.""" %
                     elif library == "bundled" and os.path.exists(os.path.join(matlibpath, "bundled", "cycles", "textures", image_name + ext)):
                         image_filepath = os.path.join(matlibpath, "bundled", "cycles", "textures", image_name + ext)
                     elif working_mode == "online":
-                        connection = http.client.HTTPConnection(mat_lib_host)
+                        connection = httplib.HTTPConnection(mat_lib_host)
                         connection.request("GET", mat_lib_location + "cycles/textures/" + image_name + ext)
                         response = connection.getresponse().read()
                         
@@ -4476,14 +4479,14 @@ You may need a newer version of Blender for this material to work properly.""" %
                             node.image_user.use_auto_refresh = boolean(node_data['auto_refresh'].value)
                 
         elif node_type == "TEX_MAGIC":
-            print ("TEX_MAGIC")
+            print "TEX_MAGIC"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
             node.turbulence_depth = int(node_data['depth'].value)
             node.inputs['Scale'].default_value = float(node_data['scale'].value)
             node.inputs['Distortion'].default_value = float(node_data['distortion'].value)
         
         elif node_type == "TEX_MUSGRAVE":
-            print ("TEX_MUSGRAVE")
+            print "TEX_MUSGRAVE"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
             node.musgrave_type = node_data['musgrave'].value
             node.inputs['Scale'].default_value = float(node_data['scale'].value)
@@ -4494,26 +4497,26 @@ You may need a newer version of Blender for this material to work properly.""" %
             node.inputs['Gain'].default_value = float(node_data['gain'].value)
         
         elif node_type == "TEX_NOISE":
-            print ("TEX_NOISE")
+            print "TEX_NOISE"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
             node.inputs['Scale'].default_value = float(node_data['scale'].value)
             node.inputs['Detail'].default_value = float(node_data['detail'].value)
             node.inputs['Distortion'].default_value = float(node_data['distortion'].value)
                         
         elif node_type == "TEX_SKY":
-            print ("TEX_SKY")
+            print "TEX_SKY"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
             node.sun_direction = vector(node_data['sun_direction'].value)
             node.turbidity = float(node_data['turbidity'].value)
         
         elif node_type == "TEX_VORONOI":
-            print ("TEX_VORONOI")
+            print "TEX_VORONOI"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
             node.coloring = node_data['coloring'].value
             node.inputs['Scale'].default_value = float(node_data['scale'].value)
         
         elif node_type == "TEX_WAVE":
-            print ("TEX_WAVE")
+            print "TEX_WAVE"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
             node.wave_type = node_data['wave'].value
             node.inputs['Scale'].default_value = float(node_data['scale'].value)
@@ -4523,14 +4526,14 @@ You may need a newer version of Blender for this material to work properly.""" %
         
             #COLOR TYPES
         elif node_type == "BRIGHTCONTRAST":
-            print ("BRIGHTCONTRAST")
+            print "BRIGHTCONTRAST"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
             node.inputs['Color'].default_value = color(node_data['color'].value)
             node.inputs['Bright'].default_value = float(node_data['bright'].value)
             node.inputs['Contrast'].default_value = float(node_data['contrast'].value)
             
         elif node_type == "CURVE_RGB":
-            print ("CURVE_RGB")
+            print "CURVE_RGB"
             if bpy.app.version[0] + (bpy.app.version[1] / 100.0) < 2.66:
                 node_message = ['ERROR', """The material file contains the node \"%s\".
 This node is not available in the Blender version you are currently using.
@@ -4603,13 +4606,13 @@ You may need a newer version of Blender for this material to work properly.""" %
                 p += 1
         
         elif node_type == "GAMMA":
-            print ("GAMMA")
+            print "GAMMA"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
             node.inputs['Color'].default_value = color(node_data['color'].value)
             node.inputs['Gamma'].default_value = float(node_data['gamma'].value)
         
         elif node_type == "HUE_SAT":
-            print ("HUE_SAT")
+            print "HUE_SAT"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
             node.inputs['Hue'].default_value = float(node_data['hue'].value)
             node.inputs['Saturation'].default_value = float(node_data['saturation'].value)
@@ -4618,19 +4621,19 @@ You may need a newer version of Blender for this material to work properly.""" %
             node.inputs['Color'].default_value = color(node_data['color'].value)
             
         elif node_type == "INVERT":
-            print ("INVERT")
+            print "INVERT"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
             node.inputs['Fac'].default_value = float(node_data['fac'].value)
             node.inputs['Color'].default_value = color(node_data['color'].value)
         
         elif node_type == "LIGHT_FALLOFF":
-            print ("LIGHT_FALLOFF")
+            print "LIGHT_FALLOFF"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
             node.inputs['Strength'].default_value = float(node_data['strength'].value)
             node.inputs['Smooth'].default_value = float(node_data['smooth'].value)
         
         elif node_type == "MIX_RGB":
-            print ("MIX_RGB")
+            print "MIX_RGB"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
             node.blend_type = node_data['blend_type'].value
             if "use_clamp" in node_data:
@@ -4641,7 +4644,7 @@ You may need a newer version of Blender for this material to work properly.""" %
         
             #VECTOR TYPES
         elif node_type == "BUMP":
-            print ("BUMP")
+            print "BUMP"
             if bpy.app.version[0] + (bpy.app.version[1] / 100.0) < 2.65:
                 node_message = ['ERROR', """The material file contains the node \"%s\".
 This node is not available in the Blender version you are currently using.
@@ -4651,7 +4654,7 @@ You may need a newer version of Blender for this material to work properly.""" %
             node.inputs["Strength"].default_value = float(node_data['strength'].value)
             
         elif node_type == "CURVE_VEC":
-            print ("CURVE_VEC")
+            print "CURVE_VEC"
             if bpy.app.version[0] + (bpy.app.version[1] / 100.0) < 2.66:
                 node_message = ['ERROR', """The material file contains the node \"%s\".
 This node is not available in the Blender version you are currently using.
@@ -4709,7 +4712,7 @@ You may need a newer version of Blender for this material to work properly.""" %
                 p += 1
             
         elif node_type == "MAPPING":
-            print ("MAPPING")
+            print "MAPPING"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
             node.translation = vector(node_data['translation'].value)
             node.rotation = vector(node_data['rotation'].value)
@@ -4723,13 +4726,13 @@ You may need a newer version of Blender for this material to work properly.""" %
             node.inputs['Vector'].default_value = vector(node_data['vector'].value)
         
         elif node_type == "NORMAL":
-            print ("NORMAL")
+            print "NORMAL"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
             node.outputs['Normal'].default_value = vector(node_data['vector_output'].value)
             node.inputs['Normal'].default_value = vector(node_data['vector_input'].value)
             
         elif node_type == "NORMAL_MAP":
-            print ("NORMAL_MAP")
+            print "NORMAL_MAP"
             if bpy.app.version[0] + (bpy.app.version[1] / 100.0) < 2.65:
                 node_message = ['ERROR', """The material file contains the node \"%s\".
 This node is not available in the Blender version you are currently using.
@@ -4743,14 +4746,14 @@ You may need a newer version of Blender for this material to work properly.""" %
             
             #CONVERTOR TYPES
         elif node_type == "COMBRGB":
-            print ("COMBRGB")
+            print "COMBRGB"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
             node.inputs['R'].default_value = float(node_data['red'].value)
             node.inputs['G'].default_value = float(node_data['green'].value)
             node.inputs['B'].default_value = float(node_data['blue'].value)
         
         elif node_type == "MATH":
-            print ("MATH")
+            print "MATH"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
             node.operation = node_data['operation'].value
             if "use_clamp" in node_data:
@@ -4759,17 +4762,17 @@ You may need a newer version of Blender for this material to work properly.""" %
             node.inputs[1].default_value = float(node_data['value2'].value)
         
         elif node_type == "RGBTOBW":
-            print ("RGBTOBW")
+            print "RGBTOBW"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
             node.inputs['Color'].default_value = color(node_data['color'].value)
         
         elif node_type == "SEPRGB":
-            print ("SEPRGB")
+            print "SEPRGB"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
             node.inputs['Image'].default_value = color(node_data['image'].value)
         
         elif node_type == "VALTORGB":
-            print ("VALTORGB")
+            print "VALTORGB"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
             node.color_ramp.interpolation = node_data['interpolation'].value
             node.inputs['Fac'].default_value = float(node_data['fac'].value)
@@ -4793,7 +4796,7 @@ You may need a newer version of Blender for this material to work properly.""" %
                 i = i + 1
             
         elif node_type == "VECT_MATH":
-            print ("VECT_MATH")
+            print "VECT_MATH"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
             node.operation = node_data['operation'].value
             node.inputs[0].default_value = vector(node_data['vector1'].value)
@@ -4805,11 +4808,11 @@ You may need a newer version of Blender for this material to work properly.""" %
             #to 2.65, as Blender's nodes.new() operator was
             #unable to add FRAME nodes. Was fixed with r51926.
             if bpy.app.version[0] + (bpy.app.version[1] / 100.0) >= 2.65:
-                print("FRAME")
+                print "FRAME"
                 node = node_tree.nodes.new(node_types['SHADER'][node_type])
         
         elif node_type == "REROUTE":
-            print ("REROUTE")
+            print "REROUTE"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
         
         elif node_type == "SCRIPT":
@@ -4818,7 +4821,7 @@ You may need a newer version of Blender for this material to work properly.""" %
 This node is not available in the Blender version you are currently using.
 You may need a newer version of Blender for this material to work properly."""]
                 return
-            print ("SCRIPT")
+            print "SCRIPT"
             node = node_tree.nodes.new(node_types['SHADER'][node_type])
             node.mode = node_data['mode'].value
             if node_data['mode'].value == 'EXTERNAL':
@@ -4835,7 +4838,7 @@ You may need a newer version of Blender for this material to work properly."""]
                             node_message = ['ERROR', "The OSL script file referenced by this script node is not .osl or .oso; not downloading."]
                             return
                         
-                        connection = http.client.HTTPConnection(osl_host)
+                        connection = httplib.HTTPConnection(osl_host)
                         connection.request("GET", script_location + script_name + ext)
                         response = connection.getresponse().read()
                         #Save OSL script
@@ -4860,7 +4863,7 @@ You may need a newer version of Blender for this material to work properly."""]
                         elif library == "bundled" and os.path.exists(os.path.join(matlibpath, "bundled", "cycles", "scripts", script_name + ext)):
                             osl_filepath = os.path.join(matlibpath, "bundled", "cycles", "scripts", script_name + ext)
                         elif working_mode == "online":
-                            connection = http.client.HTTPConnection(mat_lib_host)
+                            connection = httplib.HTTPConnection(mat_lib_host)
                             connection.request("GET", mat_lib_location + "cycles/scripts/" + script_name + ext)
                             response = connection.getresponse().read()
                             
@@ -4904,7 +4907,7 @@ You may need a newer version of Blender for this material to work properly."""]
                         node_message = ['WARNING', "There was no value specified for input \"%s\", leaving at default." % input.name]
             
         elif node_type == "GROUP":
-            print ("GROUP")
+            print "GROUP"
             if 'group' in node_data and "." in node_data['group'].value:
                 if "file://" in node_data['group'].value:
                     group_filepath = node_data['group'].value[7:]
@@ -4927,7 +4930,7 @@ You may need a newer version of Blender for this material to work properly."""]
                         node_message = ['ERROR', "The node group file referenced by this group node is not .bcg; not downloading."]
                         return
                     
-                    connection = http.client.HTTPConnection(group_host)
+                    connection = httplib.HTTPConnection(group_host)
                     connection.request("GET", group_location + group_name + ".bcg")
                     response = connection.getresponse().read()
                     #Save node group
@@ -4950,7 +4953,7 @@ You may need a newer version of Blender for this material to work properly."""]
                     elif library == "bundled" and os.path.exists(os.path.join(matlibpath, "bundled", "cycles", "groups", group_name + ".bcg")):
                         group_filepath = os.path.join(matlibpath, "bundled", "cycles", "groups", group_name + ".bcg")
                     elif working_mode == "online":
-                        connection = http.client.HTTPConnection(mat_lib_host)
+                        connection = httplib.HTTPConnection(mat_lib_host)
                         connection.request("GET", mat_lib_location + "cycles/groups/" + group_name + ".bcg")
                         response = connection.getresponse().read()
                         
@@ -4993,7 +4996,7 @@ You may need a newer version of Blender for this material to work properly."""]
                             input.default_value = str(node_data[input.name.lower().replace(" ", "_")].value)
                     elif input.type != 'SHADER':
                         node_message = ['WARNING', "There was no value specified for input \"%s\", leaving at default." % input.name]
-                    print(input.type)
+                    print input.type
             
         else:
             node_message = ['ERROR', """The material file contains the node type \"%s\", which is not known.
@@ -5035,7 +5038,7 @@ def boolean(string):
     elif string == "false":
         boolean = False
     else:
-        print('Error converting string to a boolean')
+        print 'Error converting string to a boolean'
         return
     return boolean
 
@@ -5054,7 +5057,7 @@ def color(string):
         b = float(colors[2])
         color = [r,g,b]
     else:
-        print('Error converting string to a color')
+        print 'Error converting string to a color'
         return
     return color
 
@@ -5067,7 +5070,7 @@ def vector(string):
         z = float(vectors[2])
         vector = mathutils.Vector((x, y, z))
     else:
-        print('Error converting string to a vector')
+        print 'Error converting string to a vector'
         return
     return vector
 
@@ -5092,13 +5095,13 @@ class MaterialConvert(bpy.types.Operator):
             if not context.active_object:
                 self.save_location = ""
                 self.all_materials = False
-                self.report({'ERROR'}, "No object selected!")
-                return {'CANCELLED'}
+                self.report(set(['ERROR']), "No object selected!")
+                return set(['CANCELLED'])
             if not context.active_object.active_material:
                 self.save_location = ""
                 self.all_materials = False
-                self.report({'ERROR'}, "No material selected!")
-                return {'CANCELLED'}
+                self.report(set(['ERROR']), "No material selected!")
+                return set(['CANCELLED'])
             #For single materials, access the materials with a name
             mat = context.active_object.active_material.name
             loop_length = 1
@@ -5242,8 +5245,8 @@ class MaterialConvert(bpy.types.Operator):
                     #to 2.65, as Blender's nodes.new() operator was
                     #unable to add FRAME nodes. Was fixed with r51926.
                     frame_warning = True
-                    print("Skipping frame node; this Blender version will not support adding it back."\
-                        "\nFrame nodes are not supported prior to Blender 2.65.")
+                    print "Skipping frame node; this Blender version will not support adding it back."\
+                        "\nFrame nodes are not supported prior to Blender 2.65."
                 else:
                     #Write node opening bracket
                     write("\n\t\t<node ")
@@ -5326,28 +5329,28 @@ class MaterialConvert(bpy.types.Operator):
                 bpy.data.texts[txt].write(material_file_contents)
                 if not self.all_materials:
                     if frame_warning:
-                        self.report({'WARNING'}, "Material \"" + mat + "\" contains a frame node which was skipped; see console for details.")
+                        self.report(set(['WARNING']), "Material \"" + mat + "\" contains a frame node which was skipped; see console for details.")
                     else:
-                        self.report({'INFO'}, "Material \"" + mat + "\" written to Text \"" + txt + "\" as .bcm")
+                        self.report(set(['INFO']), "Material \"" + mat + "\" written to Text \"" + txt + "\" as .bcm")
             else:
-                print(context.scene.mat_lib_bcm_save_location + filename + ".bcm")
+                print context.scene.mat_lib_bcm_save_location + filename + ".bcm"
                 bcm_file = open(context.scene.mat_lib_bcm_save_location + filename + ".bcm", mode="w", encoding="UTF-8")
                 bcm_file.write(material_file_contents)
                 bcm_file.close()
                 if not self.all_materials:
                     if frame_warning:
-                        self.report({'WARNING'}, "Material \"" + mat + "\" contains a frame node which was skipped; see console for details.")
+                        self.report(set(['WARNING']), "Material \"" + mat + "\" contains a frame node which was skipped; see console for details.")
                     else:
-                        self.report({'INFO'}, "Material \"" + mat + "\" saved to \"" + filename + ".bcm\"")
+                        self.report(set(['INFO']), "Material \"" + mat + "\" saved to \"" + filename + ".bcm\"")
             j += 1
             if self.all_materials:
                 mat += 1
         if self.all_materials and not group_warning and not frame_warning:
-            self.report({'INFO'}, "All materials successfully saved!")
+            self.report(set(['INFO']), "All materials successfully saved!")
         
         self.save_location = ""
         self.all_materials = False
-        return {'FINISHED'}
+        return set(['FINISHED'])
     
 class GroupConvert(bpy.types.Operator):
     '''Convert group(s) to the .bcg format'''
@@ -5369,18 +5372,18 @@ class GroupConvert(bpy.types.Operator):
             if not context.active_object:
                 self.save_location = ""
                 self.all_groups = False
-                self.report({'ERROR'}, "No object selected!")
-                return {'CANCELLED'}
+                self.report(set(['ERROR']), "No object selected!")
+                return set(['CANCELLED'])
             if not context.active_object.active_material:
                 self.save_location = ""
                 self.all_groups = False
-                self.report({'ERROR'}, "No material selected!")
-                return {'CANCELLED'}
+                self.report(set(['ERROR']), "No material selected!")
+                return set(['CANCELLED'])
             if not context.active_object.active_material.node_tree.nodes.active or context.active_object.active_material.node_tree.nodes.active.type != 'GROUP':
                 self.save_location = ""
                 self.all_groups = False
-                self.report({'ERROR'}, "No active group node!")
-                return {'CANCELLED'}
+                self.report(set(['ERROR']), "No active group node!")
+                return set(['CANCELLED'])
             
             #For single groups, access the node group with a name
             group = context.active_object.active_material.node_tree.nodes.active.node_tree.name
@@ -5438,20 +5441,20 @@ class GroupConvert(bpy.types.Operator):
                 group_file.write(getGroupData(bpy.data.node_groups[group].name).replace("\n\t\t", "\n").replace("\n<group", "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<group"))
                 group_file.close()
                 if not self.all_groups:
-                    self.report({'INFO'}, "Nodegroup \"" + group + "\" saved to \"" + filename + ".bcg\"")
+                    self.report(set(['INFO']), "Nodegroup \"" + group + "\" saved to \"" + filename + ".bcg\"")
             else:
                 bpy.data.texts[txt].clear()
                 bpy.data.texts[txt].write(getGroupData(group).replace("\n\t\t", "\n").replace("\n<group", "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<group"))
-                self.report({'INFO'}, "Nodegroup \"" + group + "\" saved to \"" + txt + "\"")
+                self.report(set(['INFO']), "Nodegroup \"" + group + "\" saved to \"" + txt + "\"")
             j += 1
             if self.all_groups:
                 group += 1
         if self.all_groups:
-            self.report({'INFO'}, "All nodegroups successfully saved!")
+            self.report(set(['INFO']), "All nodegroups successfully saved!")
         
         self.save_location = ""
         self.all_groups = False
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 def getGroupData(index):
     global group_script_stack
@@ -5609,143 +5612,143 @@ def getNodeData(node, group_mode = False):
         node_type = node.type
         
     if node_type == "GROUP":
-        print("GROUP NODE!")
+        print "GROUP NODE!"
         text += ("ERROR: NESTED GROUP NODES NOT YET SUPPORTED.")
         
         #INPUT TYPES
     elif node_type == "ATTRIBUTE":
-        print("ATTRIBUTE")
+        print "ATTRIBUTE"
         text += (" attribute=\"%s\"" % node.attribute_name)
     
     elif node_type == "CAMERA":
-        print("CAMERA")
+        print "CAMERA"
         
     elif node_type == "FRESNEL":
-        print("FRESNEL")
+        print "FRESNEL"
         text += (" ior=\"%s\"" % smallFloat(I['IOR'].default_value))
     
     elif node_type == "LAYER_WEIGHT":
-        print("LAYER_WEIGHT")
+        print "LAYER_WEIGHT"
         text += (" blend=\"%s\"" % smallFloat(I['Blend'].default_value))
     
     elif node_type == "LIGHT_PATH":
-        print("LIGHT_PATH")
+        print "LIGHT_PATH"
     
     elif node_type == "NEW_GEOMETRY":
-        print("NEW_GEOMETRY")
+        print "NEW_GEOMETRY"
     
     elif node_type == "HAIR_INFO":
-        print("HAIR_INFO")
+        print "HAIR_INFO"
     
     elif node_type == "OBJECT_INFO":
-        print("OBJECT_INFO")
+        print "OBJECT_INFO"
     
     elif node_type == "PARTICLE_INFO":
-        print("PARTICLE_INFO")
+        print "PARTICLE_INFO"
     
     elif node_type == "RGB":
-        print("RGB")
+        print "RGB"
         text += (" color=\"%s\"" % rgba(O['Color'].default_value))
     
     elif node_type == "TANGENT":
-        print("TANGENT")
+        print "TANGENT"
         text += (" direction=\"%s\"" % node.direction_type)
         text += (" axis=\"%s\"" % node.axis)
     
     elif node_type == "TEX_COORD":
-        print("TEX_COORD")
+        print "TEX_COORD"
         if bpy.app.version[0] + (bpy.app.version[1] / 100.0) > 2.64:
             text += (" dupli=\"%s\"" % node.from_dupli)
         else:
             text += (" dupli=\"False\"")
     
     elif node_type == "VALUE":
-        print("VALUE")
+        print "VALUE"
         text += (" value=\"%s\"" % smallFloat(O['Value'].default_value))
         
         #OUTPUT TYPES
     elif node_type == "OUTPUT_LAMP":
-        print("OUTPUT_LAMP")
+        print "OUTPUT_LAMP"
     
     elif node_type == "OUTPUT_MATERIAL":
-        print("OUTPUT_MATERIAL")
+        print "OUTPUT_MATERIAL"
     
     elif node_type == "OUTPUT_WORLD":
-        print("OUTPUT_WORLD")
+        print "OUTPUT_WORLD"
     
         #SHADER TYPES
     elif node_type == "ADD_SHADER":
-        print("ADD_SHADER")
+        print "ADD_SHADER"
     
     elif node_type == "AMBIENT_OCCLUSION":
-        print("AMBIENT_OCCLUSION")
+        print "AMBIENT_OCCLUSION"
         text += (" color=\"%s\"" % rgba(I['Color'].default_value))
     
     elif node_type == "BACKGROUND":
-        print("BACKGROUND")
+        print "BACKGROUND"
         text += (" color=\"%s\"" % rgba(I['Color'].default_value))
         text += (" strength=\"%s\"" % smallFloat(I['Strength'].default_value))
     
     elif node_type == "BSDF_ANISOTROPIC":
-        print("BSDF_ANISOTROPIC")
+        print "BSDF_ANISOTROPIC"
         text += (" color=\"%s\"" % rgba(I['Color'].default_value))
         text += (" roughness=\"%s\"" % smallFloat(I['Roughness'].default_value))
         text += (" anisotropy=\"%s\"" % smallFloat(I['Anisotropy'].default_value))
         text += (" rotation=\"%s\"" % smallFloat(I['Rotation'].default_value))
     
     elif node_type == "BSDF_DIFFUSE":
-        print("BSDF_DIFFUSE")
+        print "BSDF_DIFFUSE"
         text += (" color=\"%s\"" % rgba(I['Color'].default_value))
         text += (" roughness=\"%s\"" % smallFloat(I['Roughness'].default_value))
     
     elif node_type == "BSDF_GLASS":
-        print("BSDF_GLASS")
+        print "BSDF_GLASS"
         text += (" distribution=\"%s\"" % node.distribution)
         text += (" color=\"%s\"" % rgba(I['Color'].default_value))
         text += (" roughness=\"%s\"" % smallFloat(I['Roughness'].default_value))
         text += (" ior=\"%s\"" % smallFloat(I['IOR'].default_value))
     
     elif node_type == "BSDF_GLOSSY":
-        print("BSDF_GLOSSY")
+        print "BSDF_GLOSSY"
         text += (" distribution=\"%s\"" % node.distribution)
         text += (" color=\"%s\"" % rgba(I['Color'].default_value))
         text += (" roughness=\"%s\"" % smallFloat(I['Roughness'].default_value))
     
     elif node_type == "BSDF_REFRACTION":
-        print("BSDF_REFRACTION")
+        print "BSDF_REFRACTION"
         text += (" distribution=\"%s\"" % node.distribution)
         text += (" color=\"%s\"" % rgba(I['Color'].default_value))
         text += (" roughness=\"%s\"" % smallFloat(I['Roughness'].default_value))
         text += (" ior=\"%s\"" % smallFloat(I['IOR'].default_value))
     
     elif node_type == "BSDF_TRANSLUCENT":
-        print("BSDF_TRANSLUCENT")
+        print "BSDF_TRANSLUCENT"
         text += (" color=\"%s\"" % rgba(I['Color'].default_value))
     
     elif node_type == "BSDF_TRANSPARENT":
-        print("BSDF_TRANSPARENT")
+        print "BSDF_TRANSPARENT"
         text += (" color=\"%s\"" % rgba(I['Color'].default_value))
     
     elif node_type == "BSDF_VELVET":
-        print("BSDF_VELVET")
+        print "BSDF_VELVET"
         text += (" color=\"%s\"" % rgba(I['Color'].default_value))
         text += (" sigma=\"%s\"" % smallFloat(I['Sigma'].default_value))
     
     elif node_type == "EMISSION":
-        print("EMISSION")
+        print "EMISSION"
         text += (" color=\"%s\"" % rgba(I['Color'].default_value))
         text += (" strength=\"%s\"" % smallFloat(I['Strength'].default_value))
     
     elif node_type == "HOLDOUT":
-        print("HOLDOUT")
+        print "HOLDOUT"
     
     elif node_type == "MIX_SHADER":
-        print("MIX_SHADER")
+        print "MIX_SHADER"
         text += (" fac=\"%s\"" % smallFloat(I['Fac'].default_value))
         
         #TEXTURE TYPES
     elif node_type == "TEX_BRICK":
-        print ("TEX_BRICK")
+        print "TEX_BRICK"
         text += (" offset=\"%s\"" % smallFloat(node.offset))
         text += (" offset_freq=\"%s\"" % str(node.offset_frequency))
         text += (" squash=\"%s\"" % smallFloat(node.squash))
@@ -5760,13 +5763,13 @@ def getNodeData(node, group_mode = False):
         text += (" height=\"%s\"" % smallFloat(I['Row Height'].default_value))
             
     elif node_type == "TEX_CHECKER":
-        print("TEX_CHECKER")
+        print "TEX_CHECKER"
         text += (" color1=\"%s\"" % rgba(I['Color1'].default_value))
         text += (" color2=\"%s\"" % rgba(I['Color2'].default_value))
         text += (" scale=\"%s\"" % smallFloat(I['Scale'].default_value))
     
     elif node_type == "TEX_ENVIRONMENT":
-        print("TEX_ENVIRONMENT")
+        print "TEX_ENVIRONMENT"
         if node.image:
             text += (" image=\"file://%s\"" % os.path.realpath(bpy.path.abspath(node.image.filepath)))
             text += (" source=\"%s\"" % node.image.source)
@@ -5782,11 +5785,11 @@ def getNodeData(node, group_mode = False):
         text += (" projection=\"%s\"" % node.projection)
     
     elif node_type == "TEX_GRADIENT":
-        print("TEX_GRADIENT")
+        print "TEX_GRADIENT"
         text += (" gradient=\"%s\"" % node.gradient_type)
     
     elif node_type == "TEX_IMAGE":
-        print("TEX_IMAGE")
+        print "TEX_IMAGE"
         if node.image:
             text += (" image=\"file://%s\"" % os.path.realpath(bpy.path.abspath(node.image.filepath)))
             text += (" source=\"%s\"" % node.image.source)
@@ -5806,13 +5809,13 @@ def getNodeData(node, group_mode = False):
             text += (" projection=\"FLAT\"")
     
     elif node_type == "TEX_MAGIC":
-        print("TEX_MAGIC")
+        print "TEX_MAGIC"
         text += (" depth=\"%s\"" % str(node.turbulence_depth))
         text += (" scale=\"%s\"" % smallFloat(I['Scale'].default_value))
         text += (" distortion=\"%s\"" % smallFloat(I['Distortion'].default_value))
     
     elif node_type == "TEX_MUSGRAVE":
-        print("TEX_MUSGRAVE")
+        print "TEX_MUSGRAVE"
         text += (" musgrave=\"%s\"" % node.musgrave_type)
         text += (" scale=\"%s\"" % smallFloat(I['Scale'].default_value))
         text += (" detail=\"%s\"" % smallFloat(I['Detail'].default_value))
@@ -5822,23 +5825,23 @@ def getNodeData(node, group_mode = False):
         text += (" gain=\"%s\"" % smallFloat(I['Gain'].default_value))
     
     elif node_type == "TEX_NOISE":
-        print("TEX_NOISE")
+        print "TEX_NOISE"
         text += (" scale=\"%s\"" % smallFloat(I['Scale'].default_value))
         text += (" detail=\"%s\"" % smallFloat(I['Detail'].default_value))
         text += (" distortion=\"%s\"" % smallFloat(I['Distortion'].default_value))
     
     elif node_type == "TEX_SKY":
-        print("TEX_SKY")
+        print "TEX_SKY"
         text += (" sun_direction=\"%s\"" % smallVector(node.sun_direction))
         text += (" turbidity=\"%s\"" % smallFloat(node.turbidity))
     
     elif node_type == "TEX_VORONOI":
-        print("TEX_VORONOI")
+        print "TEX_VORONOI"
         text += (" coloring=\"%s\"" % node.coloring)
         text += (" scale=\"%s\"" % smallFloat(I['Scale'].default_value))
     
     elif node_type == "TEX_WAVE":
-        print("TEX_WAVE")
+        print "TEX_WAVE"
         text += (" wave=\"%s\"" % node.wave_type)
         text += (" scale=\"%s\"" % smallFloat(I['Scale'].default_value))
         text += (" distortion=\"%s\"" % smallFloat(I['Distortion'].default_value))
@@ -5847,13 +5850,13 @@ def getNodeData(node, group_mode = False):
     
         #COLOR TYPES
     elif node_type == "BRIGHTCONTRAST":
-        print("BRIGHTCONTRAST")
+        print "BRIGHTCONTRAST"
         text += (" color=\"%s\"" % rgba(I['Color'].default_value))
         text += (" bright=\"%s\"" % smallFloat(I['Bright'].default_value))
         text += (" contrast=\"%s\"" % smallFloat(I['Contrast'].default_value))
         
     elif node_type == "CURVE_RGB":
-        print("CURVE_RGB")
+        print "CURVE_RGB"
         text += (" fac=\"%s\"" % smallFloat(I['Fac'].default_value))
         text += (" color=\"%s\"" % rgba(I['Color'].default_value))
         if group_mode:
@@ -5876,12 +5879,12 @@ def getNodeData(node, group_mode = False):
             curve_stack.append(node.mapping.curves[2])
     
     elif node_type == "GAMMA":
-        print("GAMMA")
+        print "GAMMA"
         text += (" color=\"%s\"" % rgba(I['Color'].default_value))
         text += (" gamma=\"%s\"" % smallFloat(I['Gamma'].default_value))
     
     elif node_type == "HUE_SAT":
-        print("HUE_SAT")
+        print "HUE_SAT"
         text += (" hue=\"%s\"" % smallFloat(I['Hue'].default_value))
         text += (" saturation=\"%s\"" % smallFloat(I['Saturation'].default_value))
         text += (" value=\"%s\"" % smallFloat(I['Value'].default_value))
@@ -5889,12 +5892,12 @@ def getNodeData(node, group_mode = False):
         text += (" color=\"%s\"" % rgba(I['Color'].default_value))
     
     elif node_type == "LIGHT_FALLOFF":
-        print("LIGHT_FALLOFF")
+        print "LIGHT_FALLOFF"
         text += (" strength=\"%s\"" % smallFloat(I['Strength'].default_value))
         text += (" smooth=\"%s\"" % smallFloat(I['Smooth'].default_value))
     
     elif node_type == "MIX_RGB":
-        print("MIX_RGB")
+        print "MIX_RGB"
         text += (" blend_type=\"%s\"" % node.blend_type)
         text += (" use_clamp=\"%s\"" % str(node.use_clamp))
         text += (" fac=\"%s\"" % smallFloat(I['Fac'].default_value))
@@ -5902,17 +5905,17 @@ def getNodeData(node, group_mode = False):
         text += (" color2=\"%s\"" % rgba(I[2].default_value))
     
     elif node_type == "INVERT":
-        print("INVERT")
+        print "INVERT"
         text += (" fac=\"%s\"" % smallFloat(I['Fac'].default_value))
         text += (" color=\"%s\"" % rgba(I['Color'].default_value))
         
         #VECTOR TYPES
     elif node_type == "BUMP":
-        print("BUMP")
+        print "BUMP"
         text += (" strength=\"%s\"" % smallFloat(I['Strength'].default_value))
     
     elif node_type == "CURVE_VEC":
-        print("CURVE_VEC")
+        print "CURVE_VEC"
         text += (" fac=\"%s\"" % smallFloat(I['Fac'].default_value))
         text += (" vector=\"%s\"" % smallVector(I['Vector'].default_value))
         
@@ -5932,7 +5935,7 @@ def getNodeData(node, group_mode = False):
             curve_stack.append(node.mapping.curves[2])
         
     elif node_type == "MAPPING":
-        print("MAPPING")
+        print "MAPPING"
         text += (" translation=\"%s\"" % smallVector(node.translation))
         text += (" rotation=\"%s\"" % smallVector(node.rotation))
         text += (" scale=\"%s\"" % smallVector(node.scale))
@@ -5949,12 +5952,12 @@ def getNodeData(node, group_mode = False):
         text += (" vector=\"%s\"" % smallVector(I['Vector'].default_value))
     
     elif node_type == "NORMAL":
-        print("NORMAL")
+        print "NORMAL"
         text += (" vector_output=\"%s\"" % smallVector(O['Normal'].default_value))
         text += (" vector_input=\"%s\"" % smallVector(I['Normal'].default_value))
         
     elif node_type == "NORMAL_MAP":
-        print("NORMAL_MAP")
+        print "NORMAL_MAP"
         text += (" space=\"%s\"" % node.space)
         text += (" uv_map=\"%s\"" % node.uv_map)
         text += (" strength=\"%s\"" % smallFloat(I['Strength'].default_value))
@@ -5962,28 +5965,28 @@ def getNodeData(node, group_mode = False):
         
         #CONVERTER TYPES
     elif node_type == "COMBRGB":
-        print("COMBRGB")
+        print "COMBRGB"
         text += (" red=\"%s\"" % smallFloat(I['R'].default_value))
         text += (" green=\"%s\"" % smallFloat(I['G'].default_value))
         text += (" blue=\"%s\"" % smallFloat(I['B'].default_value))
     
     elif node_type == "MATH":
-        print("MATH")
+        print "MATH"
         text += (" operation=\"%s\"" % node.operation)
         text += (" use_clamp=\"%s\"" % str(node.use_clamp))
         text += (" value1=\"%s\"" % smallFloat(I[0].default_value))
         text += (" value2=\"%s\"" % smallFloat(I[1].default_value))
         
     elif node_type == "RGBTOBW":
-        print ("RGBTOBW")
+        print "RGBTOBW"
         text += (" color=\"%s\"" % rgba(I['Color'].default_value))
     
     elif node_type == "SEPRGB":
-        print("SEPRGB")
+        print "SEPRGB"
         text += (" image=\"%s\"" % rgba(I['Image'].default_value))
     
     elif node_type == "VALTORGB":
-        print("VALTORGB")
+        print "VALTORGB"
         text += (" interpolation=\"%s\"" % str(node.color_ramp.interpolation))
         text += (" fac=\"%s\"" % smallFloat(I['Fac'].default_value))
         text += (" stops=\"%s\"" % str(len(node.color_ramp.elements)))
@@ -5999,20 +6002,20 @@ def getNodeData(node, group_mode = False):
             k += 1
     
     elif node_type == "VECT_MATH":
-        print("VECT_MATH")
+        print "VECT_MATH"
         text += (" operation=\"%s\"" % node.operation)
         text += (" vector1=\"%s\"" % smallVector(I[0].default_value))
         text += (" vector2=\"%s\"" % smallVector(I[1].default_value))
         
         #MISCELLANEOUS NODE TYPES
     elif node_type == "FRAME":
-        print("FRAME")
+        print "FRAME"
     
     elif node_type == "REROUTE":
-        print("REROUTE")
+        print "REROUTE"
     
     elif node_type == "SCRIPT":
-        print("SCRIPT")
+        print "SCRIPT"
         text += (" mode=\"%s\"" % node.mode)
         if node.mode == 'EXTERNAL':
             if node.filepath:

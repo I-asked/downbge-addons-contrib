@@ -18,6 +18,7 @@ Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 END GPL LICENCE BLOCK
 '''
 
+from __future__ import absolute_import
 import bpy
 import bmesh
 from mathutils import Vector
@@ -125,7 +126,7 @@ def update_mesh(obj, d):
         num_points = len(point_list)
         num_edges_to_add = num_points-1
 
-        for i in range(num_edges_to_add):
+        for i in xrange(num_edges_to_add):
             oe.add(1)
             ov.add(2)
 
@@ -152,7 +153,7 @@ def unselect_nonintersecting(bm, d_edges, edge_indices):
         reserved_edges = set(edge_indices) - set(d_edges)
         for edge in reserved_edges:
             bm.edges[edge].select = False
-        print("unselected {}, non intersecting edges".format(reserved_edges))
+        print "unselected {}, non intersecting edges".format(reserved_edges)
 
 
 class IntersectAllEdges(bpy.types.Operator):
@@ -182,6 +183,6 @@ class IntersectAllEdges(bpy.types.Operator):
             unselect_nonintersecting(bm, d.keys(), edge_indices)
             update_mesh(obj, d)
         else:
-            print('must be in edit mode')
+            print 'must be in edit mode'
 
-        return {'FINISHED'}
+        return set(['FINISHED'])

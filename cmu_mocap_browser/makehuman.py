@@ -16,6 +16,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import division
+from __future__ import absolute_import
 import bpy
 from mathutils import Matrix, Quaternion
 from math import radians
@@ -82,7 +84,7 @@ class CMUMocapAlignArmatures(bpy.types.Operator):
     #
     bl_idname = "object.cmu_align"
     bl_label = "Align selected armatures at frame 0"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     def execute(self, context):
         cml = context.user_preferences.addons['cmu_mocap_browser'].preferences
@@ -180,7 +182,7 @@ class CMUMocapAlignArmatures(bpy.types.Operator):
         # record pose
         bpy.ops.pose.select_all(action='SELECT')
         bpy.ops.anim.keyframe_insert_menu(type='LocRotScale')
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class CMUMocapTransferer(bpy.types.Operator):
@@ -189,7 +191,7 @@ class CMUMocapTransferer(bpy.types.Operator):
     #
     bl_idname = "object.cmu_transfer"
     bl_label = "Transfer an animation to a MakeHuman armature"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     timer = None
     bindings = None
@@ -229,7 +231,7 @@ class CMUMocapTransferer(bpy.types.Operator):
             self.frame += 1
             if self.frame > self.end_frame:
                 return self.cancel(context)
-        return {'PASS_THROUGH'}
+        return set(['PASS_THROUGH'])
 
     def execute(self, context):
         cml = context.user_preferences.addons['cmu_mocap_browser'].preferences
@@ -255,7 +257,7 @@ class CMUMocapTransferer(bpy.types.Operator):
                     bpy.ops.pose.constraint_add(type='IK')
                 c = DPB[db].constraints["IK"]
                 c.name = name
-                for i in range(3):
+                for i in xrange(3):
                     bpy.ops.constraint.move_up(constraint=name, owner='BONE')
             c = DPB[db].constraints[name]
             c.target = self.src
@@ -290,7 +292,7 @@ class CMUMocapTransferer(bpy.types.Operator):
         context.window_manager.modal_handler_add(self)
         self.timer = context.window_manager.\
             event_timer_add(0.001, context.window)
-        return {'RUNNING_MODAL'}
+        return set(['RUNNING_MODAL'])
 
     def cancel(self, context):
         bpy.context.scene.frame_set(bpy.context.scene.frame_current)

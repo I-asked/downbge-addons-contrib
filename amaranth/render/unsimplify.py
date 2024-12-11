@@ -18,6 +18,7 @@ Handy option when you want to simplify the 3D View but unsimplify during
 render. Find it on the Simplify panel under Scene properties.
 """
 
+from __future__ import absolute_import
 import bpy
 from amaranth import utils
 

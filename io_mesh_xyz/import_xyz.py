@@ -16,9 +16,13 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import division
+from __future__ import absolute_import
 import bpy
 from math import pi, sqrt
 from mathutils import Vector, Matrix
+from io import open
+from itertools import izip
 
 # -----------------------------------------------------------------------------
 #                                                  Atom and element data
@@ -237,7 +241,7 @@ def read_xyz_file(filepath_xyz,radiustype):
             line = line.rstrip()
             
             all_atoms= []
-            for i in range(number_atoms):
+            for i in xrange(number_atoms):
 
 
                 # This is a guarantee that only the total number of atoms of the
@@ -685,11 +689,11 @@ def build_frames(frame_delta, frame_skip):
            
         if j % frame_skip == 0:
            
-            for elements_frame, elements_structure in zip(frame,STRUCTURE):
+            for elements_frame, elements_structure in izip(frame,STRUCTURE):
              
                 key = elements_structure.shape_key_add()
     
-                for atom_frame, atom_structure in zip(elements_frame, key.data):
+                for atom_frame, atom_structure in izip(elements_frame, key.data):
     
                     atom_structure.co = (atom_frame.location 
                                        - elements_structure.location)

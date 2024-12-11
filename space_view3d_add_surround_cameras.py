@@ -16,6 +16,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import division
+from __future__ import absolute_import
 bl_info = {
     "name": "Surround Projection Tools",
     "author": "Cole Ingraham",
@@ -60,7 +62,7 @@ class AddSurroundCamerasPanel(bpy.types.Panel):
     bl_region_type = 'TOOLS'
     bl_label = "Surround Projection"
     bl_category = 'Tools'
-    bl_options = {'DEFAULT_CLOSED'}
+    bl_options = set(['DEFAULT_CLOSED'])
 
     def draw(self, context):
         layout = self.layout
@@ -94,7 +96,7 @@ class AddSurroundCamerasOperator(bpy.types.Operator):
     bl_idname = 'objects.add_surround_cameras'
     bl_label = "Add Cameras"
     bl_description = "Add n cameras"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     @classmethod
     def poll(cls, context):
@@ -113,7 +115,7 @@ class AddSurroundCamerasOperator(bpy.types.Operator):
             obj_origin.name = CAMERA_ORIGIN_NAME
             obj_origin.location = scene.cursor_location
 
-        for i in range(0,numScreens):
+        for i in xrange(0,numScreens):
 
             # add a new camer
             bpy.ops.object.camera_add()
@@ -142,7 +144,7 @@ class AddSurroundCamerasOperator(bpy.types.Operator):
         scene.objects.active = obj_origin
 
         context.window_manager.previous_num_surround_screens = numScreens
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # operator for creating new linked scenes for each camera
@@ -150,7 +152,7 @@ class AddSurroundScenesOperator(bpy.types.Operator):
     bl_idname = 'scene.add_linked_scenes_for_surround_cameras'
     bl_label = "Make Scenes"
     bl_description = "Creates new scenes with linked object data for each camera"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     @classmethod
     def poll(cls, context):
@@ -164,7 +166,7 @@ class AddSurroundScenesOperator(bpy.types.Operator):
         sceneName = scene_base.name
         renderpath = scene_base.render.filepath
 
-        for i in range(0, numScreens):
+        for i in xrange(0, numScreens):
 
             thisScene = sceneName + "-Camera" + str(i)
 
@@ -183,7 +185,7 @@ class AddSurroundScenesOperator(bpy.types.Operator):
 
         context.screen.scene = scene_base
         context.window_manager.surround_screens_init = True
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # operator for removing the surround scenes
@@ -191,7 +193,7 @@ class RemoveSurroundScenesOperator(bpy.types.Operator):
     bl_idname = 'objects.remove_linked_scenes_for_surround_cameras'
     bl_label = "Remove Scenes"
     bl_description = "Removes all surround scenes"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     @classmethod
     def poll(cls, context):
@@ -205,7 +207,7 @@ class RemoveSurroundScenesOperator(bpy.types.Operator):
                 bpy.data.scenes.remove(scene)
 
         context.window_manager.surround_screens_init = False
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # operator for removing the surround cameras/scenes
@@ -213,7 +215,7 @@ class RemoveSurroundCamerasOperator(bpy.types.Operator):
     bl_idname = 'objects.remove_surround_cameras'
     bl_label = "Remove Cameras"
     bl_description = "Removes all surround cameras"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     @classmethod
     def poll(cls, context):
@@ -232,7 +234,7 @@ class RemoveSurroundCamerasOperator(bpy.types.Operator):
                 scene.objects.unlink(obj)
 
         context.window_manager.previous_num_surround_screens = -1
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 

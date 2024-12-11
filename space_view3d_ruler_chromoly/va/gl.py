@@ -18,6 +18,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import division
+from __future__ import absolute_import
 import math
 
 import bpy
@@ -28,11 +30,11 @@ from mathutils import Matrix, Euler, Vector, Quaternion
 import bgl
 #geo = mathutils.geometry
 
-class GLSettings:
+class GLSettings(object):
     def __init__(self, context):
         rv3d = context.region_data
         persmat = rv3d.perspective_matrix
-        flatten_persmat = [persmat[i][j] for i in range(4) for j in range(4)]
+        flatten_persmat = [persmat[i][j] for i in xrange(4) for j in xrange(4)]
         self.persmat_buffer = bgl.Buffer(bgl.GL_FLOAT, 16, flatten_persmat)
 
         # GL_BLEND
@@ -90,7 +92,7 @@ def draw_circle(x, y, radius, subdivide, poly=False):
         bgl.glVertex2f(x, y)
     else:
         bgl.glBegin(bgl.GL_LINE_LOOP)
-    for i in range(subdivide):
+    for i in xrange(subdivide):
         bgl.glVertex2f(x + radius * math.cos(r), y + radius * math.sin(r))
         r += dr
     bgl.glEnd()
@@ -195,7 +197,7 @@ def draw_arc12(x, y, radius, start_angle, end_angle, subdivide):  # いずれ削
     m = e.to_matrix()
 
     bgl.glBegin(bgl.GL_LINE_STRIP)
-    for i in range(subdivide + 2):
+    for i in xrange(subdivide + 2):
         v1 = v * radius
         bgl.glVertex2f(x + v1[0], y + v1[1])
         v = v * m
@@ -220,7 +222,7 @@ def draw_quad_fan(x, y, inner_radius, outer_radius,
     d = (end - start) / edgenum
     a = start
     bgl.glBegin(bgl.GL_QUAD_STRIP)
-    for i in range(edgenum + 1):
+    for i in xrange(edgenum + 1):
         bgl.glVertex2f(x + inner_radius * math.cos(a),
                        y + inner_radius * math.sin(a))
         bgl.glVertex2f(x + outer_radius * math.cos(a),
@@ -238,7 +240,7 @@ def draw_arc_get_vectors(x, y, radius, start_angle, end_angle, edgenum=16):
     d = (end - start) / edgenum
     a = start
     l = []
-    for i in range(edgenum + 1):
+    for i in xrange(edgenum + 1):
         l.append(Vector([x + radius * math.cos(a), y + radius * math.sin(a)]))
         a += d
     return l
@@ -297,7 +299,7 @@ def draw_sun(x, y, radius, subdivide=16, raydirections=[],
     draw_circle(x, y, radius, subdivide)
     bgl.glBegin(bgl.GL_LINES)
     if isinstance(raylength, (int, float)):
-        llist = [raylength for i in range(len(raydirections))]
+        llist = [raylength for i in xrange(len(raydirections))]
     else:
         llist = raylength
     for i, angle in enumerate(raydirections):

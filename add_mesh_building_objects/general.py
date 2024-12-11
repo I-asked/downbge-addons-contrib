@@ -36,12 +36,14 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import division
+from __future__ import absolute_import
 import bpy
 from bpy_extras import object_utils
 from math import atan
 from mathutils import Vector
 
-class General:
+class General(object):
     def __init__(self,rise,run,N):
         self.stop=float(N)*Vector([run,0,rise])
         self.slope=rise/run

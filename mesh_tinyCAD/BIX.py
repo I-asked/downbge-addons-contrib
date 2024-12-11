@@ -18,6 +18,8 @@ Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 END GPL LICENCE BLOCK
 '''
 
+from __future__ import division
+from __future__ import absolute_import
 import bpy
 import bmesh
 from mathutils import geometry
@@ -38,11 +40,11 @@ def add_line_to_bisection(self):
 
     if not len(edges) == 2:
         msg = "select two coplanar non parallel edges"
-        self.report({"WARNING"}, msg)
+        self.report(set(["WARNING"]), msg)
         return
 
     [[v1, v2], [v3, v4]] = [[v.co for v in e.verts] for e in edges]
-    print('vectors found:\n', v1, '\n', v2, '\n', v3, '\n', v4)
+    print 'vectors found:\n', v1, '\n', v2, '\n', v3, '\n', v4
 
     dist1 = (v1-v2).length
     dist2 = (v3-v4).length
@@ -52,7 +54,7 @@ def add_line_to_bisection(self):
 
     if not cm.test_coplanar(edge1, edge2):
         msg = "edges must be coplanar non parallel edges"
-        self.report({"WARNING"}, msg)
+        self.report(set(["WARNING"]), msg)
         return
 
     # get pt and pick fartest vertex from (projected) intersections
@@ -83,7 +85,7 @@ class LineOnBisection(bpy.types.Operator):
 
     bl_idname = 'mesh.linetobisect'
     bl_label = 'bix line to bisector'
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     @classmethod
     def poll(self, context):
@@ -92,4 +94,4 @@ class LineOnBisection(bpy.types.Operator):
 
     def execute(self, context):
         add_line_to_bisection(self)
-        return {'FINISHED'}
+        return set(['FINISHED'])

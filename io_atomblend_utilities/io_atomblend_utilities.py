@@ -16,12 +16,15 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import division
+from __future__ import absolute_import
 import os
 import bpy
 import bmesh
 from mathutils import Vector
 from math import sqrt
 from copy import copy
+from io import open
 
 # -----------------------------------------------------------------------------
 #                                                         Atom and element data
@@ -254,7 +257,7 @@ def choose_objects(action_type,
     for atom in change_objects:
         if len(atom.children) != 0:
             for atom_child in atom.children:
-                if atom_child.type in {'SURFACE', 'MESH', 'META'}: 
+                if atom_child.type in set(['SURFACE', 'MESH', 'META']): 
                     modify_objects(action_type, 
                                    atom_child,
                                    radius_all, 
@@ -263,7 +266,7 @@ def choose_objects(action_type,
                                    radius_type_ionic,
                                    sticks_all)
         else:
-            if atom.type in {'SURFACE', 'MESH', 'META'}:
+            if atom.type in set(['SURFACE', 'MESH', 'META']):
                 modify_objects(action_type, 
                                    atom,  
                                    radius_all, 
@@ -358,7 +361,7 @@ def modify_objects(action_type,
             # If the atom shape shall not be changed, then:
             if scn.replace_objs == '0':
                 atom.active_material = new_material 
-                return {'FINISHED'}
+                return set(['FINISHED'])
             # If the atom shape shall change, then:
             else:
                 new_atom = draw_obj(scn.replace_objs, atom)
@@ -420,7 +423,7 @@ def separate_atoms(scn):
         
     # Do nothing if it is not a dupliverts structure.
     if not atom.dupli_type == "VERTS":
-       return {'FINISHED'}
+       return set(['FINISHED'])
         
     bm = bmesh.from_edit_mesh(atom.data)
     locations = []
@@ -505,7 +508,7 @@ def draw_obj_material(material_type, material):
     # this makes sense: Imagine, an other object uses the same material as the 
     # selected one. After changing the material of the selected object the old 
     # material should certainly not change and remain the same.
-    if material_type in {'1','2','3','4'}:
+    if material_type in set(['1','2','3','4']):
         if "_repl" in material.name:
             pos = material.name.rfind("_repl")
             if material.name[pos+5:].isdigit():
@@ -577,7 +580,7 @@ def draw_obj(atom_shape, atom):
             location=atom.location, 
             rotation=(0, 0, 0), 
             layers=current_layers)
-    if atom_shape in {'5a','5b','5c','5d','5e'}: #Icosphere        
+    if atom_shape in set(['5a','5b','5c','5d','5e']): #Icosphere        
         index = {'5a':1,'5b':2,'5c':3,'5d':4,'5e':5}  
         bpy.ops.mesh.primitive_ico_sphere_add(
             subdivisions=int(index[atom_shape]), 
@@ -865,13 +868,13 @@ def custom_datafile_change_atom_props():
     for atom in bpy.context.selected_objects:
         if len(atom.children) != 0:
             child = atom.children[0]
-            if child.type in {'SURFACE', 'MESH', 'META'}:
+            if child.type in set(['SURFACE', 'MESH', 'META']):
                 for element in ELEMENTS:
                     if element.name in atom.name:
                         child.scale = (element.radii[0],) * 3
                         child.active_material.diffuse_color = element.color
         else:
-            if atom.type in {'SURFACE', 'MESH', 'META'}:
+            if atom.type in set(['SURFACE', 'MESH', 'META']):
                 for element in ELEMENTS:
                     if element.name in atom.name:
                         atom.scale = (element.radii[0],) * 3

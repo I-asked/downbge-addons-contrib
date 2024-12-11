@@ -28,7 +28,7 @@ __date__ = "20 Jun 2015"
 DEBUG = False
 
 # Properties used in this add-on.
-class CPUVProperties():
+class CPUVProperties(object):
     default = None
     selseq = None
     uvmap = None
@@ -41,25 +41,25 @@ class CPUVProperties():
         self.transuv = CPUVTransUVOpsProps()
 
 
-class CPUVDefaultOpsProps():
+class CPUVDefaultOpsProps(object):
     src_uv_map = None
     src_obj = None
     src_faces = None
 
 
-class CPUVSelSeqOpsProps():
+class CPUVSelSeqOpsProps(object):
     src_uv_map = None
     src_obj = None
     src_faces = None
 
 
-class CPUVUVMapOpsProps():
+class CPUVUVMapOpsProps(object):
     src_uv_map = None
     src_obj = None
     src_faces = None
 
 
-class CPUVTransUVOpsProps():
+class CPUVTransUVOpsProps(object):
     topology_copied = []
 
 

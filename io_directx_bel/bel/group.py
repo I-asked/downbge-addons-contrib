@@ -8,6 +8,7 @@ naming_method = 2   create new, rename existing,
 naming_method = 3   create new, replace existing
 '''
 
+from __future__ import absolute_import
 def new(name,naming_method):
     if name in bpy.data.groups and naming_method :
         grp = bpy.data.groups[name]

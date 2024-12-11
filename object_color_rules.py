@@ -16,6 +16,8 @@
 #
 # ***** END GPL LICENCE BLOCK *****
 
+from __future__ import absolute_import
+from itertools import izip
 bl_info = {
     "name": "Object Color Rules",
     "author": "Campbell Barton",
@@ -38,7 +40,7 @@ def test_name(rule, needle, haystack):
         return (needle in haystack)
 
 
-class rule_test:
+class rule_test(object):
     __slots__ = ()
 
     def __new__(cls, *args, **kwargs):
@@ -61,7 +63,7 @@ class rule_test:
     def GROUP(obj, rule, cache):
         if not cache:
             match_name = rule.match_name
-            objects = {o for g in bpy.data.groups if test_name(rule, match_name, g.name) for o in g.objects}
+            objects = set([o for g in bpy.data.groups if test_name(rule, match_name, g.name) for o in g.objects])
             cache["objects"] = objects
         else:
             objects = cache["objects"]
@@ -81,7 +83,7 @@ class rule_test:
         match_layers = rule.match_layers[:]
         obj_layers = obj.layers[:]
 
-        return any((match_layers[i] and obj_layers[i]) for i in range(20))
+        return any((match_layers[i] and obj_layers[i]) for i in xrange(20))
 
     @staticmethod
     def TYPE(obj, rule, cache):
@@ -110,7 +112,7 @@ class rule_test:
             return False
 
 
-class rule_draw:
+class rule_draw(object):
     __slots__ = ()
 
     def __new__(cls, *args, **kwargs):
@@ -162,7 +164,7 @@ def object_colors_calc(rules, objects):
     rules_cb = [getattr(rule_test, rule.type) for rule in rules]
     rules_blend = [(1.0 - rule.factor, rule.factor) for rule in rules]
     rules_color = [Color(rule.color) for rule in rules]
-    rules_cache = [{} for i in range(len(rules))]
+    rules_cache = [{} for i in xrange(len(rules))]
     rules_inv = [rule.use_invert for rule in rules]
 
     for obj in objects:
@@ -170,7 +172,7 @@ def object_colors_calc(rules, objects):
         obj_color = Color(obj.color[0:3])
 
         for (rule, test_cb, color, blend, cache, use_invert) \
-             in zip(rules, rules_cb, rules_color, rules_blend, rules_cache, rules_inv):
+             in izip(rules, rules_cb, rules_color, rules_blend, rules_cache, rules_inv):
 
             if test_cb(obj, rule, cache) is not use_invert:
                 if is_set is False:
@@ -201,20 +203,20 @@ def object_colors_select(rule, objects):
 def object_colors_rule_validate(rule, report):
     rule_type = rule.type
 
-    if rule_type in {'NAME', 'DATA', 'GROUP', 'MATERIAL'}:
+    if rule_type in set(['NAME', 'DATA', 'GROUP', 'MATERIAL']):
         if rule.use_match_regex:
             import re
             try:
                 re.compile(rule.match_name)
-            except Exception as e:
-                report({'ERROR'}, "Rule %r: %s" % (rule.name, str(e)))
+            except Exception, e:
+                report(set(['ERROR']), "Rule %r: %s" % (rule.name, str(e)))
                 return False
 
     elif rule_type == 'EXPR':
         try:
             compile(rule.match_expr, rule.name, 'eval')
-        except Exception as e:
-            report({'ERROR'}, "Rule %r: %s" % (rule.name, str(e)))
+        except Exception, e:
+            report(set(['ERROR']), "Rule %r: %s" % (rule.name, str(e)))
             return False
 
     return True
@@ -305,7 +307,7 @@ class OBJECT_OT_color_rules_assign(Operator):
     """Assign colors to objects based on user rules"""
     bl_idname = "object.color_rules_assign"
     bl_label = "Assign Colors"
-    bl_options = {'UNDO'}
+    bl_options = set(['UNDO'])
 
     use_selection = BoolProperty(
             name="Selected",
@@ -323,34 +325,34 @@ class OBJECT_OT_color_rules_assign(Operator):
         rules = scene.color_rules[:]
         for rule in rules:
             if not object_colors_rule_validate(rule, self.report):
-                return {'CANCELLED'}
+                return set(['CANCELLED'])
 
         object_colors_calc(rules, objects)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class OBJECT_OT_color_rules_select(Operator):
     """Select objects matching the current rule"""
     bl_idname = "object.color_rules_select"
     bl_label = "Select Rule"
-    bl_options = {'UNDO'}
+    bl_options = set(['UNDO'])
 
     def execute(self, context):
         scene = context.scene
         rule = scene.color_rules[scene.color_rules_active_index]
 
         if not object_colors_rule_validate(rule, self.report):
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
 
         objects = context.visible_objects
         object_colors_select(rule, objects)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class OBJECT_OT_color_rules_add(Operator):
     bl_idname = "object.color_rules_add"
     bl_label = "Add Color Layer"
-    bl_options = {'UNDO'}
+    bl_options = set(['UNDO'])
 
     def execute(self, context):
         scene = context.scene
@@ -358,13 +360,13 @@ class OBJECT_OT_color_rules_add(Operator):
         rule = rules.add()
         rule.name = "Rule.%.3d" % len(rules)
         scene.color_rules_active_index = len(rules) - 1
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class OBJECT_OT_color_rules_remove(Operator):
     bl_idname = "object.color_rules_remove"
     bl_label = "Remove Color Layer"
-    bl_options = {'UNDO'}
+    bl_options = set(['UNDO'])
 
     def execute(self, context):
         scene = context.scene
@@ -372,13 +374,13 @@ class OBJECT_OT_color_rules_remove(Operator):
         rules.remove(scene.color_rules_active_index)
         if scene.color_rules_active_index > len(rules) - 1:
             scene.color_rules_active_index = len(rules) - 1
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class OBJECT_OT_color_rules_move(Operator):
     bl_idname = "object.color_rules_move"
     bl_label = "Remove Color Layer"
-    bl_options = {'UNDO'}
+    bl_options = set(['UNDO'])
     direction = IntProperty()
 
     def execute(self, context):
@@ -389,9 +391,9 @@ class OBJECT_OT_color_rules_move(Operator):
         if index_new < len(rules) and index_new >= 0:
             rules.move(index, index_new)
             scene.color_rules_active_index = index_new
-            return {'FINISHED'}
+            return set(['FINISHED'])
         else:
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
 
 
 class ColorRule(bpy.types.PropertyGroup):

@@ -1,3 +1,5 @@
+from __future__ import division
+from __future__ import absolute_import
 import bpy
 import math
 import sys
@@ -17,7 +19,7 @@ bpy.types.Scene.SearchAndSelectOt = bpy.props.StringProperty(default="Object nam
 class SearchAndSelectOt(bpy.types.Operator):
     bl_idname = "object.search_and_select_osc"
     bl_label = "Search And Select"
-    bl_options = {"REGISTER", "UNDO"}
+    bl_options = set(["REGISTER", "UNDO"])
     
     start = bpy.props.BoolProperty(name="Start With", default=True)
     count = bpy.props.BoolProperty(name="Contain", default=True)
@@ -35,7 +37,7 @@ class SearchAndSelectOt(bpy.types.Operator):
             if self.end:
                 if objeto.name.count(variableNombre):
                     objeto.select = True                          
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 ##-------------------------RENAME OBJECTS----------------------------------
@@ -46,12 +48,12 @@ bpy.types.Scene.RenameObjectOt = bpy.props.StringProperty(default="Type here")
 class renameObjectsOt (bpy.types.Operator):
     bl_idname = "object.rename_objects_osc"
     bl_label = "Rename Objects"
-    bl_options = {"REGISTER", "UNDO"}
+    bl_options = set(["REGISTER", "UNDO"])
     def execute(self,context):
         listaObj = bpy.context.selected_objects[:]
         for objeto in listaObj:
             objeto.name = bpy.context.scene.RenameObjectOt
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 
@@ -60,19 +62,19 @@ class renameObjectsOt (bpy.types.Operator):
 class oscRemModifiers (bpy.types.Operator):
     bl_idname = "object.modifiers_remove_osc"
     bl_label = "Remove modifiers"
-    bl_options = {"REGISTER", "UNDO"}
+    bl_options = set(["REGISTER", "UNDO"])
     def execute(self,context):
         for objeto in bpy.context.selected_objects:
             for modificador in objeto.modifiers:
-                print(modificador.type)
+                print modificador.type
                 bpy.context.scene.objects.active=objeto
                 bpy.ops.object.modifier_remove(modifier=modificador.name)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class oscApplyModifiers (bpy.types.Operator):
     bl_idname = "object.modifiers_apply_osc"
     bl_label = "Apply modifiers"
-    bl_options = {"REGISTER", "UNDO"}
+    bl_options = set(["REGISTER", "UNDO"])
     def execute(self,context):
         for objeto in bpy.context.selected_objects:
             bpy.ops.object.select_all(action='DESELECT')
@@ -85,9 +87,9 @@ class oscApplyModifiers (bpy.types.Operator):
                     bpy.ops.object.modifier_apply(apply_as="DATA", modifier=modificador.name)
                 except:
                     bpy.ops.object.modifier_remove(modifier=modificador.name) 
-                    print("* Modifier %s skipping apply" % (modificador.name))   
+                    print "* Modifier %s skipping apply" % (modificador.name)   
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 ## ------------------------------------ RELINK OBJECTS--------------------------------------
@@ -111,7 +113,7 @@ def relinkObjects (self):
 
     for OBJETO in OBJECTS:
         if OBJETO.users != len(bpy.data.scenes):
-            print(OBJETO.name)
+            print OBJETO.name
             OBJETO.select = True
 
     for SCENE in LISTSCENE:
@@ -124,12 +126,12 @@ def relinkObjects (self):
 class OscRelinkObjectsBetween (bpy.types.Operator):
     bl_idname = "object.relink_objects_between_scenes"
     bl_label = "Relink Objects Between Scenes"
-    bl_options = {"REGISTER", "UNDO"}
+    bl_options = set(["REGISTER", "UNDO"])
 
 
     def execute (self, context):
         relinkObjects(self)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 ## ------------------------------------ COPY GROUPS AND LAYERS--------------------------------------
@@ -167,12 +169,12 @@ def CopyObjectGroupsAndLayers (self):
 class OscCopyObjectGAL (bpy.types.Operator):
     bl_idname = "object.copy_objects_groups_layers"
     bl_label = "Copy Groups And Layers"
-    bl_options = {"REGISTER", "UNDO"}
+    bl_options = set(["REGISTER", "UNDO"])
 
 
     def execute (self, context):
         CopyObjectGroupsAndLayers (self)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 
@@ -236,7 +238,7 @@ def ObjectDistributeOscurart (self, X, Y, Z):
             chunky+=chunkglobal[1]
             chunkz+=chunkglobal[2]
     else:  
-        self.report({'ERROR'}, "Selection is only 1!")      
+        self.report(set(['ERROR']), "Selection is only 1!")      
     
 class DialogDistributeOsc(bpy.types.Operator):
     bl_idname = "object.distribute_osc"
@@ -247,7 +249,7 @@ class DialogDistributeOsc(bpy.types.Operator):
     
     def execute(self, context):
         ObjectDistributeOscurart(self, self.Boolx,self.Booly,self.Boolz)
-        return {'FINISHED'}
+        return set(['FINISHED'])
     def invoke(self, context, event):
         self.Boolx = True
         self.Booly = True
@@ -270,7 +272,7 @@ def DefSetLayersToOtherScenes():
                 bpy.context.screen.scene = scene
                 object.layers = lyrs  
             else:
-                print ("* %s is not in %s" % (object.name, scene.name))    
+                print "* %s is not in %s" % (object.name, scene.name)    
   
         
     bpy.context.screen.scene = actsc        
@@ -279,12 +281,12 @@ def DefSetLayersToOtherScenes():
 class SetLayersToOtherScenes (bpy.types.Operator):
     bl_idname = "object.set_layers_to_other_scenes"
     bl_label = "Copy actual Layers to Other Scenes"
-    bl_options = {"REGISTER", "UNDO"}
+    bl_options = set(["REGISTER", "UNDO"])
 
 
     def execute (self, context):
         DefSetLayersToOtherScenes()
-        return {'FINISHED'}
+        return set(['FINISHED'])
     
     
       
@@ -326,12 +328,12 @@ def DefRenderOnlyInCamera():
 class RenderOnlyInCamera (bpy.types.Operator):
     bl_idname = "group.group_in_out_camera"
     bl_label = "Make a group for objects in outer camera"
-    bl_options = {"REGISTER", "UNDO"}
+    bl_options = set(["REGISTER", "UNDO"])
 
 
     def execute (self, context):
         DefRenderOnlyInCamera()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 ##------------------------ DUPLICATE OBJECTS SYMMETRY ------------------------
@@ -345,7 +347,7 @@ def duplicateSymmetrical (self, disconect):
         bpy.context.scene.objects.active = objeto
         bpy.ops.object.duplicate(linked=1)
         OBDUP=bpy.context.active_object
-        print(OBDUP)
+        print OBDUP
         OBDUP.driver_add("location")
         OBDUP.animation_data.drivers[0].driver.expression = "-var"
         OBDUP.animation_data.drivers[0].driver.variables.new()
@@ -404,7 +406,7 @@ def duplicateSymmetrical (self, disconect):
 class oscDuplicateSymmetricalOp (bpy.types.Operator):
     bl_idname = "object.duplicate_object_symmetry_osc"
     bl_label = "Oscurart Duplicate Symmetrical"
-    bl_options = {"REGISTER", "UNDO"}
+    bl_options = set(["REGISTER", "UNDO"])
 
     desconecta = bpy.props.BoolProperty(name="Keep Connection", default=True)
 
@@ -412,4 +414,4 @@ class oscDuplicateSymmetricalOp (bpy.types.Operator):
 
         duplicateSymmetrical(self, self.desconecta)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])

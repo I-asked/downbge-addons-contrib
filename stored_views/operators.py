@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import bpy
 from bpy.props import IntProperty
 
@@ -19,7 +20,7 @@ class VIEW3D_stored_views_save(bpy.types.Operator):
         context.scene.stored_views.view_modified = False
         init_draw(context)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class VIEW3D_stored_views_set(bpy.types.Operator):
@@ -36,7 +37,7 @@ class VIEW3D_stored_views_set(bpy.types.Operator):
         context.scene.stored_views.view_modified = False
         init_draw(context)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class VIEW3D_stored_views_delete(bpy.types.Operator):
@@ -50,4 +51,4 @@ class VIEW3D_stored_views_delete(bpy.types.Operator):
         data = DataStore()
         data.delete(self.index)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])

@@ -28,9 +28,13 @@ http://code.google.com/p/blender-cod/
 
 """
 
+from __future__ import division
+from __future__ import absolute_import
 import bpy
 import os
 from datetime import datetime
+from io import open
+from itertools import izip
 
 def save(self, context, filepath="",
          use_version='6',
@@ -101,7 +105,7 @@ def save(self, context, filepath="",
 
         filepath_split = os.path.splitext(filepath)
 
-        for i_frame, frame in enumerate(range(use_frame_start,
+        for i_frame, frame in enumerate(xrange(use_frame_start,
                                               use_frame_end + frame_order,
                                               frame_order
                                               ),
@@ -328,7 +332,7 @@ def _write(self, context, filepath,
         if roots != 1:
             warning_string = "Warning: %i root bones found in armature object '%s'\n" \
                              % (roots, armature.name)
-            print(warning_string)
+            print warning_string
             file.write("// %s" % warning_string)
 
         # Look up table for bone indices
@@ -406,7 +410,7 @@ def _write(self, context, filepath,
 
             weight_group_list = []
             for weights in vWeightList:
-                weight_group_list.append(sorted(zip(weights, groupIndices), reverse=True))
+                weight_group_list.append(sorted(izip(weights, groupIndices), reverse=True))
 
         # Use uniquified vert sets and count the verts
         for i_vert, vert in enumerate(verts_unique[i]):
@@ -456,7 +460,7 @@ def _write(self, context, filepath,
                 if c_bones == 0:
                     warning_string = "Warning: No bone influence found for vertex %i, binding to bone %i\n" \
                                      % (v.index, bone_index)
-                    print(warning_string)
+                    print warning_string
                     file.write("// %s" % warning_string)
                     file.write("BONES 1\n")
                     file.write("BONE %i 0.000001\n\n" % bone_index) # HACK: Is a minimum weight a good idea?
@@ -498,7 +502,7 @@ def _write(self, context, filepath,
 
                 warning_string = "Warning: Assigned material with index %i not found, falling back to first\n" \
                                   % f.material_index
-                print(warning_string)
+                print warning_string
                 file.write("// %s" % warning_string)
 
             else:
@@ -510,7 +514,7 @@ def _write(self, context, filepath,
 
                     warning_string = "Warning: Material \"%s\" not mapped, falling back to first\n" \
                                       % mat.name
-                    print(warning_string)
+                    print warning_string
                     file.write("// %s" % warning_string)
 
             # Support for vertex colors
@@ -697,7 +701,7 @@ def BPyMesh_meshWeight2List(vgroup, me):
         return [], []
 
     else:
-        vWeightList = [[0.0] * len_groupNames for i in range(len(me.vertices))]
+        vWeightList = [[0.0] * len_groupNames for i in xrange(len(me.vertices))]
 
     for i, v in enumerate(me.vertices):
         for g in v.groups:
@@ -729,4 +733,4 @@ def meshNormalizedWeights(vgroup, me, weight_min, weight_min_threshold):
     return groupNames, vWeightList
 
 def _skip_notice(ob_name, mesh_name, notice):
-    print("\nSkipped object \"%s\" (mesh \"%s\"): %s" % (ob_name, mesh_name, notice))
+    print "\nSkipped object \"%s\" (mesh \"%s\"): %s" % (ob_name, mesh_name, notice)

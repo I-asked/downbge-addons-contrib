@@ -16,6 +16,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import absolute_import
 bl_info = {
     "name": "Oscurart Tools",
     "author": "Oscurart, CodemanX",
@@ -44,7 +45,7 @@ from oscurart_tools.oscurart_render import *
 from oscurart_tools.oscurart_overrides import *
 from oscurart_tools.oscurart_animation import *
 
-class View3DOscPanel():
+class View3DOscPanel(object):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
 
@@ -82,7 +83,7 @@ class OscPanelControl(View3DOscPanel, bpy.types.Panel):
         col.prop(bpy.context.scene, "osc_files_tools", text="Files", icon="IMASEL")
         col.prop(bpy.context.scene, "osc_overrides_tools", text="Overrides", icon="GREASEPENCIL")
 # POLLS
-class OscPollObject():
+class OscPollObject(object):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
 
@@ -91,7 +92,7 @@ class OscPollObject():
         return context.scene.osc_object_tools
 
 
-class OscPollMesh():
+class OscPollMesh(object):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
 
@@ -100,7 +101,7 @@ class OscPollMesh():
         return context.scene.osc_mesh_tools
 
 
-class OscPollShapes():
+class OscPollShapes(object):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
 
@@ -108,7 +109,7 @@ class OscPollShapes():
     def poll(cls, context):
         return context.scene.osc_shapes_tools
 
-class OscPollRender():
+class OscPollRender(object):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
 
@@ -116,7 +117,7 @@ class OscPollRender():
     def poll(cls, context):
         return context.scene.osc_render_tools
 
-class OscPollFiles():
+class OscPollFiles(object):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
 
@@ -124,7 +125,7 @@ class OscPollFiles():
     def poll(cls, context):
         return context.scene.osc_files_tools
 
-class OscPollOverrides():
+class OscPollOverrides(object):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
 
@@ -132,7 +133,7 @@ class OscPollOverrides():
     def poll(cls, context):
         return context.scene.osc_overrides_tools
 
-class OscPollAnimation():
+class OscPollAnimation(object):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
 

@@ -36,9 +36,11 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import division
+from __future__ import absolute_import
 from mathutils import Vector
 
-class Retainers:
+class Retainers(object):
     def __init__(self,G,w,h,wP,wT,hR,n, rEnable, lEnable):
         self.G = G #General
         self.w=w #retainer width
@@ -52,14 +54,14 @@ class Retainers:
         self.Create()
 
     def Create(self):
-        for i in range(self.nR):
+        for i in xrange(self.nR):
             coords = []
             offset=(i+1)*Vector([0,0,self.sp])
             coords.append(offset)
             coords.append(self.G.stop + offset)
             coords.append(offset + Vector([0,self.w,0]))
             coords.append(self.G.stop + offset + Vector([0,self.w,0]))
-            for j in range(4):
+            for j in xrange(4):
                 coords.append(coords[j] + Vector([0,0,self.h]))
             #centre in posts
             for j in coords:

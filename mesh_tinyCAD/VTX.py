@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import bpy
 import sys
 import bmesh
@@ -50,7 +51,7 @@ def checkVTX(self, context):
     indices = cm.vertex_indices_from_edges_tuple(self.bm, self.selected_edges)
     if cm.duplicates(indices):
         msg = "edges share a vertex, degenerate case, returning early"
-        self.report({"WARNING"}, msg)
+        self.report(set(["WARNING"]), msg)
         return False
 
     # find which edges intersect
@@ -61,7 +62,7 @@ def checkVTX(self, context):
         coplanar = cm.test_coplanar(self.edge1, self.edge2)
         if not coplanar:
             msg = "parallel or not coplanar! returning early"
-            self.report({"WARNING"}, msg)
+            self.report(set(["WARNING"]), msg)
             return False
 
     return True
@@ -75,9 +76,9 @@ def doVTX(self):
     - If only one is None, then it's a projection onto a real edge (T)
     - Else, then the intersection lies on both edges (X)
     '''
-    print('point:', self.point)
-    print('edges selected:', self.idx1, self.idx2)
-    print('edges to use:', self.edges)
+    print 'point:', self.point
+    print 'edges selected:', self.idx1, self.idx2
+    print 'edges to use:', self.edges
 
     self.bm.verts.new((self.point))
 
@@ -148,4 +149,4 @@ class AutoVTX(bpy.types.Operator):
         if checkVTX(self, context):
             doVTX(self)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])

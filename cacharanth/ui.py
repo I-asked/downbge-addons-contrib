@@ -18,6 +18,7 @@
 
 # <pep8 compliant>
 
+from __future__ import absolute_import
 import bpy, os
 from bpy.types import Operator, Panel, UIList
 from bpy.props import *
@@ -34,7 +35,7 @@ class MESH_OP_MeshcacheRefresh(Operator):
 
     def execute(self, context):
         context.scene.frame_current = context.scene.frame_current
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class CACHARANTH_GroupSelect(Operator):
@@ -54,7 +55,7 @@ class CACHARANTH_GroupSelect(Operator):
     
     def execute(self,context):
         bpy.context.scene.meshcache_group = bpy.data.groups[int(self.group_select)].name
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 def MeshcacheFolderSet(context, filepath):
@@ -63,7 +64,7 @@ def MeshcacheFolderSet(context, filepath):
     fp =  filepath if os.path.isdir(filepath) else  os.path.dirname(filepath)
     for sc in bpy.data.scenes:
         sc.meshcache_folder = fp
-    return {'FINISHED'}
+    return set(['FINISHED'])
 
 
 class MeshcacheFolderSetButton(Operator, ImportHelper):
@@ -85,7 +86,7 @@ class MESH_UL_MeshcacheExcludeName(bpy.types.UIList):
 class MESH_OT_MeshcacheExcludeNameAdd(Operator):
     bl_idname = "buttons.meshcache_exclude_add"
     bl_label = "Add Exclude Rule"
-    bl_options = {'UNDO'}
+    bl_options = set(['UNDO'])
 
     def execute(self, context):
         scene = context.scene
@@ -93,13 +94,13 @@ class MESH_OT_MeshcacheExcludeNameAdd(Operator):
         rule = rules.add()
         rule.name = "Rule.%.3d" % len(rules)
         scene.meshcache_exclude_names_active_index = len(rules) - 1
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class MESH_OT_MeshcacheExcludeNameRemove(Operator):
     bl_idname = "buttons.meshcache_exclude_remove"
     bl_label = "Remove Exclude Rule"
-    bl_options = {'UNDO'}
+    bl_options = set(['UNDO'])
 
     def execute(self, context):
         scene = context.scene
@@ -107,7 +108,7 @@ class MESH_OT_MeshcacheExcludeNameRemove(Operator):
         rules.remove(scene.meshcache_exclude_names_active_index)
         if scene.meshcache_exclude_names_active_index > len(rules) - 1:
             scene.meshcache_exclude_names_active_index = len(rules) - 1
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class MeshcacheExcludeNames(bpy.types.PropertyGroup):
     name = StringProperty(

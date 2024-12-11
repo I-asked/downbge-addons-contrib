@@ -21,6 +21,8 @@ of your render, it also displays the size for border renders.
 
 On the 'Dimensions' panel, Render properties.
 """
+from __future__ import division
+from __future__ import absolute_import
 import bpy
 
 

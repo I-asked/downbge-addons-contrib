@@ -34,6 +34,7 @@ bl_info = {
 
 """Align Selected Objects"""
 
+from __future__ import absolute_import
 import bpy
 
 
@@ -43,7 +44,7 @@ class AlignUi(bpy.types.Panel):
     bl_label = "Simple Align"
     bl_context = "objectmode"
     bl_category = 'Tools'
-    bl_options = {'DEFAULT_CLOSED'}
+    bl_options = set(['DEFAULT_CLOSED'])
 
     def draw(self, context):
         layout = self.layout
@@ -163,7 +164,7 @@ class AlignOperator(bpy.types.Operator):
 
     def execute(self, context):
         main(context)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 #######################Align Location########################
 ## Align LocationAll
@@ -178,7 +179,7 @@ class AlignLocationOperator(bpy.types.Operator):
 
     def execute(self, context):
         LocAll(context)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 ## Align LocationX
 class AlignLocationXOperator(bpy.types.Operator):
     """"""
@@ -191,7 +192,7 @@ class AlignLocationXOperator(bpy.types.Operator):
 
     def execute(self, context):
         LocX(context)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 ## Align LocationY
 class AlignLocationYOperator(bpy.types.Operator):
     """"""
@@ -204,7 +205,7 @@ class AlignLocationYOperator(bpy.types.Operator):
 
     def execute(self, context):
         LocY(context)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 ## Align LocationZ
 class AlignLocationZOperator(bpy.types.Operator):
     """"""
@@ -217,7 +218,7 @@ class AlignLocationZOperator(bpy.types.Operator):
 
     def execute(self, context):
         LocZ(context)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 #######################Align Rotation########################
 ## Align RotationAll
@@ -232,7 +233,7 @@ class AlignRotationOperator(bpy.types.Operator):
 
     def execute(self, context):
         RotAll(context)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 ## Align RotationX
 class AlignRotationXOperator(bpy.types.Operator):
     """"""
@@ -245,7 +246,7 @@ class AlignRotationXOperator(bpy.types.Operator):
 
     def execute(self, context):
         RotX(context)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 ## Align RotationY
 class AlignRotationYOperator(bpy.types.Operator):
     """"""
@@ -258,7 +259,7 @@ class AlignRotationYOperator(bpy.types.Operator):
 
     def execute(self, context):
         RotY(context)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 ## Align RotationZ
 class AlignRotationZOperator(bpy.types.Operator):
     """"""
@@ -271,7 +272,7 @@ class AlignRotationZOperator(bpy.types.Operator):
 
     def execute(self, context):
         RotZ(context)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 #######################Align Scale########################
 ## Scale All
 class AlignScaleOperator(bpy.types.Operator):
@@ -285,7 +286,7 @@ class AlignScaleOperator(bpy.types.Operator):
 
     def execute(self, context):
         ScaleAll(context)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 ## Align ScaleX
 class AlignScaleXOperator(bpy.types.Operator):
     """"""
@@ -298,7 +299,7 @@ class AlignScaleXOperator(bpy.types.Operator):
 
     def execute(self, context):
         ScaleX(context)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 ## Align ScaleY
 class AlignScaleYOperator(bpy.types.Operator):
     """"""
@@ -311,7 +312,7 @@ class AlignScaleYOperator(bpy.types.Operator):
 
     def execute(self, context):
         ScaleY(context)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 ## Align ScaleZ
 class AlignScaleZOperator(bpy.types.Operator):
     """"""
@@ -324,7 +325,7 @@ class AlignScaleZOperator(bpy.types.Operator):
 
     def execute(self, context):
         ScaleZ(context)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 ## registring
 def register():

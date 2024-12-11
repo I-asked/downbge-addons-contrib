@@ -18,6 +18,7 @@ Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 END GPL LICENCE BLOCK
 '''
 
+from __future__ import absolute_import
 import bpy
 import bmesh
 import mathutils
@@ -40,11 +41,11 @@ def cut_visible_by_perpendicular(self):
 
     if not len(verts) == 2:
         msg = "select two vertices"
-        self.report({"WARNING"}, msg)
-        return {'CANCELLED'}
+        self.report(set(["WARNING"]), msg)
+        return set(['CANCELLED'])
 
     v1, v2 = [v.co for v in verts]
-    print('vectors found:\n', v1, '\n', v2)
+    print 'vectors found:\n', v1, '\n', v2
 
     mid_vec = v1.lerp(v2, 0.5)
     plane_no = v2 - mid_vec
@@ -71,7 +72,7 @@ class CutOnPerpendicular(bpy.types.Operator):
 
     bl_idname = 'mesh.cutonperp'
     bl_label = 'perp cutline for verts'
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     @classmethod
     def poll(self, context):
@@ -80,4 +81,4 @@ class CutOnPerpendicular(bpy.types.Operator):
 
     def execute(self, context):
         cut_visible_by_perpendicular(self)
-        return {'FINISHED'}
+        return set(['FINISHED'])

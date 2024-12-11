@@ -68,6 +68,7 @@
 
 #-----------------------------------------------------------
 # BEGIN NEW B2.5/Py3.2 CODE
+from __future__ import absolute_import
 import bpy
 from add_mesh_building_objects.general import General
 from add_mesh_building_objects.post import Posts
@@ -92,7 +93,7 @@ class stairs(bpy.types.Operator):
     """Add stair objects"""
     bl_idname = "mesh.stairs"
     bl_label = "Add Stairs"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
     bl_description = "Add stairs"
 
     # Stair types for enum:
@@ -558,4 +559,4 @@ class stairs(bpy.types.Operator):
                          self.string_n,
                          self.string_dis,
                          self.use_original)
-        return {'FINISHED'}
+        return set(['FINISHED'])

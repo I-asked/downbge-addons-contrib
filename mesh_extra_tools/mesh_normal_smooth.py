@@ -43,6 +43,8 @@ Additional links:
     e-mail: dolf {at} macouno {dot} com
 """
 
+from __future__ import division
+from __future__ import absolute_import
 import bpy, mathutils, math
 from bpy.props import IntProperty
 
@@ -167,7 +169,7 @@ class nsmooth_help(bpy.types.Operator):
 
 
 	def execute(self, context):
-		return {'FINISHED'}
+		return set(['FINISHED'])
 
 	def invoke(self, context, event):
 		return context.window_manager.invoke_popup(self, width = 300)
@@ -176,7 +178,7 @@ class NormalSmooth(bpy.types.Operator):
     """Smoothes verticle position based on vertex normals"""
     bl_idname = 'normal.smooth'
     bl_label = 'Normal Smooth'
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
 
     iterations = IntProperty(name="Smoothing iterations",
@@ -188,9 +190,9 @@ class NormalSmooth(bpy.types.Operator):
         return (obj and obj.type == 'MESH')
 
     def execute(self, context):
-        for i in range(0,self.iterations):
+        for i in xrange(0,self.iterations):
             normal_smooth(context)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 def menu_func(self, context):

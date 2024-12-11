@@ -18,6 +18,7 @@
 
 # <pep8 compliant>
 
+from __future__ import absolute_import
 bl_info = {
     "name": "Quake/Doom3 MAP format",
     "author": "Campbell Barton, scorpion81, Bastien Montagne, motorstep",
@@ -48,10 +49,10 @@ class ExportMAP(bpy.types.Operator, ExportHelper):
     """Export selection to a quake map"""
     bl_idname = "export_scene.quake_map"
     bl_label = "Export MAP"
-    bl_options = {'PRESET'}
+    bl_options = set(['PRESET'])
 
     filename_ext = ".map"
-    filter_glob = StringProperty(default="*.map", options={'HIDDEN'})
+    filter_glob = StringProperty(default="*.map", options=set(['HIDDEN']))
 
     doom3_format = BoolProperty(
             name="Doom 3 Format",

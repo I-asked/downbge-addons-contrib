@@ -26,6 +26,8 @@ which has the line segments, bezier segments, arc segments,
 and faces specified in a vector file.
 """
 
+from __future__ import absolute_import
+from io import open
 __author__ = "howard.trickey@gmail.com"
 
 import re
@@ -68,11 +70,11 @@ def ClassifyFile(filename):
     # Adobe Illustrator files, version 8 and earlier, have
     #   %%+ procset Adobe_Illustrator...
     # sometime before %%EndProlog
-    if start.startswith(b"%!PS-Adobe-"):
+    if start.startswith("%!PS-Adobe-"):
         ans = ("ps", "")
-        if start[14:20] == b" EPSF-":
+        if start[14:20] == " EPSF-":
             ans = ("eps", start[20:23].decode())
-        if start[14:19] == b" PDF-":
+        if start[14:19] == " PDF-":
             ans = ("pdf", start[19:22].decode())
         if ans[0] != "pdf" and _FindAdobeIllustrator(f):
             ans = ("ai", "eps")
@@ -80,7 +82,7 @@ def ClassifyFile(filename):
     # Adobe Illustrator files, version 9 and later, have
     #   %%+ procset Adobe_Illustrator...
     # sometime before %%EndProlog
-    elif start.startswith(b"%PDF"):
+    elif start.startswith("%PDF"):
         ans = ("pdf", start[5:8].decode())
         if _FindAdobeIllustrator(f):
             ans = ("ai", "pdf")
@@ -101,9 +103,9 @@ def _FindAdobeIllustrator(f):
 
     while True:
         s = f.readline()
-        if not s or s.startswith(b"%%EndProlog"):
+        if not s or s.startswith("%%EndProlog"):
             break
-        if s.find(b"Adobe_Illustrator") >= 0:
+        if s.find("Adobe_Illustrator") >= 0:
             return True
     return False
 
@@ -122,7 +124,7 @@ def ParseVecFile(filename):
 
     (major, minor) = ClassifyFile(filename)
     if (major == "error"):
-        print("Couldn't get Art:", minor)
+        print "Couldn't get Art:", minor
         return None
     if major == "pdf" or (major == "ai" and minor == "pdf"):
         contents = pdf.ReadPDFPageOneContents(filename)
@@ -168,7 +170,7 @@ def TokenizeAIEPSFile(filename):
         f = open(filename, "rU")  # 'U'-> all newline reps converted to '\n'
     except IOError:
         if WARN:
-            print("Can't open file", filename)
+            print "Can't open file", filename
         return []
     contents = f.read()
     f.close()
@@ -213,7 +215,7 @@ def TokenizeAIEPS(s):
                 i = m.end()
             else:
                 if WARN:
-                    print("empty name at", i)
+                    print "empty name at", i
                 i += 1
         elif c == "(":
             m = _re_psstring.match(s, i)
@@ -222,7 +224,7 @@ def TokenizeAIEPS(s):
                 i = m.end()
             else:
                 if WARN:
-                    print("unterminated string at", i)
+                    print "unterminated string at", i
                 i = len(s)
         elif c == "<":
             m = _re_pshexstring.match(s, i)
@@ -231,7 +233,7 @@ def TokenizeAIEPS(s):
                 i = m.end()
             else:
                 if WARN:
-                    print("unterminated hex string at", i)
+                    print "unterminated hex string at", i
                 i = len(s)  # unterminated hex string
         elif c == "[" or c == "]" or c == "{" or c == "}":
             ans.append((TNAME, c))
@@ -250,7 +252,7 @@ def TokenizeAIEPS(s):
                     i = m.end()
                 else:
                     if WARN:
-                        print("number parse problem at", i)
+                        print "number parse problem at", i
                     i += 1
         else:
             m = _re_psname.match(s, i)
@@ -259,7 +261,7 @@ def TokenizeAIEPS(s):
                 i = m.end()
             else:
                 if WARN:
-                    print("tokenize error at", i, s[i:i + 10], "...")
+                    print "tokenize error at", i, s[i:i + 10], "..."
                 i += 1
     return ans
 

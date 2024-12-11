@@ -71,6 +71,8 @@ http://gitorious.org/blender-scripts/blender-measure-panel-script
 http://blenderartists.org/forum/showthread.php?t=177800
 """
 
+from __future__ import division
+from __future__ import absolute_import
 import bpy
 from bpy.props import *
 from bpy.app.handlers import persistent
@@ -780,7 +782,7 @@ def draw_measurements_callback(self, context):
             view3d = bpy.context
             region = view3d.region_data
             perspMatrix = region.perspective_matrix
-            tempMat = [perspMatrix[j][i] for i in range(4) for j in range(4)]
+            tempMat = [perspMatrix[j][i] for i in xrange(4) for j in xrange(4)]
             perspBuff = bgl.Buffer(bgl.GL_FLOAT, 16, tempMat)
 
             # ---
@@ -912,7 +914,7 @@ class VIEW3D_OT_display_measurements(bpy.types.Operator):
     bl_label = "Display measurements"
     bl_description = "Display the measurements made in the" \
         " 'Measure' panel in the 3D View"
-    bl_options = {'REGISTER'}  # TODO: can this be removed?
+    bl_options = set(['REGISTER'])  # TODO: can this be removed?
     _handle = None
 
     @staticmethod
@@ -938,15 +940,15 @@ class VIEW3D_OT_display_measurements(bpy.types.Operator):
         if not context.window_manager.display_measurements_runstate:
             #stop script
             VIEW3D_OT_display_measurements.handle_remove(context)
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
 
-        return {'PASS_THROUGH'}
+        return set(['PASS_THROUGH'])
 
     def cancel(self, context):
         if context.window_manager.display_measurements_runstate:
             display_measurements.handle_remove(context)
             context.window_manager.display_measurements_runstate = False
-        return {'CANCELLED'}
+        return set(['CANCELLED'])
 
     def invoke(self, context, event):
         if context.area.type == 'VIEW_3D':
@@ -955,31 +957,31 @@ class VIEW3D_OT_display_measurements(bpy.types.Operator):
                 context.window_manager.display_measurements_runstate = True
                 VIEW3D_OT_display_measurements.handle_add(self, context)
                 context.window_manager.modal_handler_add(self)
-                return {'RUNNING_MODAL'}
+                return set(['RUNNING_MODAL'])
 
             else:
                 # operator is called again, stop displaying
                 context.window_manager.display_measurements_runstate = False
-                return {'CANCELLED'}
+                return set(['CANCELLED'])
 
         else:
-            self.report({'WARNING'}, "3D View not found, can't run operator"
+            self.report(set(['WARNING']), "3D View not found, can't run operator"
                 " for 'Display measurements'")
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
 
 
 class VIEW3D_OT_activate_measure_panel(bpy.types.Operator):
     bl_label = "Activate"
     bl_idname = "view3d.activate_measure_panel"
     bl_description = "Activate the callback needed to draw the lines"
-    bl_options = {'REGISTER'}
+    bl_options = set(['REGISTER'])
 
     def invoke(self, context, event):
 
         # Execute operator (this adds the callback)
         # if it wasn't done yet.
         bpy.ops.view3d.display_measurements()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class VIEW3D_OT_reenter_editmode(bpy.types.Operator):
@@ -987,7 +989,7 @@ class VIEW3D_OT_reenter_editmode(bpy.types.Operator):
     bl_idname = "view3d.reenter_editmode"
     bl_description = "Update mesh data of an active mesh object " \
         "(this is done by exiting and re-entering mesh edit mode)"
-    bl_options = {'REGISTER'}
+    bl_options = set(['REGISTER'])
 
     def invoke(self, context, event):
 
@@ -1000,16 +1002,16 @@ class VIEW3D_OT_reenter_editmode(bpy.types.Operator):
             bpy.ops.object.mode_set(mode='OBJECT')
             bpy.ops.object.mode_set(mode='EDIT')
             sce.measure_panel_update = 1
-            return {'FINISHED'}
+            return set(['FINISHED'])
 
-        return {'CANCELLED'}
+        return set(['CANCELLED'])
 
 
 class VIEW3D_PT_measure(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_label = "Measure"
-    bl_options = {'DEFAULT_CLOSED'}
+    bl_options = set(['DEFAULT_CLOSED'])
 
     @classmethod
     def poll(cls, context):

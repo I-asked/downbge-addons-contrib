@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 bl_info = {
     "name": "Boolean Operators",
     "location": "View3D > Toolshelf > Addons",
@@ -18,7 +19,7 @@ class boolean(bpy.types.Operator):
     """Boolean the currently selected objects"""
     bl_idname = "mesh.boolean"
     bl_label = "Boolean Operator"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     modOp = bpy.props.StringProperty()
 
@@ -57,13 +58,13 @@ class boolean(bpy.types.Operator):
                     activeObj.select = True
                     scene.objects.active = activeObj
                 else:
-                    self.report({'INFO'}, "Select only 2 objects at a time")
+                    self.report(set(['INFO']), "Select only 2 objects at a time")
             else:
-                self.report({'INFO'}, "Only 1 object selected")
+                self.report(set(['INFO']), "Only 1 object selected")
         else:
-            self.report({'INFO'}, "No objects selected")
+            self.report(set(['INFO']), "No objects selected")
 
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 
 ###------- Create the Boolean Menu --------###
@@ -94,7 +95,7 @@ class booleanToolbar(bpy.types.Panel):
     bl_region_type = 'TOOLS'
     bl_context = 'objectmode'
     bl_category = 'Tools'
-    bl_options = {'DEFAULT_CLOSED'}
+    bl_options = set(['DEFAULT_CLOSED'])
 
     def draw(self, context):
         layout = self.layout

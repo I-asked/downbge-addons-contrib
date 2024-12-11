@@ -16,6 +16,9 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import division
+from __future__ import absolute_import
+from io import open
 bl_info = {
     "name": "LRO Lola & MGS Mola img Importer",
     "author": "Valter Battioli (ValterVB)",
@@ -119,7 +122,7 @@ def createFaces(vertIdx1, vertIdx2, closed=False, flipped=False):
             faces.append(face)
 
     # Bridge the rest of the faces.
-    for num in range(total - 1):
+    for num in xrange(total - 1):
         if flipped:
             if fan:
                 face = [vertIdx2[num], vertIdx1[0], vertIdx2[num + 1]]
@@ -364,7 +367,7 @@ class Import(bpy.types.Operator):
         Faces = []  # Faces arrays
         FirstRow = []
         SecondRow = []
-        print('*** Start create vertex ***')
+        print '*** Start create vertex ***'
         FileAndPath = bpy.context.scene.fpath
         FileAndExt = os.path.splitext(FileAndPath)
         #Check for UNIX that is case sensitive
@@ -403,12 +406,12 @@ class Import(bpy.types.Operator):
             LatToRead -= (1 / MAP_RESOLUTION)
         f.close
         del Altitudes
-        print('*** End create Vertex   ***')
+        print '*** End create Vertex   ***'
 
-        print('*** Start create faces ***')
+        print '*** Start create faces ***'
         LinesToRead = int(LatToLine(To_Lat) - LatToLine(From_Lat) + 1)   # Number of the lines to read
         PointsToRead = int(LongToPoint(To_Long) - LongToPoint(From_Long) + 1)  # Number of the points to read
-        for Point in range(0, PointsToRead):
+        for Point in xrange(0, PointsToRead):
             FirstRow.append(Point)
             SecondRow.append(Point + PointsToRead)
         if int(PointsToRead) == LINE_SAMPLES:
@@ -418,11 +421,11 @@ class Import(bpy.types.Operator):
         Faces.extend(FaceTemp)
 
         FaceTemp = []
-        for Line in range(1, (LinesToRead - 1)):
+        for Line in xrange(1, (LinesToRead - 1)):
             FirstRow = SecondRow
             SecondRow = []
             FacesTemp = []
-            for Point in range(0, PointsToRead):
+            for Point in xrange(0, PointsToRead):
                 SecondRow.append(Point + (Line + 1) * PointsToRead)
             if int(PointsToRead) == LINE_SAMPLES:
                 FaceTemp = createFaces(FirstRow, SecondRow, closed=True, flipped=True)
@@ -430,9 +433,9 @@ class Import(bpy.types.Operator):
                 FaceTemp = createFaces(FirstRow, SecondRow, closed=False, flipped=True)
             Faces.extend(FaceTemp)
         del FaceTemp
-        print('*** End create faces   ***')
+        print '*** End create faces   ***'
 
-        print ('*** Start draw ***')
+        print '*** Start draw ***'
         mesh = bpy.data.meshes.new(TARGET_NAME)
         mesh.from_pydata(Vertex, [], Faces)
         del Faces
@@ -444,16 +447,16 @@ class Import(bpy.types.Operator):
         scene.objects.link(ob_new)
         scene.objects.active = ob_new
         ob_new.select = True
-        print ('*** End draw   ***')
-        print('*** Start Smooth ***')
+        print '*** End draw   ***'
+        print '*** Start Smooth ***'
         bpy.ops.object.shade_smooth()
-        print('*** End Smooth   ***')
+        print '*** End Smooth   ***'
         if TARGET_NAME == "MOON":
             MakeMaterialMoon(ob_new)
         elif TARGET_NAME == "MARS":
             MakeMaterialMars(ob_new)
-        print('*** FINISHED ***')
-        return {'FINISHED'}
+        print '*** FINISHED ***'
+        return set(['FINISHED'])
 
 
 # User inteface
@@ -567,7 +570,7 @@ class Reset(bpy.types.Operator):
 
     def execute(self, context):
         clear_properties()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 def initialize():

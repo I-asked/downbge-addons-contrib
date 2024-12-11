@@ -19,6 +19,8 @@
 
 # <pep8 compliant> (Thanks to CodemanX on IRC)
 
+from __future__ import division
+from __future__ import absolute_import
 bl_info = {
     "name": "Show Vertex Groups/Weights",
     "author": "Jason van Gumster (Fweeb), Bartius Crouch, CoDEmanX",
@@ -131,7 +133,7 @@ def draw_callback(self, context):
 
     bm = bmesh.from_edit_mesh(context.active_object.data)
 
-    if bm.select_mode == {'VERT'} and bm.select_history.active is not None:
+    if bm.select_mode == set(['VERT']) and bm.select_history.active is not None:
         active_vert = bm.select_history.active
     else:
         active_vert = None
@@ -141,13 +143,13 @@ def draw_callback(self, context):
     blf.enable(0, blf.SHADOW)
     blf.shadow(0, 3, 0.0, 0.0, 0.0, 1.0)
     blf.shadow_offset(0, 2, -2)
-    for i in range(0, len(texts), 7):
+    for i in xrange(0, len(texts), 7):
         bgl.glColor3f(texts[i], texts[i+1], texts[i+2])
         blf.position(0, texts[i+4], texts[i+5], texts[i+6])
         blf.draw(0, "Vertex " + str(int(texts[i+3])) + ":")
         font_y = texts[i+5]
         group_name = ""
-        for j in range(0, len(weights), 3):
+        for j in xrange(0, len(weights), 3):
             if int(weights[j]) == int(texts[i+3]):
                 font_y -= 13
                 blf.position(0, texts[i+4] + 10, font_y, texts[i+6])
@@ -206,10 +208,10 @@ class ShowVGroupWeights(bpy.types.Operator):
                 context.scene.show_vgroups_weights = False
                 clear_properties(full=False)
             context.area.tag_redraw()
-            return {'FINISHED'}
+            return set(['FINISHED'])
         else:
-            self.report({'WARNING'}, "View3D not found, can't run operator")
-            return {'CANCELLED'}
+            self.report(set(['WARNING']), "View3D not found, can't run operator")
+            return set(['CANCELLED'])
 
 class VGroupsWeights(bpy.types.PropertyGroup):
     vgroup = bpy.props.IntProperty()
@@ -245,7 +247,7 @@ class AssignVertexWeight(bpy.types.Operator):
                     dvert[vgroup] = weights[vgroup]
                 break
         context.area.tag_redraw()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class RemoveFromVertexGroup(bpy.types.Operator):
@@ -284,7 +286,7 @@ class RemoveFromVertexGroup(bpy.types.Operator):
         #XXX Hacky, but there's no other way to update the UI panels
         bpy.ops.object.editmode_toggle()
         bpy.ops.object.editmode_toggle()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class AddToVertexGroup(bpy.types.Operator):
@@ -351,14 +353,14 @@ class AddToVertexGroup(bpy.types.Operator):
         #XXX Hacky, but there's no other way to update the UI panels
         bpy.ops.object.editmode_toggle()
         bpy.ops.object.editmode_toggle()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class PanelShowWeights(bpy.types.Panel):
     bl_label = "Show Weights"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
-    bl_options = {'DEFAULT_CLOSED'}
+    bl_options = set(['DEFAULT_CLOSED'])
 
     @classmethod
     def poll(cls, context):
@@ -382,7 +384,7 @@ class PanelShowWeights(bpy.types.Panel):
             active_vert = bm.select_history.active
             sub = layout.box()
             col = sub.column(align = True)
-            if bm.select_mode == {'VERT'} and active_vert is not None:
+            if bm.select_mode == set(['VERT']) and active_vert is not None:
                 col.label(text = "Active Vertex")
                 row = col.row()
                 row.label(text = "Vertex " + str(active_vert.index) + ":")
@@ -393,7 +395,7 @@ class PanelShowWeights(bpy.types.Panel):
                 for i in me.vertices:
                     if i.index == active_vert.index:
                         vgroup_weights_index = i.index
-                        for j in range(len(i.groups)):
+                        for j in xrange(len(i.groups)):
                             for k in ob.vertex_groups:
                                 if k.index == i.groups[j].group:
                                     has_groups = True
@@ -433,7 +435,7 @@ class PanelShowWeights(bpy.types.Panel):
                         for i in me.vertices:
                             if i.index == v.index:
                                 vgroup_weights_index = i.index
-                                for j in range(len(i.groups)):
+                                for j in xrange(len(i.groups)):
                                     for k in ob.vertex_groups:
                                         if k.index == i.groups[j].group:
                                             has_groups = True

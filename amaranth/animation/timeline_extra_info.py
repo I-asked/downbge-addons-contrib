@@ -19,6 +19,7 @@ rendering an animation or OpenGL preview.
 Display current/end time on SMPTE. Find it on the Timeline header.
 """
 
+from __future__ import absolute_import
 import bpy
 
 

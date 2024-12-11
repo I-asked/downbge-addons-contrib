@@ -23,6 +23,8 @@
 
 # first implementation done by jbakker
 
+from __future__ import absolute_import
+from io import open
 bl_info = {
     "name": "Keyboard Layout (svg)",
     "author": "Jbakker",
@@ -98,7 +100,7 @@ def createKeyboard(viewtype):
                         kc_map[ktype].append((test, cont + key.name))
 
         filename = "keyboard_%s.svg" % viewtype
-        print(filename)
+        print filename
         svgfile = open(filename, "w")
         svgfile.write("""<?xml version="1.0" standalone="no"?>
     <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
@@ -258,7 +260,7 @@ class WM_OT_Keyboardlayout(bpy.types.Operator):
                    'Window'):
 
             createKeyboard(vt)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 def register():

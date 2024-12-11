@@ -47,6 +47,7 @@ Once you have the right vertexes selected, you can use the standard vertex group
 """
 
 
+from __future__ import absolute_import
 import bpy
 from bpy.props import *
 
@@ -69,7 +70,7 @@ class UseAll(bpy.types.Operator):
         bpy.ops.object.editmode_toggle()
         set_used()
         bpy.ops.object.editmode_toggle()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class UseSelected(bpy.types.Operator):
     bl_idname = "mesh.primitive_fvg_useselected"
@@ -83,7 +84,7 @@ class UseSelected(bpy.types.Operator):
         bpy.ops.object.editmode_toggle()
         set_used()
         bpy.ops.object.editmode_toggle()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class SelectFound(bpy.types.Operator):
     bl_idname = "mesh.primitive_fvg_selfound"
@@ -99,7 +100,7 @@ class SelectFound(bpy.types.Operator):
         fv = found_verts(vertexgroup)
         for v in fv: v.select = True
         bpy.ops.object.editmode_toggle()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class DeselectFound(bpy.types.Operator):
     bl_idname = "mesh.primitive_fvg_deselfound"
@@ -115,7 +116,7 @@ class DeselectFound(bpy.types.Operator):
         fv = found_verts(vertexgroup)
         for v in fv: v.select = False
         bpy.ops.object.editmode_toggle()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 def set_used():
     global use_selected_only, used_vertexes, the_mesh, vertex_usage
@@ -155,7 +156,7 @@ def make_groups(limit):
     for gn in vgused.keys():
         name = vgdict[gn]
         vgp.append((name, '%s has %d vertexes' % (name, vgused[gn]) ))
-    print("%d groups found\n" % len(vgp))
+    print "%d groups found\n" % len(vgp)
     return vgp
 
 def found_verts(vertex_group):
@@ -175,7 +176,7 @@ def found_verts(vertex_group):
                         vgfound.append(v)
                         break
 
-    print('%d vertexes found for %s' % (len(vgfound), vertex_group))
+    print '%d vertexes found for %s' % (len(vgfound), vertex_group)
     return vgfound
 
 
@@ -184,7 +185,7 @@ class VIEW3D_PT_FixVertexGroups(bpy.types.Panel):
     bl_region_type = "TOOLS"
     bl_label = "Select Vertex Groups"
     bl_category = 'Tools'
-    bl_options = {'DEFAULT_CLOSED'}
+    bl_options = set(['DEFAULT_CLOSED'])
 
     @classmethod
     def poll(self, context):
@@ -230,5 +231,5 @@ def unregister():
     pass
 
 if __name__ == "__main__":
-    print('------ executing --------')
+    print '------ executing --------'
     register()

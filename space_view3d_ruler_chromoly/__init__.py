@@ -32,8 +32,9 @@ Pour utiliser le patch la fonctionnalité complète sera nécessaire.
 '''
 
 
+from __future__ import division
+from __future__ import absolute_import
 import time	 # debug
-from functools import reduce
 from collections import OrderedDict
 import math
 
@@ -46,6 +47,7 @@ from bgl import glEnable, glDisable, GL_BLEND, \
 				glLineStipple, GL_LINE_STIPPLE
 import mathutils
 from mathutils import *
+from itertools import izip
 geo = mathutils.geometry
 intersect_line_line_2d = geo.intersect_line_line_2d
 import blf
@@ -67,7 +69,7 @@ started = 0
 cursorstate = 0
 snapon = snapon3d = 0
 
-class TmpClass():
+class TmpClass(object):
 	def __init__(self, d=None):
 		if isinstance(d, (dict, OrderedDict)):
 			self.__dict__.update(d)
@@ -157,7 +159,7 @@ class FontMeasure(bpy.types.PropertyGroup):
 
 def blf_text_height_max(fontid):
 		text_width, text_height = blf.dimensions(fontid,
-							  reduce(lambda x, y: x+chr(y), range(32, 127), ''))
+							  reduce(lambda x, y: x+chr(y), xrange(32, 127), ''))
 		return text_height
 
 class RulerConfig(bpy.types.PropertyGroup):
@@ -286,7 +288,7 @@ class VIEW3D_OT_ruler_config_reset(bpy.types.Operator):
 	'''reset current config'''
 	bl_idname = 'view3d.ruler_config_reset'
 	bl_label = 'Reset Ruler Config'
-	bl_options = {'REGISTER', 'UNDO'}
+	bl_options = set(['REGISTER', 'UNDO'])
 
 	def execute(self, context):
 		config = context.scene.ruler_config
@@ -296,7 +298,7 @@ class VIEW3D_OT_ruler_config_reset(bpy.types.Operator):
 										default=d['color_background'],
 										min=0., max=1., soft_min=0., soft_max=1.,
 										subtype='COLOR', size=4)
-		return {'FINISHED'}
+		return set(['FINISHED'])
 
 
 def copy_ruler_config(config, source, copy_font=True):
@@ -344,7 +346,7 @@ class VIEW3D_OT_ruler_config_copy(bpy.types.Operator):
 	'''copy current config to ... or from'''
 	bl_idname = 'view3d.ruler_config_copy'
 	bl_label = 'Copy Ruler Config'
-	bl_options = {'REGISTER', 'UNDO'}
+	bl_options = set(['REGISTER', 'UNDO'])
 
 	mode = EnumProperty(name='Mode',
 						 items=(('from', 'From', ''),
@@ -366,7 +368,7 @@ class VIEW3D_OT_ruler_config_copy(bpy.types.Operator):
 					copy_ruler_config(cc, c)
 				else:
 					copy_ruler_config(c, cc)
-		return {'FINISHED'}
+		return set(['FINISHED'])
 
 class RulerConfigPanel(bpy.types.Panel):
 	bl_label = 'Ruler Config'
@@ -517,7 +519,7 @@ class MeasureRuler(list):
 		self.f = f
 
 
-class MeasurePoint():
+class MeasurePoint(object):
 	vec_window = Vector([0.0, 0.0, 0.0]) # window co
 	vec_world = Vector([0.0, 0.0, 0.0]) # world co
 	#dpu = 1.0 # dot per blender unit. Valeur entre le point suivant
@@ -546,7 +548,7 @@ class MeasurePoint():
 		v = convert_world_to_window(self.vec_world, persmat, sx, sy)
 		self.vec_window = Vector(v)
 
-class Measure():
+class Measure(object):
 	on = 0 # 1:on
 	always = 0 # 1:draw when not measure mode
 	drag = 0 # 0:def, 1:drag, 2:transform
@@ -701,7 +703,7 @@ measure_ = Measure()
 ### Config end #################################################################
 
 ### ShortCut ###################################################################
-class ShortCut():
+class ShortCut(object):
 	def __init__(self, type,
 				 any=False, shift=False, ctrl=False, alt=False, oskey=False):
 		self.type = type
@@ -756,7 +758,7 @@ def get_modifier(event):
 
 GRID_MIN_PX = 6.0
 
-class Data():
+class Data(object):
 	rv3d = None
 	persmat = viewmat = viewloc = None
 	sx = sy = 0
@@ -1452,7 +1454,7 @@ def draw_measure_box(data, config, font, measure):
 	length_height = active_to_mouse_vec[1] / data.dot_per_blender_unit
 	dpu = data.dot_per_blender_unit
 	upd = 1.0 / dpu
-	for column in range(10):
+	for column in xrange(10):
 		if upd * (10 ** column) >= 1.0:
 			break
 	length_width_text = '{0:.{1}f}'.format(length_width, column)
@@ -1550,7 +1552,7 @@ def draw_measure_box(data, config, font, measure):
 	# La ligne en pointillé lorsque drag
 	if drag == 2:
 		glEnable(GL_LINE_STIPPLE);
-		glLineStipple(5 , int(0b101010101010101)) # (factor, pattern)
+		glLineStipple(5 , int(__builtins__.long("101010101010101", 2))) # (factor, pattern)
 		glBegin(GL_LINES)
 		glVertex2f(active_vec_window[0], active_vec_window[1])
 		glVertex2f(mouseco[0], mouseco[1])
@@ -1601,7 +1603,7 @@ def draw_measure_circle(measure, config, dpu, alpha):
 		if len(ruler) <= 1:
 			continue
 		points = ruler
-		for p1, p2 in zip(points, points[1:]):
+		for p1, p2 in izip(points, points[1:]):
 			if measure.space_type == '3D':
 				radius_3d = (p1.vec_world - p2.vec_world).length
 				radius = radius_3d * dpu
@@ -1644,7 +1646,7 @@ def draw_measure_subdivide(config, measure):
 		# 2D: v, d
 		# vec1 -> vec2 = vec12, vec12.length = l12
 		ruler[0].length_total = 0.0
-		for p1, p2 in zip(ruler, ruler[1:]):
+		for p1, p2 in izip(ruler, ruler[1:]):
 			if measure.space_type == '3D':
 				vec1 = p1.vec_world
 				vec2 = p2.vec_world
@@ -1669,7 +1671,7 @@ def draw_measure_subdivide(config, measure):
 		if ruler.subdivide == 0:
 			continue
 		total_length = ruler[-1].length_total
-		for p1, p2 in zip(ruler, ruler[1:]):
+		for p1, p2 in izip(ruler, ruler[1:]):
 			if ruler.total_mode == 0:
 				v1 = Vector(p1.vec_window[:2])
 				v2 = Vector(p2.vec_window[:2])
@@ -1677,7 +1679,7 @@ def draw_measure_subdivide(config, measure):
 				v12n = v12.normalized()
 				v12vn = Vector([-v12n[1], v12n[0]])
 				v12tmp = v12 / (ruler.subdivide + 1)
-				for i in range(ruler.subdivide):
+				for i in xrange(ruler.subdivide):
 					v3 = v1 + v12tmp * (i + 1)
 					glVertex2f(*v3)
 					glVertex2f(*(v3 + v12vn * mssl))
@@ -1734,7 +1736,7 @@ def draw_measure_scale(data, config, measure, font):
 		# 3D: vec, l
 		# 2D: v, d
 		# vec1 -> vec2 = vec12, vec12.length = l12
-		for p1, p2 in zip(ruler, ruler[1:]):
+		for p1, p2 in izip(ruler, ruler[1:]):
 			v1 = Vector(p1.vec_window[:2])
 			v2 = Vector(p2.vec_window[:2])
 			# Calculer l'intersection avec le bord de l'écran
@@ -1823,7 +1825,7 @@ def draw_measure_scale(data, config, measure, font):
 			cnt_last = int((start_point.offset + l_se) / unit)
 
 			glBegin(GL_LINES)
-			for cnt in range(cnt_start, cnt_last + 1):
+			for cnt in xrange(cnt_start, cnt_last + 1):
 				# text
 				draw_5 = cnt % 5 == 0 and data.dx >= config.number_min_px[0]
 				if ruler.draw_scale == 2 and (cnt % 10 == 0 or draw_5):
@@ -1878,7 +1880,7 @@ def draw_measure_line(measure):
 	mouseco = measure.mouse_point.vec_window
 	glBegin(GL_LINES)
 	for points in measure.rulers:
-		for p1, p2 in zip(points, points[1:]):
+		for p1, p2 in izip(points, points[1:]):
 			glVertex2f(p1.vec_window[0], p1.vec_window[1])
 			glVertex2f(p2.vec_window[0], p2.vec_window[1])
 	if measure.drag == 0 and measure.on:
@@ -1945,7 +1947,7 @@ def draw_measure_angle(measure, config, font, alpha):
 			continue
 		if len(ruler) <= 2:
 			continue
-		for i in range(len(ruler) - 2):
+		for i in xrange(len(ruler) - 2):
 			# angle
 			if measure.space_type == '3D':
 				v1 = ruler[i].vec_world
@@ -2019,7 +2021,7 @@ def draw_measure_length_def(measure, rulers, font, column, dpu):
 			continue
 		if ruler.total_mode:
 			continue
-		for p1, p2 in zip(ruler, ruler[1:]):
+		for p1, p2 in izip(ruler, ruler[1:]):
 			if measure.space_type == '3D':
 				length = (p2.vec_world - p1.vec_world).length
 			else:
@@ -2055,7 +2057,7 @@ def draw_measure_length_total(measure, rulers, font, column, dpu):
 		if not ruler.total_mode:
 			continue
 		total_length = 0.0
-		for p1, p2 in zip(ruler, ruler[1:]):
+		for p1, p2 in izip(ruler, ruler[1:]):
 			v = Vector((p2.vec_window - p1.vec_window)[:2])
 			vv = Vector([-v[1], v[0]])
 			vv.normalize()
@@ -2099,7 +2101,7 @@ def draw_measure_length_total(measure, rulers, font, column, dpu):
 
 def draw_measure_length(measure, dpu, font):
 	upd = 1.0 / dpu
-	for column in range(10):
+	for column in xrange(10):
 		if upd * (10 ** column) >= 1.0:
 			break
 
@@ -2455,7 +2457,7 @@ class VIEW3D_OT_display_ruler(bpy.types.Operator):
 	# 1 modal=pass_through, invoke
 	# 2 modal=finished, execute
 
-	mode = IntProperty(name = 'Mode', default = 0, options = {'HIDDEN'})
+	mode = IntProperty(name = 'Mode', default = 0, options = set(['HIDDEN']))
 
 	added = 0
 #	disable_regions = {}
@@ -2523,14 +2525,14 @@ class VIEW3D_OT_display_ruler(bpy.types.Operator):
 				
 				_handle = bpy.types.SpaceView3D.draw_handler_add(draw_callback_px, (self, context), 'WINDOW', 'POST_PIXEL')
 
-			print("Ruler display callback added")
+			print "Ruler display callback added"
 			context.area.tag_redraw()
 
-			return {'RUNNING_MODAL'}
+			return set(['RUNNING_MODAL'])
 
 		else:
-			self.report({'WARNING'}, "View3D not found, cannot run operator")
-			return {'CANCELLED'}
+			self.report(set(['WARNING']), "View3D not found, cannot run operator")
+			return set(['CANCELLED'])
 
 	def modal(self, context, event):
 
@@ -2539,7 +2541,7 @@ class VIEW3D_OT_display_ruler(bpy.types.Operator):
 		scn = bpy.context.scene
 
 		if not(started):
-			return {"FINISHED"}
+			return set(["FINISHED"])
 
 		measure = measure_
 		globmx = event.mouse_region_x
@@ -2565,10 +2567,10 @@ class VIEW3D_OT_display_ruler(bpy.types.Operator):
 
 					measure.on ^= 1
 					redraw_area_by_regionid(event)
-					return {'RUNNING_MODAL'}
+					return set(['RUNNING_MODAL'])
 
 		if not(scn.Active):
-			return {'PASS_THROUGH'}
+			return set(['PASS_THROUGH'])
 
 		if measure.on:
 			scn = bpy.context.scene
@@ -2593,7 +2595,7 @@ class VIEW3D_OT_display_ruler(bpy.types.Operator):
 					if event.type == 'RIGHTMOUSE':
 						text += ' (' + event.value + ')'
 					if event.value == 'PRESS' or event.type == 'RIGHTMOUSE':
-						print(text)
+						print text
 			need_redraw = 1 # supprimer redraw -1
 			data = data_
 			#config = config_
@@ -2650,7 +2652,7 @@ class VIEW3D_OT_display_ruler(bpy.types.Operator):
 									 apply_modifiers=measure.snap_to_dm, \
 									 objects=None, subdivide=100)
 					if debug:
-						print('calc {0:.4f}s'.format(time.time() - t))
+						print 'calc {0:.4f}s'.format(time.time() - t)
 					#measure.ctrl = 1
 				snap_vmat = measure.snap_vmat
 				snap_vwmat = measure.snap_vwmat
@@ -2922,7 +2924,7 @@ class VIEW3D_OT_display_ruler(bpy.types.Operator):
 						event.ctrl == shortcut.ctrl and
 						event.alt == shortcut.alt and
 						event.oskey == shortcut.oskey):
-						return {'PASS_THROUGH'}
+						return set(['PASS_THROUGH'])
 
 			if event.type == 'MOUSEMOVE' or need_redraw == 1:
 			#if need_redraw == 1:
@@ -2934,7 +2936,7 @@ class VIEW3D_OT_display_ruler(bpy.types.Operator):
 						#if self.regionid not in self.__class__.disable_regions:
 						redraw_area_by_regionid(event, self.regionid)
 						self.regionid = id
-						return {'PASS_THROUGH'}
+						return set(['PASS_THROUGH'])
 						# Afin d'éviter que le curseur de la souris quitte le redimensionnement
 					else:
 						id = data.region.id # 3dview
@@ -2944,9 +2946,9 @@ class VIEW3D_OT_display_ruler(bpy.types.Operator):
 
 			if not data.in_region: # Y at-il une souris dans la vue3D?
 				# Transmis si la souris est dans la vue3D
-				return {'PASS_THROUGH'}
+				return set(['PASS_THROUGH'])
 			else:
-				return {'RUNNING_MODAL'}
+				return set(['RUNNING_MODAL'])
 
 		else:
 			# measure off
@@ -2960,7 +2962,7 @@ class VIEW3D_OT_display_ruler(bpy.types.Operator):
 							region = context.region
 							if region:
 								region.tag_redraw()
-						return {'RUNNING_MODAL'}
+						return set(['RUNNING_MODAL'])
 					else:
 						if self.__class__.draw_cursor is not None:
 							self.__class__.draw_cursor = 0
@@ -2968,7 +2970,7 @@ class VIEW3D_OT_display_ruler(bpy.types.Operator):
 							region = context.region
 							if region:
 								region.tag_redraw()
-						return {'RUNNING_MODAL'}
+						return set(['RUNNING_MODAL'])
 
 			if event.type in ('MOUSEMOVE',):
 				if context.area and \
@@ -2982,7 +2984,7 @@ class VIEW3D_OT_display_ruler(bpy.types.Operator):
 					else:
 #						if id not in self.__class__.disable_regions:
 						redraw_area_by_regionid(event, id)
-			return {'PASS_THROUGH'}
+			return set(['PASS_THROUGH'])
 
 	def invoke(self, context, event):
 
@@ -2995,10 +2997,10 @@ class VIEW3D_OT_display_ruler(bpy.types.Operator):
 		default_config['color_background'] = list(color_background) + [1.0]	# alpha
 		bpy.types.Scene.ruler_config = PointerProperty(name='Ruler Config',
 													   type=RulerConfig,
-													   options={'HIDDEN'})
+													   options=set(['HIDDEN']))
 #		scn.ruler_config.color_background = d['color_background']
-		print (scn.ruler_config.color_background)
-		print ("BACKGROUND")
+		print scn.ruler_config.color_background
+		print "BACKGROUND"
 
 		if bpy.context.space_data.viewport_shade == "WIREFRAME":
 			scn.Wire = True
@@ -3021,7 +3023,7 @@ class VIEW3D_OT_display_ruler(bpy.types.Operator):
 #			self.__class__.disable_regions = {}
 
 			retval = self.add_handler(context)
-			return {'RUNNING_MODAL'}
+			return set(['RUNNING_MODAL'])
 
 #		elif mode == 1:
 			# draw enable
@@ -3051,17 +3053,17 @@ class VIEW3D_OT_display_ruler(bpy.types.Operator):
 #						else:
 #							disable_regions[screen.name].add(id)
 #						area.tag_redraw()
-			return {'FINISHED'}
+			return set(['FINISHED'])
 		elif mode == 2:
 			if self.__class__.draw_cursor is not None:
 				self.__class__.draw_cursor = 1
 				self.__class__.draw_mc = 1
-			return {'FINISHED'}
+			return set(['FINISHED'])
 		elif mode == 3:
 			if self.__class__.draw_cursor is not None:
 				self.__class__.draw_cursor = 0
 				self.__class__.draw_mc = 0
-			return {'FINISHED'}
+			return set(['FINISHED'])
 		'''elif mode == 4:
 			self.__class__.draw_mc = 1
 			return {'FINISHED'}
@@ -3127,7 +3129,7 @@ class VIEW3D_PT_ruler(bpy.types.Panel):
 	bl_space_type = 'VIEW_3D'
 	bl_region_type = 'UI'
 	bl_label = "Ruler"
-	bl_options = {'DEFAULT_CLOSED'}
+	bl_options = set(['DEFAULT_CLOSED'])
 
 	@classmethod
 	def poll(cls, context):
@@ -3173,7 +3175,7 @@ class RulerToOrig(bpy.types.Operator):
 	bl_idname = "ruler.rulertoorig"
 	bl_label = "Ruler->Orig"
 	bl_description = "Snap rulers to custom origin."
-	bl_options = {"REGISTER"}
+	bl_options = set(["REGISTER"])
 
 	def invoke(self, context, event):
 		global data_
@@ -3185,7 +3187,7 @@ class RulerToOrig(bpy.types.Operator):
 
 		data.center_ofs = offset
 
-		return {'FINISHED'}
+		return set(['FINISHED'])
 
 
 

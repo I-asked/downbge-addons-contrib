@@ -19,6 +19,8 @@
 # <pep8 compliant>
 
 
+from __future__ import division
+from __future__ import absolute_import
 from . import geom
 import math
 import random
@@ -150,7 +152,7 @@ def _SortFace(face, points):
         return face
     lefti = 0
     leftv = face[0]
-    for i in range(1, n):
+    for i in xrange(1, n):
         # following comparison is lexicographic on n-tuple
         # so sorts on x first, using lower y as tie breaker.
         if points.pos[face[i]] < points.pos[leftv]:
@@ -193,7 +195,7 @@ def _GetLeastIndex(face, points):
 
     bestindex = 0
     bestpos = points.pos[face[0]]
-    for i in range(1, len(face)):
+    for i in xrange(1, len(face)):
         pos = points.pos[face[i]]
         if pos[0] < bestpos[0] or \
                 (pos[0] == bestpos[0] and pos[1] < bestpos[1]):
@@ -213,7 +215,7 @@ def _FindEar(face, n, start, incr, points):
     uses a desperation mode if fails to find one with above rule)."""
 
     angk = _ClassifyAngles(face, n, points)
-    for mode in range(0, 5):
+    for mode in xrange(0, 5):
         i = start
         while True:
             if _IsEar(face, i, n, angk, points, mode):
@@ -264,7 +266,7 @@ def _EarCheck(face, n, angk, vm1, v0, v1, points):
     inside the triangle vm1-v0-v1.  (Well, there are
     messy cases when other points of the face coincide with
     v0 or touch various lines involved in the ear.)"""
-    for j in range(0, n):
+    for j in xrange(0, n):
         fv = face[j]
         k = angk[j]
         b = (k == Angreflex or k == Ang360) \
@@ -355,7 +357,7 @@ def _LeftMostFace(holes, points):
     if len(lefthole) == 0:
         return (lefthole, lefti)
     leftv = lefthole[0]
-    for i in range(1, len(holes)):
+    for i in xrange(1, len(holes)):
         ihole = holes[i]
         if len(ihole) == 0:
             return (ihole, i)
@@ -377,8 +379,8 @@ def _FindDiag(face, hv, points):
 
     besti = - 1
     bestdist = 1e30
-    for mode in range(0, 3):
-        for i in range(0, len(face)):
+    for mode in xrange(0, 3):
+        for i in xrange(0, len(face)):
             v = face[i]
             if mode == 0 and points.pos[v] > points.pos[hv]:
                 continue  # in mode 0, only want points left of hv
@@ -405,7 +407,7 @@ def _IsDiag(i, v, hv, face, points):
     k = _AngleKind(vm1, v, v1, points)
     if not _InCone(hv, vm1, v, v1, k, points):
         return False
-    for j in range(0, n):
+    for j in xrange(0, n):
         vj = face[j]
         vj1 = face[(j + 1) % n]
         if SegsIntersect(v, hv, vj, vj1, points):
@@ -426,9 +428,9 @@ def _BorderEdges(facelist):
     in some face in the list in facelist."""
 
     ans = set()
-    for i in range(0, len(facelist)):
+    for i in xrange(0, len(facelist)):
         f = facelist[i]
-        for j in range(1, len(f)):
+        for j in xrange(1, len(f)):
             ans.add((f[j - 1], f[j]))
         ans.add((f[-1], f[0]))
     return ans
@@ -489,7 +491,7 @@ def _TriDict(tris):
     triangle list."""
 
     ans = dict()
-    for i in range(0, len(tris)):
+    for i in xrange(0, len(tris)):
         (a, b, c) = t = tris[i]
         ans[(a, b)] = t
         ans[(b, c)] = t
@@ -505,7 +507,7 @@ def _ReveresedEdges(tris, td, bord, points):
     triangles of edges."""
 
     ans = []
-    for i in range(0, len(tris)):
+    for i in xrange(0, len(tris)):
         (a, b, c) = tris[i]
         for e in [(a, b), (b, c), (c, a)]:
             if e in bord:
@@ -552,7 +554,7 @@ def _ClassifyAngles(face, n, points):
     """Return vector of anglekinds of the Angle around each point in face."""
 
     return [_AngleKind(face[(i - 1) % n], face[i], face[(i + 1) % n], points) \
-        for i in list(range(0, n))]
+        for i in range(0, n)]
 
 
 def _AngleKind(a, b, c, points):
@@ -740,7 +742,7 @@ def _DCMatch(er):
         return (er, er[0][0])
     match = []
     matchw = 0.0
-    for i in range(0, len(er)):
+    for i in xrange(0, len(er)):
         (nc, comp) = _FindComponents(er, i)
         if nc == 1:
             # er[i] doesn't separate er
@@ -853,7 +855,7 @@ def _FindComponents(er, excepti):
 
     ncomps = 0
     comp = dict()
-    for i in range(0, len(er)):
+    for i in xrange(0, len(er)):
         (_, _, tl, tr) = er[i]
         for t in [tl, tr]:
             if t not in comp:
@@ -866,7 +868,7 @@ def _FCVisit(er, excepti, comp, t, compnum):
     """Helper for _FindComponents depth-first-search."""
 
     comp[t] = compnum
-    for i in range(0, len(er)):
+    for i in xrange(0, len(er)):
         if i == excepti:
             continue
         (_, _, tl, tr) = er[i]
@@ -897,7 +899,7 @@ def _PartitionComps(er, comp, excepti, compa, compb):
 
     parta = []
     partb = []
-    for i in range(0, len(er)):
+    for i in xrange(0, len(er)):
 
         if i == excepti:
             continue

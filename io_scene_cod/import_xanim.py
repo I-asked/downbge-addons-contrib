@@ -35,4 +35,4 @@ def load(self, context, **keywords):
 
     #filepath = os.fsencode(filepath)
 
-    return {'FINISHED'}
+    return set(['FINISHED'])

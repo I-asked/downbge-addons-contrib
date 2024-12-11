@@ -18,6 +18,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import absolute_import
 import bpy
 from bpy.props import BoolProperty, IntProperty
 from . import cpuv_common
@@ -35,7 +36,7 @@ class CPUVFlipRotate(bpy.types.Operator):
     bl_idname = "uv.flip_rotate"
     bl_label = "Flip/Rotate UV"
     bl_description = "Flip/Rotate UV"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     flip = BoolProperty(
         name="Flip UV",
@@ -49,15 +50,15 @@ class CPUVFlipRotate(bpy.types.Operator):
         max=30)
 
     def execute(self, context):
-        self.report({'INFO'}, "Flip/Rotate UVs.")
+        self.report(set(['INFO']), "Flip/Rotate UVs.")
         mem = cpuv_common.View3DModeMemory(context)
 
         # get active object to be fliped/rotated
         obj = context.active_object
         # check if active object has more than one UV map
         if len(obj.data.uv_textures.keys()) == 0:
-            self.report({'WARNING'}, "Object must have more than one UV map.")
-            return {'CANCELLED'}
+            self.report(set(['WARNING']), "Object must have more than one UV map.")
+            return set(['CANCELLED'])
         sel_face = cpuv_common.get_selected_faces_by_sel_seq(obj)
         uv_map = obj.data.uv_layers.active.name
         # change to 'OBJECT' mode, in order to access internal data
@@ -71,7 +72,7 @@ class CPUVFlipRotate(bpy.types.Operator):
                 list(indices), self.flip, self.rotate)
             orig = [uv.data[i].uv.copy() for i in indices_orig]
             # update
-            for j in range(len(indices_orig)):
+            for j in xrange(len(indices_orig)):
                 uv.data[indices[j]].uv = orig[j]
 
-        return {'FINISHED'}
+        return set(['FINISHED'])

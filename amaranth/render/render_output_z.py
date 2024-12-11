@@ -22,6 +22,7 @@ default).
 
 Find it on the Output panel, Render properties.
 """
+from __future__ import absolute_import
 import bpy
 
 

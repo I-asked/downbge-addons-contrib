@@ -18,6 +18,7 @@
 # Contributed to by
 # SAYproductions, meta-androcto, jambay, brikbot#
 
+from __future__ import absolute_import
 bl_info = {
     "name": "Building Objects",
     "author": "Multiple Authors",

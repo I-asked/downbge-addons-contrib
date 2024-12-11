@@ -16,6 +16,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import absolute_import
 bl_info = {
     "name": "PasteAll",
     "author": "Dalai Felinto (dfelinto)",
@@ -48,7 +49,7 @@ bl_info = {
 
 import bpy
 import urllib
-import urllib.request
+import urllib2, urllib
 import webbrowser
 
 class TEXT_PT_pasteall(bpy.types.Panel):
@@ -90,17 +91,17 @@ class TEXT_OT_pasteall(bpy.types.Operator):
         html = self.send_text(text, format)
 
         if html is None:
-            self.report({'ERROR'}, "Error in sending the text to the server.")
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "Error in sending the text to the server.")
+            return set(['CANCELLED'])
 
         # get the link of the posted page
         page = self.get_page(str(html))
 
         if page is None or page == "":
-            self.report({'ERROR'}, "Error in retrieving the page.")
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "Error in retrieving the page.")
+            return set(['CANCELLED'])
         else:
-            self.report({'INFO'}, page)
+            self.report(set(['INFO']), page)
 
         # store the link in the clipboard
         bpy.context.window_manager.clipboard = page
@@ -109,9 +110,9 @@ class TEXT_OT_pasteall(bpy.types.Operator):
             try:
                 webbrowser.open_new_tab(page)
             except:
-                self.report({'WARNING'}, "Error in opening the page %s." % (page))
+                self.report(set(['WARNING']), "Error in opening the page %s." % (page))
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def send_text(self, text, format):
         """"""
@@ -123,9 +124,9 @@ class TEXT_OT_pasteall(bpy.types.Operator):
                     'code' : text }
 
         try:
-            data = urllib.parse.urlencode(values).encode()
-            req = urllib.request.Request(url, data)
-            response = urllib.request.urlopen(req)
+            data = urllib.urlencode(values).encode()
+            req = urllib2.Request(url, data)
+            response = urllib2.urlopen(req)
             page_source = response.read()
         except:
             return None

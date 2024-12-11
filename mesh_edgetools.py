@@ -68,6 +68,10 @@
 # <pep8 compliant>
 # ^^ Maybe. . . . :P
 
+from __future__ import division
+from __future__ import absolute_import
+from itertools import izip
+import sys
 bl_info = {
     "name": "EdgeTools",
     "author": "Paul Marshall",
@@ -137,7 +141,7 @@ def is_same_co(v1, v2):
     if len(v1) != len(v2):
         return False
     else:
-        for co1, co2 in zip(v1, v2):
+        for co1, co2 in izip(v1, v2):
             if co1 != co2:
                 return False
     return True
@@ -150,7 +154,7 @@ def is_face_planar(face, error = 0.0005):
     for v in face.verts:
         d = distance_point_to_plane(v.co, face.verts[0].co, face.normal)
         if bpy.app.debug:
-            print("Distance: " + str(d))
+            print "Distance: " + str(d)
         if d < -error or d > error:
             return False
     return True
@@ -166,9 +170,9 @@ def order_joined_edges(edge, edges = [], direction = 1):
         edges[0] = edge
 
     if bpy.app.debug:
-        print(edge, end = ", ")
-        print(edges, end = ", ")
-        print(direction, end = "; ")
+        print edge,; sys.stdout.write( ", ")
+        print edges,; sys.stdout.write( ", ")
+        print direction,; sys.stdout.write( "; ")
 
     # Robustness check: direction cannot be zero
     if direction == 0:
@@ -201,8 +205,8 @@ def order_joined_edges(edge, edges = [], direction = 1):
                 newList.extend(order_joined_edges(e, edges, direction))
 
     if bpy.app.debug:
-        print(newList, end = ", ")
-        print(direction)
+        print newList,; sys.stdout.write( ", ")
+        print direction
 
     return newList
 
@@ -259,10 +263,10 @@ def interpolate_line_line(p1_co, p1_dir, p2_co, p2_dir, segments, tension = 1,
     if include_ends:
         pieces.append(p1_co)
     # Generate each point:
-    for i in range(segments - 1):
+    for i in xrange(segments - 1):
         t = fraction * (i + 1)
         if bpy.app.debug:
-            print(t)
+            print t
         s = [t ** 3, t ** 2, t, 1]
         h00 = (poly[0][0] * s[0]) + (poly[0][1] * s[1]) + (poly[0][2] * s[2]) + (poly[0][3] * s[3])
         h01 = (poly[1][0] * s[0]) + (poly[1][1] * s[1]) + (poly[1][2] * s[2]) + (poly[1][3] * s[3])
@@ -276,7 +280,7 @@ def interpolate_line_line(p1_co, p1_dir, p2_co, p2_dir, segments, tension = 1,
         return None
     else:
         if bpy.app.debug:
-            print(pieces)
+            print pieces
         return pieces
 
 
@@ -358,14 +362,14 @@ def intersect_line_face(edge, face, is_infinite = False, error = 0.000002):
         edgeB = None
         flipB = False
 
-        for i in range(len(face.edges)):
+        for i in xrange(len(face.edges)):
             if face.edges[i].verts[0] not in edgeA.verts and face.edges[i].verts[1] not in edgeA.verts:
                 edgeB = face.edges[i]
                 break
 
         # I haven't figured out a way to mix this in with the above.  Doing so might remove a
         # few extra instructions from having to be executed saving a few clock cycles:
-        for i in range(len(face.edges)):
+        for i in xrange(len(face.edges)):
             if face.edges[i] == edgeA or face.edges[i] == edgeB:
                 continue
             if (edgeA.verts[0] in face.edges[i].verts and edgeB.verts[1] in face.edges[i].verts) or (edgeA.verts[1] in face.edges[i].verts and edgeB.verts[0] in face.edges[i].verts):
@@ -508,7 +512,7 @@ def intersect_line_face(edge, face, is_infinite = False, error = 0.000002):
         elif a33 != b33:
             t3 = (-a13 + a33 + (a13 - b13) * t + (a13 - a23) * t12 + (a23 - a13 + b13 - b23) * t * t12) / (a33 - b33)
         else:
-            print("The second edge is a zero-length edge")
+            print "The second edge is a zero-length edge"
             return None
 
         # Calculate the point of intersection:
@@ -518,7 +522,7 @@ def intersect_line_face(edge, face, is_infinite = False, error = 0.000002):
         int_co = Vector((x, y, z))
 
         if bpy.app.debug:
-            print(int_co)
+            print int_co
 
         # If the line does not intersect the quad, we return "None":
         if (t < -1 or t > 1 or t12 < -1 or t12 > 1) and not is_infinite:
@@ -579,7 +583,7 @@ def get_next_edge(edge, vert):
     invalidEdges = [e for f in edge.link_faces for e in f.edges if e != edge]
     invalidEdges.append(edge)
     if bpy.app.debug:
-        print(invalidEdges)
+        print invalidEdges
     newEdge = [e for e in vert.link_edges if e not in invalidEdges and not is_planar_edge(e)]
     if len(newEdge) == 0:
         return None
@@ -651,7 +655,7 @@ def fillet_axis(edge, radius):
     # that the base vectors are planar with the "normal" definied by the edge to
     # be filleted.  Then we set the length of the vector and shift it into a
     # coordinate:
-    for i in range(len(vectors)):
+    for i in xrange(len(vectors)):
         vectors[i] = project_point_plane(vectors[i], origin, axis)[1]
         vectors[i].length = adj_len
         vectors[i] = vectors[i] + edge.verts[i % 2].co
@@ -675,7 +679,7 @@ class Extend(bpy.types.Operator):
     bl_idname = "mesh.edgetools_extend"
     bl_label = "Extend"
     bl_description = "Extend the selected edges of vertice pair."
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     di1 = BoolProperty(name = "Forwards",
                        description = "Extend the edge forwards",
@@ -761,7 +765,7 @@ class Extend(bpy.types.Operator):
 
         bm.to_mesh(bpy.context.active_object.data)
         bpy.ops.object.editmode_toggle()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # Creates a series of edges between two edges using spline interpolation.
@@ -775,7 +779,7 @@ class Spline(bpy.types.Operator):
     bl_idname = "mesh.edgetools_spline"
     bl_label = "Spline"
     bl_description = "Create a spline interplopation between two edges"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     alg = EnumProperty(name = "Spline Algorithm",
                        items = [('Blender', 'Blender', 'Interpolation provided through \"mathutils.geometry\"'),
@@ -839,7 +843,7 @@ class Spline(bpy.types.Operator):
 
         seg = self.segments
         edges = [e for e in bEdges if e.select]
-        verts = [edges[v // 2].verts[v % 2] for v in range(4)]
+        verts = [edges[v // 2].verts[v % 2] for v in xrange(4)]
 
         if self.flip1:
             v1 = verts[1]
@@ -882,18 +886,18 @@ class Spline(bpy.types.Operator):
         verts = []
         verts.append(v1)
         # Add vertices and set the points:
-        for i in range(seg - 1):
+        for i in xrange(seg - 1):
             v = bVerts.new()
             v.co = pieces[i]
             verts.append(v)
         verts.append(v2)
         # Connect vertices:
-        for i in range(seg):
+        for i in xrange(seg):
             e = bEdges.new((verts[i], verts[i + 1]))
 
         bm.to_mesh(bpy.context.active_object.data)
         bpy.ops.object.editmode_toggle()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # Creates edges normal to planes defined between each of two edges and the
@@ -913,7 +917,7 @@ class Ortho(bpy.types.Operator):
     bl_idname = "mesh.edgetools_ortho"
     bl_label = "Angle Off Edge"
     bl_description = ""
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     vert1 = BoolProperty(name = "Vertice 1",
                          description = "Enable edge creation for vertice 1.",
@@ -987,9 +991,9 @@ class Ortho(bpy.types.Operator):
         # Until I can figure out a better way of handeling it:
         if len(edges) < 2:
             bpy.ops.object.editmode_toggle()
-            self.report({'ERROR_INVALID_INPUT'},
+            self.report(set(['ERROR_INVALID_INPUT']),
                         "You must select two edges.")
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
 
         verts = [edges[0].verts[0],
                  edges[0].verts[1],
@@ -1000,7 +1004,7 @@ class Ortho(bpy.types.Operator):
 
         # If the two edges are parallel:
         if cos == None:
-            self.report({'WARNING'},
+            self.report(set(['WARNING']),
                         "Selected lines are parallel: results may be unpredictable.")
             vectors.append(verts[0].co - verts[1].co)
             vectors.append(verts[0].co - verts[2].co)
@@ -1010,7 +1014,7 @@ class Ortho(bpy.types.Operator):
         else:
             # Warn the user if they have not chosen two planar edges:
             if not is_same_co(cos[0], cos[1]):
-                self.report({'WARNING'},
+                self.report(set(['WARNING']),
                             "Selected lines are not planar: results may be unpredictable.")
 
             # This makes the +/- behavior predictable:
@@ -1052,7 +1056,7 @@ class Ortho(bpy.types.Operator):
         # ------- BMESH UPDATE -------
         # BMesh uses ".new()"
 
-        for v in range(len(verts)):
+        for v in xrange(len(verts)):
             vert = verts[v]
             if (v == 0 and self.vert1) or (v == 1 and self.vert2) or (v == 2 and self.vert3) or (v == 3 and self.vert4):
                 if self.pos:
@@ -1066,7 +1070,7 @@ class Ortho(bpy.types.Operator):
 
         bm.to_mesh(bpy.context.active_object.data)
         bpy.ops.object.editmode_toggle()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # Usage:
@@ -1077,7 +1081,7 @@ class Shaft(bpy.types.Operator):
     bl_idname = "mesh.edgetools_shaft"
     bl_label = "Shaft"
     bl_description = "Create a shaft mesh around an axis"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     # Selection defaults:
     shaftType = 0
@@ -1169,9 +1173,9 @@ class Shaft(bpy.types.Operator):
         # Robustness check: there should at least be one edge selected
         if len(edges) < 1:
             bpy.ops.object.editmode_toggle()
-            self.report({'ERROR_INVALID_INPUT'},
+            self.report(set(['ERROR_INVALID_INPUT']),
                         "At least one edge must be selected.")
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
 
         # If two edges are selected:
         if len(edges) == 2:
@@ -1199,9 +1203,9 @@ class Shaft(bpy.types.Operator):
                         edge = [edge[1], edge[0]]
                 else:
                     bpy.ops.object.editmode_toggle()
-                    self.report({'ERROR_INVALID_INPUT'},
+                    self.report(set(['ERROR_INVALID_INPUT']),
                                 "Active geometry is not an edge.")
-                    return {'CANCELLED'}
+                    return set(['CANCELLED'])
             elif self.edge == 1:
                 edge = [1, 0]
 
@@ -1232,9 +1236,9 @@ class Shaft(bpy.types.Operator):
                         verts.append(e.verts[1])
             else:
                 bpy.ops.object.editmode_toggle()
-                self.report({'ERROR_INVALID_INPUT'},
+                self.report(set(['ERROR_INVALID_INPUT']),
                             "Active geometry is not an edge.")
-                return {'CANCELLED'}
+                return set(['CANCELLED'])
             self.shaftType = 1
         else:
             verts.append(edges[0].verts[0])
@@ -1260,7 +1264,7 @@ class Shaft(bpy.types.Operator):
 ##        matrices = []
 ##        for i in range(numV):
 ##            matrices.append(Matrix.Rotation((rads * i) + rotRange[0], 3, axis))
-        matrices = [Matrix.Rotation((rads * i) + rotRange[0], 3, axis) for i in range(numV)]
+        matrices = [Matrix.Rotation((rads * i) + rotRange[0], 3, axis) for i in xrange(numV)]
 
         # New vertice coordinates:
         verts_out = []
@@ -1268,24 +1272,24 @@ class Shaft(bpy.types.Operator):
         # If two edges were selected:
         #   - If the lines are not parallel, then it will create a cone-like shaft
         if self.shaftType == 0:
-            for i in range(len(verts) - 2):
+            for i in xrange(len(verts) - 2):
                 init_vec = distance_point_line(verts[i + 2].co, verts[0].co, verts[1].co)
                 co = init_vec + verts[i + 2].co
                 # These will be rotated about the orgin so will need to be shifted:
-                for j in range(numV):
+                for j in xrange(numV):
                     verts_out.append(co - (matrices[j] * init_vec))
         elif self.shaftType == 1:
             for i in verts:
                 init_vec = distance_point_line(i.co, active.verts[0].co, active.verts[1].co)
                 co = init_vec + i.co
                 # These will be rotated about the orgin so will need to be shifted:
-                for j in range(numV):
+                for j in xrange(numV):
                     verts_out.append(co - (matrices[j] * init_vec))
         # Else if a line and a point was selected:
         elif self.shaftType == 2:
             init_vec = distance_point_line(verts[2].co, verts[0].co, verts[1].co)
             # These will be rotated about the orgin so will need to be shifted:
-            verts_out = [(verts[i].co - (matrices[j] * init_vec)) for i in range(2) for j in range(numV)]
+            verts_out = [(verts[i].co - (matrices[j] * init_vec)) for i in xrange(2) for j in xrange(numV)]
         # Else the above are not possible, so we will just use the edge:
         #   - The vector defined by the edge is the normal of the plane for the shaft
         #   - The shaft will have radius "radius".
@@ -1302,7 +1306,7 @@ class Shaft(bpy.types.Operator):
                 vec = verts[0].co + Vector((0, self.radius, 0))
             init_vec = distance_point_line(vec, verts[0].co, verts[1].co)
             # These will be rotated about the orgin so will need to be shifted:
-            verts_out = [(verts[i].co - (matrices[j] * init_vec)) for i in range(2) for j in range(numV)]
+            verts_out = [(verts[i].co - (matrices[j] * init_vec)) for i in xrange(2) for j in xrange(numV)]
 
         # We should have the coordinates for a bunch of new verts.  Now add the verts
         # and build the edges and then the faces.
@@ -1311,19 +1315,19 @@ class Shaft(bpy.types.Operator):
 
         if self.shaftType == 1:
             # Vertices:
-            for i in range(numV * len(verts)):
+            for i in xrange(numV * len(verts)):
                 new = bVerts.new()
                 new.co = verts_out[i]
                 new.select = True
                 newVerts.append(new)
 
             # Edges:
-            for i in range(numE):
-                for j in range(len(verts)):
+            for i in xrange(numE):
+                for j in xrange(len(verts)):
                     e = bEdges.new((newVerts[i + (numV * j)], newVerts[i + (numV * j) + 1]))
                     e.select = True
-            for i in range(numV):
-                for j in range(len(verts) - 1):
+            for i in xrange(numV):
+                for j in xrange(len(verts) - 1):
                     e = bEdges.new((newVerts[i + (numV * j)], newVerts[i + (numV * (j + 1))]))
                     e.select = True
 
@@ -1336,31 +1340,31 @@ class Shaft(bpy.types.Operator):
 ##                    f.normal_update()
         else:
             # Vertices:
-            for i in range(numV * 2):
+            for i in xrange(numV * 2):
                 new = bVerts.new()
                 new.co = verts_out[i]
                 new.select = True
                 newVerts.append(new)
 
             # Edges:
-            for i in range(numE):
+            for i in xrange(numE):
                 e = bEdges.new((newVerts[i], newVerts[i + 1]))
                 e.select = True
                 e = bEdges.new((newVerts[i + numV], newVerts[i + numV + 1]))
                 e.select = True
-            for i in range(numV):
+            for i in xrange(numV):
                 e = bEdges.new((newVerts[i], newVerts[i + numV]))
                 e.select = True
 
             # Faces:
-            for i in range(numE):
+            for i in xrange(numE):
                 f = bFaces.new((newVerts[i], newVerts[i + 1],
                                 newVerts[i + numV + 1], newVerts[i + numV]))
                 f.normal_update()
 
         bm.to_mesh(bpy.context.active_object.data)
         bpy.ops.object.editmode_toggle()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # "Slices" edges crossing a plane defined by a face.
@@ -1370,7 +1374,7 @@ class Slice(bpy.types.Operator):
     bl_idname = "mesh.edgetools_slice"
     bl_label = "Slice"
     bl_description = "Cuts edges at the plane defined by a selected face."
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     make_copy = BoolProperty(name = "Make Copy",
                              description = "Make new vertices at intersection points instead of spliting the edge",
@@ -1442,25 +1446,25 @@ class Slice(bpy.types.Operator):
         # If we don't find a selected face, we have problem.  Exit:
         if face == None:
             bpy.ops.object.editmode_toggle()
-            self.report({'ERROR_INVALID_INPUT'},
+            self.report(set(['ERROR_INVALID_INPUT']),
                         "You must select a face as the cutting plane.")
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
         # Warn the user if they are using an n-gon.  We can work with it, but it
         # might lead to some odd results.
         elif len(face.verts) > 4 and not is_face_planar(face):
-            self.report({'WARNING'},
+            self.report(set(['WARNING']),
                         "Selected face is an n-gon.  Results may be unpredictable.")
 
         # @todo DEBUG TRACKER - DELETE WHEN FINISHED:
         dbg = 0
         if bpy.app.debug:
-            print(len(bEdges))
+            print len(bEdges)
 
         # Iterate over the edges:
         for e in bEdges:
             # @todo DEBUG TRACKER - DELETE WHEN FINISHED:
             if bpy.app.debug:
-                print(dbg)
+                print dbg
                 dbg = dbg + 1
 
             # Get the end verts on the edge:
@@ -1476,8 +1480,8 @@ class Slice(bpy.types.Operator):
 
                 # More debug info - I think this can stay.
                 if bpy.app.debug:
-                    print("Intersection", end = ': ')
-                    print(intersection)
+                    print "Intersection",; sys.stdout.write( ': ')
+                    print intersection
 
                 # If an intersection exists find the distance of each of the end
                 # points from the plane, with "positive" being in the direction
@@ -1501,25 +1505,25 @@ class Slice(bpy.types.Operator):
                             newV1.co = intersection
 
                             if bpy.app.debug:
-                                print("newV1 created", end = '; ')
+                                print "newV1 created",; sys.stdout.write( '; ')
 
                             newV2 = bVerts.new()
                             newV2.co = intersection
 
                             if bpy.app.debug:
-                                print("newV2 created", end = '; ')
+                                print "newV2 created",; sys.stdout.write( '; ')
 
                             newE1 = bEdges.new((v1, newV1))
                             newE2 = bEdges.new((v2, newV2))
 
                             if bpy.app.debug:
-                                print("new edges created", end = '; ')
+                                print "new edges created",; sys.stdout.write( '; ')
 
                             bEdges.remove(e)
 
                             if bpy.app.debug:
-                                print("old edge removed.")
-                                print("We're done with this edge.")
+                                print "old edge removed."
+                                print "We're done with this edge."
                         else:
                             new = list(bmesh.utils.edge_split(e, v1, 0.5))
                             new[1].co = intersection
@@ -1532,7 +1536,7 @@ class Slice(bpy.types.Operator):
 
         bm.to_mesh(context.active_object.data)
         bpy.ops.object.editmode_toggle()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # This projects the selected edges onto the selected plane.  This projects both
@@ -1541,7 +1545,7 @@ class Project(bpy.types.Operator):
     bl_idname = "mesh.edgetools_project"
     bl_label = "Project"
     bl_description = "Projects the selected vertices/edges onto the selected plane."
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     make_copy = BoolProperty(name = "Make Copy",
                              description = "Make a duplicate of the vertices instead of moving it",
@@ -1600,7 +1604,7 @@ class Project(bpy.types.Operator):
 
         bm.to_mesh(context.active_object.data)
         bpy.ops.object.editmode_toggle()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # Project_End is for projecting/extending an edge to meet a plane.
@@ -1611,7 +1615,7 @@ class Project_End(bpy.types.Operator):
     bl_idname = "mesh.edgetools_project_end"
     bl_label = "Project (End Point)"
     bl_description = "Projects the vertice of the selected edges closest to a plane onto that plane."
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     make_copy = BoolProperty(name = "Make Copy",
                              description = "Make a duplicate of the vertice instead of moving it",
@@ -1711,7 +1715,7 @@ class Project_End(bpy.types.Operator):
 
         bm.to_mesh(context.active_object.data)
         bpy.ops.object.editmode_toggle()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # Edge Fillet
@@ -1753,7 +1757,7 @@ class Fillet(bpy.types.Operator):
     bl_idname = "mesh.edgetools_fillet"
     bl_label = "Edge Fillet"
     bl_description = "Fillet the selected edges."
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     radius = FloatProperty(name = "Radius",
                            description = "Radius of the edge fillet",
@@ -1817,7 +1821,7 @@ class Fillet(bpy.types.Operator):
         # @todo I would REALLY like this to just handle n-gons. . . .
         for f in bFaces:
             if len(face.verts) > 4:
-                self.report({'WARNING'},
+                self.report(set(['WARNING']),
                             "Mesh contains n-gons which are not supported. Operation may fail.")
                 break
 
@@ -1831,7 +1835,7 @@ class Fillet(bpy.types.Operator):
 
         bm.to_mesh(bpy.context.active_object.data)
         bpy.ops.object.editmode_toggle()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # For testing the mess that is "intersect_line_face" for possible math errors.
@@ -1842,7 +1846,7 @@ class Intersect_Line_Face(bpy.types.Operator):
     bl_idname = "mesh.edgetools_ilf"
     bl_label = "ILF TEST"
     bl_description = "TEST ONLY: INTERSECT_LINE_FACE"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     @classmethod
     def poll(cls, context):
@@ -1857,9 +1861,9 @@ class Intersect_Line_Face(bpy.types.Operator):
     def execute(self, context):
         # Make sure we really are in debug mode:
         if not bpy.app.debug:
-            self.report({'ERROR_INVALID_INPUT'},
+            self.report(set(['ERROR_INVALID_INPUT']),
                         "This is for debugging only: you should not be able to run this!")
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
 
         bpy.ops.object.editmode_toggle()
         bm = bmesh.new()
@@ -1889,12 +1893,12 @@ class Intersect_Line_Face(bpy.types.Operator):
             new.co = point
         else:
             bpy.ops.object.editmode_toggle()
-            self.report({'ERROR_INVALID_INPUT'}, "point was \"None\"")
-            return {'CANCELLED'}
+            self.report(set(['ERROR_INVALID_INPUT']), "point was \"None\"")
+            return set(['CANCELLED'])
 
         bm.to_mesh(bpy.context.active_object.data)
         bpy.ops.object.editmode_toggle()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class VIEW3D_MT_edit_mesh_edgetools(bpy.types.Menu):
@@ -1957,7 +1961,7 @@ def register():
 
     path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
     if os.path.isfile(path + "\mesh_edge_intersection_tools.py"):
-        print("EdgeTools UI integration test - TinyCAD VTX Found")
+        print "EdgeTools UI integration test - TinyCAD VTX Found"
         integrated = True
 
     bpy.types.VIEW3D_MT_edit_mesh_specials.prepend(menu_func)

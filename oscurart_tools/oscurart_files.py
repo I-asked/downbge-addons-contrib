@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import bpy
 import math
 import sys
@@ -11,11 +12,11 @@ import random
 class reloadImages (bpy.types.Operator):
     bl_idname = "image.reload_images_osc"
     bl_label = "Reload Images"
-    bl_options = {"REGISTER", "UNDO"}
+    bl_options = set(["REGISTER", "UNDO"])
     def execute(self,context):
         for imgs in bpy.data.images:
             imgs.reload()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 ##------------------------ SAVE INCREMENTAL ------------------------
@@ -23,7 +24,7 @@ class reloadImages (bpy.types.Operator):
 class saveIncremental(bpy.types.Operator):
     bl_idname = "file.save_incremental_osc"
     bl_label = "Save Incremental File"
-    bl_options = {"REGISTER", "UNDO"}
+    bl_options = set(["REGISTER", "UNDO"])
     def execute(self, context):     
         filepath = bpy.data.filepath        
         if filepath.count("_v"):
@@ -38,7 +39,7 @@ class saveIncremental(bpy.types.Operator):
             output = filepath.rpartition(".blend")[0]+"_v01"
             bpy.ops.wm.save_as_mainfile(filepath=output)         
         
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 ##------------------------ REPLACE FILE PATHS ------------------------
 
@@ -48,7 +49,7 @@ bpy.types.Scene.oscReplaceText = bpy.props.StringProperty(default="Replace Text"
 class replaceFilePath(bpy.types.Operator):
     bl_idname = "file.replace_file_path_osc"
     bl_label = "Replace File Path"
-    bl_options = {"REGISTER", "UNDO"}
+    bl_options = set(["REGISTER", "UNDO"])
     def execute(self, context):
         TEXTSEARCH = bpy.context.scene.oscSearchText
         TEXTREPLACE = bpy.context.scene.oscReplaceText
@@ -56,4 +57,4 @@ class replaceFilePath(bpy.types.Operator):
         for image in bpy.data.images:
             image.filepath = image.filepath.replace(TEXTSEARCH,TEXTREPLACE)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])

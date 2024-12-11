@@ -27,6 +27,7 @@
 '''
 
 #---------------------------------------------#
+from __future__ import absolute_import
 import bpy
 import os
 from bpy.props import *
@@ -77,25 +78,25 @@ def LoadBrushSet(filepath, filename):
         # filter files by extensions (filter images)
         for i in ext_list:
             if file.endswith(i):
-                print("file: ", file)
+                print "file: ", file
                 # create new texture
                 texture = bpy.data.textures.new(file, 'IMAGE')
                 texture.use_fake_user = fakeUser
-                print("texture: ", texture)
+                print "texture: ", texture
 
                 # now we need to load the image into data
                 image = bpy.data.images.load(path)
                 image.use_fake_user = fakeUser
                 # image.source = 'FILE' #default is FILE so can remove this
                 # image.filepath = path
-                print("image: ", image, " ", path)
-                print("texturename: ", texture.name)
+                print "image: ", image, " ", path
+                print "texturename: ", texture.name
 
                 # and assign the image to the texture
                 bpy.data.textures[texture.name].image = image
 
 
-    print("Brush Set imported!")
+    print "Brush Set imported!"
 
 #---------------------------------------------#
 
@@ -108,24 +109,24 @@ class BrushSetImporter(bpy.types.Operator):
                               description = "filepath", 
                               default = "", 
                               maxlen = 1024, 
-                              options = {'ANIMATABLE'}, 
+                              options = set(['ANIMATABLE']), 
                               subtype = 'NONE')
     
     filepath = StringProperty(name = "File Name", 
                               description = "filepath", 
                               default = "", 
                               maxlen = 1024, 
-                              options = {'ANIMATABLE'}, 
+                              options = set(['ANIMATABLE']), 
                               subtype = 'NONE')
 
     def execute(self, context):
         LoadBrushSet(self.properties.filepath, self.properties.filename)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def invoke(self, context, event):
         wm = context.window_manager
         wm.fileselect_add(self)
-        return {'RUNNING_MODAL'}
+        return set(['RUNNING_MODAL'])
 
 #---------------------------------------------#
 

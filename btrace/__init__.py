@@ -16,6 +16,7 @@
 
 #END GPL LICENCE BLOCK
 
+from __future__ import absolute_import
 bl_info = {
     "name": "Btrace",
     "author": "liero, crazycourier, Atom, Meta-Androcto, MacKracken",

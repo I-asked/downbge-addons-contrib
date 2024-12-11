@@ -1,3 +1,7 @@
+from __future__ import with_statement
+from __future__ import division
+from __future__ import absolute_import
+from io import open
 bl_info = {
     "name": "Mesh Cache Tools",
     "author": "Oscurart",
@@ -45,7 +49,7 @@ bpy.utils.register_class(ModifiersSettings) #registro PropertyGroup
 bpy.types.Scene.mesh_cache_tools_settings = bpy.props.PointerProperty(type=ModifiersSettings)
 
 
-class View3DMCPanel():
+class View3DMCPanel(object):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'   
   
@@ -102,7 +106,7 @@ def OscSetFolder(context, filepath):
     fp =  filepath if os.path.isdir(filepath) else  os.path.dirname(filepath)
     for sc in bpy.data.scenes:
         sc.muu_pc2_folder = fp
-    return {'FINISHED'}
+    return set(['FINISHED'])
 
 
 class OscMeshCacheButtonSet(Operator, ImportHelper):
@@ -128,12 +132,12 @@ def OscFuncExportPc2(self):
                 #encabezado
                 headerFormat = '<12siiffi'
                 headerStr = struct.pack(headerFormat,
-                         b'POINTCACHE2\0', 1, len(ob.data.vertices[:]), 0, 1.0, (end + 1) - start)
+                         'POINTCACHE2\0', 1, len(ob.data.vertices[:]), 0, 1.0, (end + 1) - start)
                 file.write(headerStr)
                 #bakeado
                 obmat = ob.matrix_world
-                for i,frame in enumerate(range(start,end+1)):
-                    print("Percentage of %s bake: %s " % (ob.name, i * 100 / framerange))
+                for i,frame in enumerate(xrange(start,end+1)):
+                    print "Percentage of %s bake: %s " % (ob.name, i * 100 / framerange)
                     bpy.context.window_manager.progress_update(i * 100 / framerange) #progressbarUpdate
                     bpy.context.scene.frame_set(frame)
                     me = bpy.data.meshes.new_from_object(
@@ -154,16 +158,16 @@ def OscFuncExportPc2(self):
                     bpy.data.meshes.remove(me)
 
 
-                print("%s Bake finished!" % (ob.name))
+                print "%s Bake finished!" % (ob.name)
                 
         bpy.context.window_manager.progress_end()#progressBarClose
-    print("Bake Totally Finished!")
+    print "Bake Totally Finished!"
 
 class OscPc2ExporterBatch(bpy.types.Operator):
     bl_idname = "export_shape.pc2_selection"
     bl_label = "Export pc2 for selected Objects"
     bl_description = "Export pc2 for selected Objects"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     @classmethod
     def poll(cls, context):
@@ -171,13 +175,13 @@ class OscPc2ExporterBatch(bpy.types.Operator):
 
     def execute(self, context):
         OscFuncExportPc2(self)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class OscRemoveSubsurf(bpy.types.Operator):
     bl_idname = "object.remove_subsurf_modifier"
     bl_label = "Remove SubSurf Modifier"
     bl_description = "Remove SubSurf Modifier"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     @classmethod
     def poll(cls, context):
@@ -191,14 +195,14 @@ class OscRemoveSubsurf(bpy.types.Operator):
                     if eval("bpy.context.scene.mesh_cache_tools_settings.%s" % (MOD.type.lower())):
                         OBJ.modifiers.remove(MOD)
   
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class OscPc2iMporterBatch(bpy.types.Operator):
     bl_idname = "import_shape.pc2_selection"
     bl_label = "Import pc2 for selected Objects"
     bl_description = "Import pc2 for selected Objects"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     @classmethod
     def poll(cls, context):
@@ -214,7 +218,7 @@ class OscPc2iMporterBatch(bpy.types.Operator):
             MOD.flip_axis = set(())
             MOD.frame_start = bpy.context.scene.muu_pc2_start
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 def OscLinkedGroupToLocal():
     ACTOBJ = bpy.context.active_object
@@ -241,7 +245,7 @@ class OscGroupLinkedToLocal(bpy.types.Operator):
     bl_idname = "group.linked_group_to_local"
     bl_label = "Group Linked To Local"
     bl_description = "Group Linked To Local"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     @classmethod
     def poll(cls, context):
@@ -249,13 +253,13 @@ class OscGroupLinkedToLocal(bpy.types.Operator):
 
     def execute(self, context):
         OscLinkedGroupToLocal()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class OscMeshCacheUp(bpy.types.Operator):
     bl_idname = "object.modifier_mesh_cache_up"
     bl_label = "Mesh Cache To Top"
     bl_description = "Send Mesh Cache Modifiers top"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     @classmethod
     def poll(cls, context):
@@ -270,12 +274,12 @@ class OscMeshCacheUp(bpy.types.Operator):
             bpy.context.scene.objects.active = ob
             for mod in ob.modifiers[:]:
                 if mod.type == "MESH_CACHE":
-                    for up in range(ob.modifiers.keys().index(mod.name)):
+                    for up in xrange(ob.modifiers.keys().index(mod.name)):
                         bpy.ops.object.modifier_move_up(modifier=mod.name)
 
         bpy.context.scene.objects.active = actob
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 def register():

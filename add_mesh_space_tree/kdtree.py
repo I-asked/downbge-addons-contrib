@@ -24,10 +24,12 @@
 
 # <pep8 compliant>
 
+from __future__ import division
+from __future__ import absolute_import
 from copy import copy, deepcopy
 
 
-class Hyperrectangle:
+class Hyperrectangle(object):
     '''an axis aligned bounding box of arbitrary dimension'''
 
     def __init__(self, dim, min, max):
@@ -37,7 +39,7 @@ class Hyperrectangle:
 
     def extend(self, pos):
         '''adapt the hyperectangle if necessary so it will contain pos.'''
-        for i in range(self.dim):
+        for i in xrange(self.dim):
             if pos[i] < self.min[i]:
                 self.min[i] = pos[i]
             elif pos[i] > self.max[i]:
@@ -46,7 +48,7 @@ class Hyperrectangle:
     def distance_squared(self, pos):
         '''return the distance squared to the nearest edge, or zero if pos lies within the hyperrectangle'''
         result = 0.0
-        for i in range(self.dim):
+        for i in xrange(self.dim):
             if pos[i] < self.min[i]:
                 result += (pos[i] - self.min[i]) ** 2
             elif pos[i] > self.max[i]:
@@ -57,7 +59,7 @@ class Hyperrectangle:
         return "[(%d) %s:%s]" % (int(self.dim), str(self.min), str(self.max))
 
 
-class Node:
+class Node(object):
     """implements a node in a kd-tree"""
 
     def __init__(self, pos, data=None):
@@ -95,7 +97,7 @@ class Node:
         return self._str(0)
 
 
-class Tree:
+class Tree(object):
     """implements a kd-tree"""
 
     def __init__(self, dim):
@@ -186,7 +188,7 @@ if __name__ == "__main__":
     class vector(list):
 
         def __init__(self, *args):
-            super().__init__([float(a) for a in args])
+            super(vector, self).__init__([float(a) for a in args])
 
         def __str__(self):
             return "<%.1f %.1f %.1f>" % tuple(self[0:3])
@@ -332,7 +334,7 @@ if __name__ == "__main__":
             self.assertAlmostEqual(distsq, 0.03)
 
         def test_nearest(self):
-            for n in range(self.repeats):
+            for n in xrange(self.repeats):
                 tree = Tree(3)
                 shuffle(self.points)
                 for p in self.points:
@@ -353,7 +355,7 @@ if __name__ == "__main__":
                     self.assertAlmostEqual(distsq, 0.0)
 
         def test_nearest_empty(self):
-            for n in range(self.repeats):
+            for n in xrange(self.repeats):
                 tree = Tree(3)
                 shuffle(self.points)
                 for p in self.points:
@@ -415,21 +417,21 @@ if __name__ == "__main__":
             qsize = 1000
             emptyq = 3
 
-            print("<performance test, may take several seconds>")
-            qpos = [vector(random(), random(), random()) for p in range(qsize)]
-            for p in range(tsize):
+            print "<performance test, may take several seconds>"
+            qpos = [vector(random(), random(), random()) for p in xrange(qsize)]
+            for p in xrange(tsize):
                 pos = vector(random(), random(), random())
                 tree.insert(pos, pos)
             s = time()
             for p in qpos:
                 node, distsq = tree.nearest(p)
             e = time() - s
-            print("queries|tree size|tree height|empties|query load|query time")
-            print("{0:7d}|{2:9d}|{1.level:11d}|      0|{3:10.2f}|{4:10.1f}".format(qsize, tree, tsize, float(tree.count) / qsize, e))
+            print "queries|tree size|tree height|empties|query load|query time"
+            print "{0:7d}|{2:9d}|{1.level:11d}|      0|{3:10.2f}|{4:10.1f}".format(qsize, tree, tsize, float(tree.count) / qsize, e)
 
             tree.resetcounters()
             empty = []
-            for p in range(tsize * 9):
+            for p in xrange(tsize * 9):
                 pos = vector(random(), random(), random())
                 tree.insert(pos, pos)
                 if (p % emptyq) == 1:
@@ -438,7 +440,7 @@ if __name__ == "__main__":
             for p in qpos:
                 node, distsq = tree.nearest(p)
             e2 = time() - s
-            print("{0:7d}|{2:9d}|{1.level:11d}|      0|{3:10.2f}|{4:10.1f}".format(qsize, tree, tsize * 10, float(tree.count) / qsize, e2))
+            print "{0:7d}|{2:9d}|{1.level:11d}|      0|{3:10.2f}|{4:10.1f}".format(qsize, tree, tsize * 10, float(tree.count) / qsize, e2)
 
             self.assertLess(e2, 3 * e, msg="a 10x bigger tree shouldn't take more than 3x the time to query")
 
@@ -450,6 +452,6 @@ if __name__ == "__main__":
             for p in qpos:
                 node, distsq = tree.nearest(p, checkempty=True)
             e3 = time() - s
-            print("{0:7d}|{2:9d}|{1.level:11d}|{5:7d}|{3:10.2f}|{4:10.1f}".format(qsize, tree, tsize * 10, float(tree.count) / qsize, e3, tsize * 10 // emptyq))
+            print "{0:7d}|{2:9d}|{1.level:11d}|{5:7d}|{3:10.2f}|{4:10.1f}".format(qsize, tree, tsize * 10, float(tree.count) / qsize, e3, tsize * 10 // emptyq)
 
     unittest.main()

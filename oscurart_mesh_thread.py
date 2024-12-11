@@ -16,6 +16,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import division
+from __future__ import absolute_import
 bl_info = {
     "name": "Make Thread Mesh",
     "author": "Oscurart",
@@ -47,7 +49,7 @@ def func_osc_screw(self, STRETCH,TURNS,DIAMETER,RESOLUTION):
     ESPACIODIV=STRETCH/(TURNS+2+RESOLUTION)
 
     # PARA CADA VERTICE EN EL RANGO DESDE CERO A LENGTH
-    for vertice in range(0,TURNS+2+RESOLUTION):
+    for vertice in xrange(0,TURNS+2+RESOLUTION):
         # SUMA EN LA LISTA UN VERTICE
         vertexlist.append((math.sin(math.radians(vertice*CANTDIV))*DIAMETER,vertice*ESPACIODIV,math.cos(math.radians(vertice*CANTDIV))*DIAMETER))
         if vertice > RESOLUTION:
@@ -64,7 +66,7 @@ class oscMakeScrew (bpy.types.Operator):
     bl_idname = "mesh.primitive_thread_oscurart"
     bl_label = "Add Mesh Thread"
     bl_description = "Create a Thread"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     resolution = bpy.props.IntProperty (name="Resolution",default=10,min=3,max=1000)
     stretch = bpy.props.FloatProperty (name="Stretch",default=1,min=0.000001,max=1000)
@@ -75,7 +77,7 @@ class oscMakeScrew (bpy.types.Operator):
 
     def execute(self, context):
         func_osc_screw(self, self.stretch,self.turns,self.diameter,self.resolution)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # Registration

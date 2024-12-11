@@ -31,6 +31,8 @@ TODO
 
 """
 
+from __future__ import division
+from __future__ import absolute_import
 bl_info = {
     "name": "Blender-CoD - Add-On for Call of Duty modding (alpha 3)",
     "author": "CoDEmanX, Flybynyt",
@@ -69,10 +71,10 @@ class ImportXmodel(bpy.types.Operator, ImportHelper):
     """Load a CoD XMODEL_EXPORT File"""
     bl_idname = "import_scene.xmodel"
     bl_label = "Import XMODEL_EXPORT"
-    bl_options = {'PRESET'}
+    bl_options = set(['PRESET'])
 
     filename_ext = ".XMODEL_EXPORT"
-    filter_glob = StringProperty(default="*.XMODEL_EXPORT", options={'HIDDEN'})
+    filter_glob = StringProperty(default="*.XMODEL_EXPORT", options=set(['HIDDEN']))
 
     #use_meshes = BoolProperty(name="Meshes", description="Import meshes", default=True)
     #use_armature = BoolProperty(name="Armature", description="Import Armature", default=True)
@@ -89,11 +91,11 @@ class ImportXmodel(bpy.types.Operator, ImportHelper):
         result = import_xmodel.load(self, context, **self.as_keywords(ignore=("filter_glob", "check_existing")))
 
         if not result:
-            self.report({'INFO'}, "Import finished in %.4f sec." % (time.clock() - start_time))
-            return {'FINISHED'}
+            self.report(set(['INFO']), "Import finished in %.4f sec." % (time.clock() - start_time))
+            return set(['FINISHED'])
         else:
-            self.report({'ERROR'}, result)
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), result)
+            return set(['CANCELLED'])
 
     """
     def draw(self, context):
@@ -116,10 +118,10 @@ class ImportXanim(bpy.types.Operator, ImportHelper):
     """Load a CoD XANIM_EXPORT File"""
     bl_idname = "import_scene.xanim"
     bl_label = "Import XANIM_EXPORT"
-    bl_options = {'PRESET'}
+    bl_options = set(['PRESET'])
 
     filename_ext = ".XANIM_EXPORT"
-    filter_glob = StringProperty(default="*.XANIM_EXPORT;*.NT_EXPORT", options={'HIDDEN'})
+    filter_glob = StringProperty(default="*.XANIM_EXPORT;*.NT_EXPORT", options=set(['HIDDEN']))
 
     def execute(self, context):
         # print("Selected: " + context.active_object.name)
@@ -132,10 +134,10 @@ class ExportXmodel(bpy.types.Operator, ExportHelper):
 
     bl_idname = "export_scene.xmodel"
     bl_label = 'Export XMODEL_EXPORT'
-    bl_options = {'PRESET'}
+    bl_options = set(['PRESET'])
 
     filename_ext = ".XMODEL_EXPORT"
-    filter_glob = StringProperty(default="*.XMODEL_EXPORT", options={'HIDDEN'})
+    filter_glob = StringProperty(default="*.XMODEL_EXPORT", options=set(['HIDDEN']))
 
     # List of operator properties, the attributes will be assigned
     # to the class instance from the operator settings before calling.
@@ -225,11 +227,11 @@ class ExportXmodel(bpy.types.Operator, ExportHelper):
         result = export_xmodel.save(self, context, **self.as_keywords(ignore=("filter_glob", "check_existing")))
 
         if not result:
-            self.report({'INFO'}, "Export finished in %.4f sec." % (time.clock() - start_time))
-            return {'FINISHED'}
+            self.report(set(['INFO']), "Export finished in %.4f sec." % (time.clock() - start_time))
+            return set(['FINISHED'])
         else:
-            self.report({'ERROR'}, result)
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), result)
+            return set(['CANCELLED'])
 
     # Extend ExportHelper invoke function to support dynamic default values
     def invoke(self, context, event):
@@ -240,7 +242,7 @@ class ExportXmodel(bpy.types.Operator, ExportHelper):
         #self.use_frame_end = context.scene.frame_end
         self.use_frame_end = context.scene.frame_current
 
-        return super().invoke(context, event)
+        return super(ExportXmodel, self).invoke(context, event)
 
     def draw(self, context):
         layout = self.layout
@@ -249,7 +251,7 @@ class ExportXmodel(bpy.types.Operator, ExportHelper):
         row.prop(self, "use_version", expand=True)
 
         # Calculate number of selected mesh objects
-        if context.mode in {'OBJECT', 'PAINT_WEIGHT'}:
+        if context.mode in set(['OBJECT', 'PAINT_WEIGHT']):
             meshes_selected = len([m for m in bpy.data.objects if m.type == 'MESH' and m.select])
         else:
             meshes_selected = 0
@@ -314,10 +316,10 @@ class ExportXanim(bpy.types.Operator, ExportHelper):
 
     bl_idname = "export_scene.xanim"
     bl_label = 'Export XANIM_EXPORT'
-    bl_options = {'PRESET'}
+    bl_options = set(['PRESET'])
 
     filename_ext = ".XANIM_EXPORT"
-    filter_glob = StringProperty(default="*.XANIM_EXPORT", options={'HIDDEN'})
+    filter_glob = StringProperty(default="*.XANIM_EXPORT", options=set(['HIDDEN']))
 
     # List of operator properties, the attributes will be assigned
     # to the class instance from the operator settings before calling.
@@ -371,11 +373,11 @@ class ExportXanim(bpy.types.Operator, ExportHelper):
         result = export_xanim.save(self, context, **self.as_keywords(ignore=("filter_glob", "check_existing")))
 
         if not result:
-            self.report({'INFO'}, "Export finished in %.4f sec." % (time.clock() - start_time))
-            return {'FINISHED'}
+            self.report(set(['INFO']), "Export finished in %.4f sec." % (time.clock() - start_time))
+            return set(['FINISHED'])
         else:
-            self.report({'ERROR'}, result)
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), result)
+            return set(['CANCELLED'])
 
     # Extend ExportHelper invoke function to support dynamic default values
     def invoke(self, context, event):
@@ -384,7 +386,7 @@ class ExportXanim(bpy.types.Operator, ExportHelper):
         self.use_frame_end = context.scene.frame_end
         self.use_framerate = round(context.scene.render.fps / context.scene.render.fps_base)
 
-        return super().invoke(context, event)
+        return super(ExportXanim, self).invoke(context, event)
 
     def draw(self, context):
 

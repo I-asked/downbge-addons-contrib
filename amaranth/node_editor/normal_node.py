@@ -24,6 +24,7 @@ Find it on the Properties panel, when selecting a Normal node.
 """
 
 
+from __future__ import absolute_import
 import bpy
 from mathutils import Vector
 

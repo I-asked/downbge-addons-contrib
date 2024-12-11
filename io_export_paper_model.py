@@ -52,6 +52,9 @@ Additional links:
     e-mail: adominec {at} gmail {dot} com
 
 """
+from __future__ import with_statement
+from __future__ import division
+from __future__ import absolute_import
 import bpy
 import bl_operators
 import bgl
@@ -59,6 +62,8 @@ import mathutils as M
 from re import compile as re_compile
 from itertools import chain
 from math import pi
+from itertools import izip
+from io import open
 
 try:
     import os.path as os_path
@@ -95,7 +100,7 @@ def is_upsidedown_wrong(name):
 def pairs(sequence):
     """Generate consecutive pairs throughout the given sequence; at last, it gives elements last, first."""
     i = iter(sequence)
-    previous = first = next(i)
+    previous = first = i.next()
     for this in i:
         yield previous, this
         previous = this
@@ -106,8 +111,8 @@ def argmax_pair(array, key):
     """Find an (unordered) pair of indices that maximize the given function"""
     l = len(array)
     mi, mj, m = None, None, None
-    for i in range(l):
-        for j in range(i+1, l):
+    for i in xrange(l):
+        for j in xrange(i+1, l):
             k = key(array[i], array[j])
             if not m or k > m:
                 mi, mj, m = i, j, k
@@ -157,7 +162,7 @@ class UnfoldError(ValueError):
     pass
 
 
-class Unfolder:
+class Unfolder(object):
     def __init__(self, ob):
         self.ob = ob
         self.mesh = Mesh(ob.data, ob.matrix_world)
@@ -175,9 +180,9 @@ class Unfolder:
 
     def copy_island_names(self, island_list):
         """Copy island label and abbreviation from the best matching island in the list"""
-        orig_list = {(frozenset(face.id for face in item.faces), item.label, item.abbreviation) for item in island_list}
+        orig_list = set((frozenset(face.id for face in item.faces), item.label, item.abbreviation) for item in island_list)
         for island in self.mesh.islands:
-            islfaces = {uvface.face.index for uvface in island.faces}
+            islfaces = set(uvface.face.index for uvface in island.faces)
             match = max(orig_list, key=lambda item: islfaces.intersection(item[0]))
             island.label = match[1]
             island.abbreviation = match[2]
@@ -244,7 +249,7 @@ class Unfolder:
         svg.write(self.mesh, filepath)
 
 
-class Mesh:
+class Mesh(object):
     """Wrapper for Bpy Mesh"""
 
     def __init__(self, mesh, matrix):
@@ -273,7 +278,7 @@ class Mesh:
     def generate_cuts(self, page_size, priority_effect):
         """Cut the mesh so that it can be unfolded to a flat net."""
         # warning: this constructor modifies its parameter (face)
-        islands = {Island(face) for face in self.faces.values()}
+        islands = set(Island(face) for face in self.faces.values())
         # check for edges that are cut permanently
         edges = [edge for edge in self.edges.values() if not edge.force_cut and len(edge.faces) > 1]
 
@@ -313,7 +318,7 @@ class Mesh:
         for island in self.islands:
             # if the normals are ambiguous, flip them so that there are more convex edges than concave ones
             if any(uvface.flipped for uvface in island.faces):
-                island_edges = {uvedge.edge for uvedge in island.edges if not uvedge.edge.is_cut(uvedge.uvface.face)}
+                island_edges = set(uvedge.edge for uvedge in island.edges if not uvedge.edge.is_cut(uvedge.uvface.face))
                 balance = sum((+1 if edge.angle > 0 else -1) for edge in island_edges)
                 if balance < 0:
                     island.is_inside_out = True
@@ -354,7 +359,7 @@ class Mesh:
                         return direction_to_float(uvedge.vb.co - uvedge.va.co)
 
                 uvedges.sort(key=uvedge_sortkey)
-                for right, left in zip(uvedges[:-1:2], uvedges[1::2]) if is_inwards(uvedges[0]) else zip([uvedges[-1]] + uvedges[1::2], uvedges[:-1:2]):
+                for right, left in izip(uvedges[:-1:2], uvedges[1::2]) if is_inwards(uvedges[0]) else izip([uvedges[-1]] + uvedges[1::2], uvedges[:-1:2]):
                     left.neighbor_right = right
                     right.neighbor_left = left
         return True
@@ -488,9 +493,9 @@ class Mesh:
         def drop_portion(stops, border, divisor):
             stops.sort()
             # distance from left neighbor to the right one, excluding the first stop
-            distances = [right - left for left, right in zip(stops, chain(stops[2:], [border]))]
+            distances = [right - left for left, right in izip(stops, chain(stops[2:], [border]))]
             quantile = sorted(distances)[len(distances) // divisor]
-            return [stop for stop, distance in zip(stops, chain([quantile], distances)) if distance >= quantile]
+            return [stop for stop, distance in izip(stops, chain([quantile], distances)) if distance >= quantile]
 
         if any(island.bounding_box.x > cage_size.x or island.bounding_box.y > cage_size.y for island in self.islands):
             raise UnfoldError("An island is too big to fit onto page of the given size. "
@@ -535,7 +540,7 @@ class Mesh:
                 island.save_uv(loop, cage_size)
         return tex
 
-    def save_image(self, tex, page_size_pixels: M.Vector, filename):
+    def save_image(self, tex, page_size_pixels, filename):
         texfaces = tex.data
         # omitting this causes a "Circular reference in texture stack" error
         for island in self.islands:
@@ -609,7 +614,7 @@ class Mesh:
                 island.image_path = image_path
 
 
-class Vertex:
+class Vertex(object):
     """BPy Vertex wrapper"""
     __slots__ = ('index', 'co', 'edges', 'uvs')
 
@@ -626,7 +631,7 @@ class Vertex:
         return self.index == other.index
 
 
-class Edge:
+class Edge(object):
     """Wrapper for BPy Edge"""
     __slots__ = ('va', 'vb', 'faces', 'main_faces', 'uvedges',
         'vect', 'length', 'angle',
@@ -714,7 +719,7 @@ class Edge:
         return self.uvedges[1] if this is self.uvedges[0] else self.uvedges[0]
 
 
-class Face:
+class Face(object):
     """Wrapper for BPy Face"""
     __slots__ = ('index', 'edges', 'verts', 'uvface',
         'loop_start', 'area', 'normal')
@@ -759,7 +764,7 @@ class Face:
         return hash(self.index)
 
 
-class Island:
+class Island(object):
     """Part of the net to be exported"""
     __slots__ = ('faces', 'edges', 'verts', 'fake_verts', 'uvverts_by_id', 'boundary', 'markers',
         'pos', 'bounding_box',
@@ -791,11 +796,11 @@ class Island:
             self.edges.update(uvface.edges)
             self.faces.append(uvface)
         # speedup for Island.join
-        self.uvverts_by_id = {uvvertex.vertex.index: [uvvertex] for uvvertex in self.verts}
+        self.uvverts_by_id = dict((uvvertex.vertex.index, [uvvertex]) for uvvertex in self.verts)
         # UVEdges on the boundary
         self.boundary = list(self.edges)
 
-    def join(self, other, edge: Edge, size_limit=None, epsilon=1e-6) -> bool:
+    def join(self, other, edge, size_limit=None, epsilon=1e-6):
         """
         Try to join other island on given edge
         Returns False if they would overlap
@@ -847,7 +852,7 @@ class Island:
                 return cross_a2 > cross_b2
             raise Intersection
 
-        class QuickSweepline:
+        class QuickSweepline(object):
             """Efficient sweepline based on binary search, checking neighbors only"""
             def __init__(self):
                 self.children = blist()
@@ -870,7 +875,7 @@ class Island:
                     if cmp(self.children[index], self.children[index-1]):
                         raise GeometryError
 
-        class BruteSweepline:
+        class BruteSweepline(object):
             """Safe sweepline which checks all its members pairwise"""
             def __init__(self):
                 self.children = set()
@@ -936,7 +941,7 @@ class Island:
             rot = fitting_matrix(flip * (first_b.co - second_b.co), uvedge_a.vb.co - uvedge_a.va.co) * flip
         trans = uvedge_a.vb.co - rot * first_b.co
         # extract and transform island_b's boundary
-        phantoms = {uvvertex: UVVertex(rot*uvvertex.co + trans, uvvertex.vertex) for uvvertex in other.verts}
+        phantoms = dict((uvvertex, UVVertex(rot*uvvertex.co + trans, uvvertex.vertex)) for uvvertex in other.verts)
 
         # check the size of the resulting island
         if size_limit:
@@ -998,8 +1003,8 @@ class Island:
             for uvedge in other.boundary if uvedge not in merged_uvedges]
         # TODO: if is_merged_mine, it might make sense to create a similar list from self.boundary as well
 
-        incidence = {vertex.tup for vertex in phantoms.values()}.intersection(vertex.tup for vertex in self.verts)
-        incidence = {position: list() for position in incidence}  # from now on, 'incidence' is a dict
+        incidence = set(vertex.tup for vertex in phantoms.values()).intersection(vertex.tup for vertex in self.verts)
+        incidence = dict((position, list()) for position in incidence)  # from now on, 'incidence' is a dict
         for uvedge in chain(boundary_other, self.boundary):
             if uvedge.va.co == uvedge.vb.co:
                 continue
@@ -1065,16 +1070,16 @@ class Island:
         for uvface in other.faces:
             uvface.island = self
             uvface.verts = [phantoms[uvvertex] for uvvertex in uvface.verts]
-            uvface.uvvertex_by_id = {index: phantoms[uvvertex]
-                for index, uvvertex in uvface.uvvertex_by_id.items()}
+            uvface.uvvertex_by_id = dict((index, phantoms[uvvertex])
+                for index, uvvertex in uvface.uvvertex_by_id.items())
             uvface.flipped ^= flipped
         if is_merged_mine:
             # there may be own uvvertices that need to be replaced by phantoms
             for uvface in self.faces:
                 if any(uvvertex in phantoms for uvvertex in uvface.verts):
                     uvface.verts = [phantoms.get(uvvertex, uvvertex) for uvvertex in uvface.verts]
-                    uvface.uvvertex_by_id = {index: phantoms.get(uvvertex, uvvertex)
-                        for index, uvvertex in uvface.uvvertex_by_id.items()}
+                    uvface.uvvertex_by_id = dict((index, phantoms.get(uvvertex, uvvertex))
+                        for index, uvvertex in uvface.uvvertex_by_id.items())
         self.faces.extend(other.faces)
 
         self.boundary = [uvedge for uvedge in
@@ -1123,7 +1128,7 @@ class Island:
                 texface[uvface.face.loop_start + i].uv[1] = uvvertex.co.y * scale_y
 
 
-class Page:
+class Page(object):
     """Container for several Islands"""
     __slots__ = ('islands', 'name', 'image_path')
 
@@ -1133,7 +1138,7 @@ class Page:
         self.image_path = None
 
 
-class UVVertex:
+class UVVertex(object):
     """Vertex in 2D"""
     __slots__ = ('co', 'vertex', 'tup')
 
@@ -1149,7 +1154,7 @@ class UVVertex:
             return "UV * [{:.3f}, {:.3f}]".format(self.co.x, self.co.y)
 
 
-class UVEdge:
+class UVEdge(object):
     """Edge in 2D"""
     # Every UVEdge is attached to only one UVFace
     # UVEdges are doubled as needed because they both have to point clockwise around their faces
@@ -1157,7 +1162,7 @@ class UVEdge:
         'min', 'max', 'bottom', 'top',
         'neighbor_left', 'neighbor_right', 'sticker')
 
-    def __init__(self, vertex1: UVVertex, vertex2: UVVertex, island: Island, uvface, edge):
+    def __init__(self, vertex1, vertex2, island, uvface, edge):
         self.va = vertex1
         self.vb = vertex2
         self.update()
@@ -1179,11 +1184,11 @@ class UVEdge:
         return "({0.va} - {0.vb})".format(self)
 
 
-class PhantomUVEdge:
+class PhantomUVEdge(object):
     """Temporary 2D Segment for calculations"""
     __slots__ = ('va', 'vb', 'min', 'max', 'bottom', 'top')
 
-    def __init__(self, vertex1: UVVertex, vertex2: UVVertex, flip):
+    def __init__(self, vertex1, vertex2, flip):
         self.va, self.vb = (vertex2, vertex1) if flip else (vertex1, vertex2)
         self.min, self.max = (self.va, self.vb) if (self.va.tup < self.vb.tup) else (self.vb, self.va)
         y1, y2 = self.va.co.y, self.vb.co.y
@@ -1196,11 +1201,11 @@ class PhantomUVEdge:
         return "[{0.va} - {0.vb}]".format(self)
 
 
-class UVFace:
+class UVFace(object):
     """Face in 2D"""
     __slots__ = ('verts', 'edges', 'face', 'island', 'flipped', 'uvvertex_by_id')
 
-    def __init__(self, face: Face, island: Island):
+    def __init__(self, face, island):
         """Creace an UVFace from a Face and a fixed edge.
         face: Face to take coordinates from
         island: Island to register itself in
@@ -1229,7 +1234,7 @@ class UVFace:
             edge.uvedges.append(uvedge)  #FIXME: editing foreign attribute
 
 
-class Arrow:
+class Arrow(object):
     """Mark in the document: an arrow denoting the number of the edge it points to"""
     __slots__ = ('bounds', 'center', 'rot', 'text', 'size')
 
@@ -1245,7 +1250,7 @@ class Arrow:
         self.bounds = [self.center, self.center + (1.2*normal + tangent)*size, self.center + (1.2*normal - tangent)*size]
 
 
-class Sticker:
+class Sticker(object):
     """Mark in the document: sticker tab"""
     __slots__ = ('bounds', 'center', 'rot', 'text', 'width', 'vertices')
 
@@ -1292,7 +1297,7 @@ class Sticker:
         self.bounds = [v3.co, v4.co, self.center] if v3.co != v4.co else [v3.co, self.center]
 
 
-class NumberAlone:
+class NumberAlone(object):
     """Mark in the document: numbering inside the island denoting edges to be sticked"""
     __slots__ = ('bounds', 'center', 'rot', 'text', 'size')
 
@@ -1308,10 +1313,10 @@ class NumberAlone:
         self.bounds = [self.center]
 
 
-class SVG:
+class SVG(object):
     """Simple SVG exporter"""
 
-    def __init__(self, page_size: M.Vector, style, pure_net=True):
+    def __init__(self, page_size, style, pure_net=True):
         """Initialize document settings.
         page_size: document dimensions in meters
         pure_net: if True, do not use image"""
@@ -1347,58 +1352,55 @@ class SVG:
                 string = string.replace(os_path.sep, '/')
             return string
 
-        styleargs = {name: format_color(getattr(self.style, name)) for name in
+        styleargs = dict((name, format_color(getattr(self.style, name))) for name in
             ("outer_color", "outbg_color", "convex_color", "concave_color", "freestyle_color",
-            "inbg_color", "sticker_fill", "text_color")}
-        styleargs.update({name: format_style[getattr(self.style, name)] for name in
-            ("outer_style", "convex_style", "concave_style", "freestyle_style")})
-        styleargs.update({name: getattr(self.style, attr)[3] for name, attr in
+            "inbg_color", "sticker_fill", "text_color"))
+        styleargs.update(dict((name, format_style[getattr(self.style, name)]) for name in
+            ("outer_style", "convex_style", "concave_style", "freestyle_style")))
+        styleargs.update(dict((name, getattr(self.style, attr)[3]) for name, attr in
             (("outer_alpha", "outer_color"), ("outbg_alpha", "outbg_color"),
             ("convex_alpha", "convex_color"), ("concave_alpha", "concave_color"),
             ("freestyle_alpha", "freestyle_color"),
             ("inbg_alpha", "inbg_color"), ("sticker_alpha", "sticker_fill"),
-            ("text_alpha", "text_color"))})
-        styleargs.update({name: getattr(self.style, name) * self.style.line_width * 1000 for name in
-            ("outer_width", "convex_width", "concave_width", "freestyle_width", "outbg_width", "inbg_width")})
+            ("text_alpha", "text_color"))))
+        styleargs.update(dict((name, getattr(self.style, name) * self.style.line_width * 1000) for name in
+            ("outer_width", "convex_width", "concave_width", "freestyle_width", "outbg_width", "inbg_width")))
         for num, page in enumerate(mesh.pages):
             with open("{}_{}.svg".format(filename, page.name), 'w') as f:
-                print(self.svg_base.format(width=self.page_size.x*1000, height=self.page_size.y*1000), file=f)
-                print(self.css_base.format(**styleargs), file=f)
+                print >>f, self.svg_base.format(width=self.page_size.x*1000, height=self.page_size.y*1000)
+                print >>f, self.css_base.format(**styleargs)
                 if page.image_path:
-                    print(self.image_linked_tag.format(
+                    print >>f, self.image_linked_tag.format(
                         pos="{0} {0}".format(self.page_size),
                         width=self.page_size.x - 2 * self.page_size,
                         height=self.page_size.y - 2 * self.page_size,
-                        path=path_convert(page.image_path)),
-                        file=f)
+                        path=path_convert(page.image_path))
                 if len(page.islands) > 1:
-                    print("<g>", file=f)
+                    print >>f, "<g>"
 
                 for island in page.islands:
-                    print("<g>", file=f)
+                    print >>f, "<g>"
                     if island.image_path:
-                        print(self.image_linked_tag.format(
+                        print >>f, self.image_linked_tag.format(
                             pos=self.format_vertex(island.pos + M.Vector((0, island.bounding_box.y))),
                             width=island.bounding_box.x*1000,
                             height=island.bounding_box.y*1000,
-                            path=path_convert(island.image_path)),
-                            file=f)
+                            path=path_convert(island.image_path))
                     elif island.embedded_image:
-                        print(self.image_embedded_tag.format(
+                        print >>f, "".join([unicode(self.image_embedded_tag.format(
                                 pos=self.format_vertex(island.pos + M.Vector((0, island.bounding_box.y))),
                                 width=island.bounding_box.x*1000,
                                 height=island.bounding_box.y*1000,
-                                path=island.image_path),
-                            island.embedded_image, "'/>",
-                            file=f, sep="")
+                                path=island.image_path)),
+                            unicode(island.embedded_image), unicode("'/>")])
                     if island.title:
-                        print(self.text_tag.format(
+                        print >>f, self.text_tag.format(
                             size=1000 * self.text_size,
                             x=1000 * (island.bounding_box.x*0.5 + island.pos.x + self.margin),
                             y=1000 * (self.page_size.y - island.pos.y - self.margin - 0.2 * self.text_size),
-                            label=island.title), file=f)
+                            label=island.title)
 
-                    data_markers, data_stickerfill, data_outer, data_convex, data_concave, data_freestyle = (list() for i in range(6))
+                    data_markers, data_stickerfill, data_outer, data_convex, data_concave, data_freestyle = (list() for i in xrange(6))
                     for marker in island.markers:
                         if isinstance(marker, Sticker):
                             data_stickerfill.append("M {} Z".format(
@@ -1425,7 +1427,7 @@ class SVG:
                                 mat=format_matrix(marker.rot),
                                 size=marker.size * 1000))
                     if data_stickerfill and self.style.sticker_fill[3] > 0:
-                        print("<path class='sticker' d='", rows(data_stickerfill), "'/>", file=f)
+                        print >>f, "<path class='sticker' d='", rows(data_stickerfill), "'/>"
 
                     outer_edges = set(island.boundary)
                     while outer_edges:
@@ -1462,24 +1464,24 @@ class SVG:
                         data_convex, data_concave = data_concave, data_convex
 
                     if data_freestyle:
-                        print("<path class='freestyle' d='", rows(data_freestyle), "'/>", file=f)
+                        print >>f, "<path class='freestyle' d='", rows(data_freestyle), "'/>"
                     if (data_convex or data_concave) and not self.pure_net and self.style.use_inbg:
-                        print("<path class='inner_background' d='", rows(data_convex + data_concave), "'/>", file=f)
+                        print >>f, "<path class='inner_background' d='", rows(data_convex + data_concave), "'/>"
                     if data_convex:
-                        print("<path class='convex' d='", rows(data_convex), "'/>", file=f)
+                        print >>f, "<path class='convex' d='", rows(data_convex), "'/>"
                     if data_concave:
-                        print("<path class='concave' d='", rows(data_concave), "'/>", file=f)
+                        print >>f, "<path class='concave' d='", rows(data_concave), "'/>"
                     if data_outer:
                         if not self.pure_net and self.style.use_outbg:
-                            print("<path class='outer_background' d='", rows(data_outer), "'/>", file=f)
-                        print("<path class='outer' d='", rows(data_outer), "'/>", file=f)
+                            print >>f, "<path class='outer_background' d='", rows(data_outer), "'/>"
+                        print >>f, "<path class='outer' d='", rows(data_outer), "'/>"
                     if data_markers:
-                        print(rows(data_markers), file=f)
-                    print("</g>", file=f)
+                        print >>f, rows(data_markers)
+                    print >>f, "</g>"
 
                 if len(page.islands) > 1:
-                    print("</g>", file=f)
-                print("</svg>", file=f)
+                    print >>f, "</g>"
+                print >>f, "</svg>"
 
     image_linked_tag = "<image transform='translate({pos})' width='{width}' height='{height}' xlink:href='{path}'/>"
     image_embedded_tag = "<image transform='translate({pos})' width='{width}' height='{height}' xlink:href='data:image/png;base64,"
@@ -1564,8 +1566,8 @@ class Unfold(bpy.types.Operator):
     bl_idname = "mesh.unfold"
     bl_label = "Unfold"
     bl_description = "Mark seams so that the mesh can be exported as a paper model"
-    bl_options = {'REGISTER', 'UNDO'}
-    edit = bpy.props.BoolProperty(name="", description="", default=False, options={'HIDDEN'})
+    bl_options = set(['REGISTER', 'UNDO'])
+    edit = bpy.props.BoolProperty(name="", description="", default=False, options=set(['HIDDEN']))
     priority_effect_convex = bpy.props.FloatProperty(name="Priority Convex",
         description="Priority effect for edges in convex angles",
         default=default_priority_effect['CONVEX'], soft_min=-1, soft_max=10, subtype='FACTOR')
@@ -1631,7 +1633,7 @@ class Unfold(bpy.types.Operator):
 
         bpy.ops.object.mode_set(mode=recall_mode)
         sce.paper_model.display_islands = recall_display_islands
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class ClearAllSeams(bpy.types.Operator):
@@ -1653,7 +1655,7 @@ class ClearAllSeams(bpy.types.Operator):
             edge.use_seam = False
         mesh.paper_island_list.clear()
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 def page_size_preset_changed(self, context):
@@ -1755,11 +1757,11 @@ class ExportPaperModel(bpy.types.Operator):
     bl_label = "Export Paper Model"
     bl_description = "Export the selected object's net and optionally bake its texture"
     filepath = bpy.props.StringProperty(name="File Path",
-        description="Target file to save the SVG", options={'SKIP_SAVE'})
+        description="Target file to save the SVG", options=set(['SKIP_SAVE']))
     filename = bpy.props.StringProperty(name="File Name",
-        description="Name of the file", options={'SKIP_SAVE'})
+        description="Name of the file", options=set(['SKIP_SAVE']))
     directory = bpy.props.StringProperty(name="Directory",
-        description="Directory of the file", options={'SKIP_SAVE'})
+        description="Directory of the file", options=set(['SKIP_SAVE']))
     page_size_preset = bpy.props.EnumProperty(name="Page Size",
         description="Size of the exported document",
         default='A4', update=page_size_preset_changed, items=[
@@ -1810,13 +1812,13 @@ class ExportPaperModel(bpy.types.Operator):
         default=1, soft_min=1.0, soft_max=10000.0, step=100, subtype='UNSIGNED', precision=0)
     do_create_uvmap = bpy.props.BoolProperty(name="Create UVMap",
         description="Create a new UV Map showing the islands and page layout",
-        default=False, options={'SKIP_SAVE'})
+        default=False, options=set(['SKIP_SAVE']))
     ui_expanded_document = bpy.props.BoolProperty(name="Show Document Settings Expanded",
         description="Shows the box 'Document Settings' expanded in user interface",
-        default=True, options={'SKIP_SAVE'})
+        default=True, options=set(['SKIP_SAVE']))
     ui_expanded_style = bpy.props.BoolProperty(name="Show Style Settings Expanded",
         description="Shows the box 'Colors and Style' expanded in user interface",
-        default=False, options={'SKIP_SAVE'})
+        default=False, options=set(['SKIP_SAVE']))
     style = bpy.props.PointerProperty(type=PaperModelStyle)
 
     unfolder = None
@@ -1831,11 +1833,11 @@ class ExportPaperModel(bpy.types.Operator):
             if self.object.data.paper_island_list:
                 self.unfolder.copy_island_names(self.object.data.paper_island_list)
             self.unfolder.save(self.properties)
-            self.report({'INFO'}, "Saved a {}-page document".format(len(self.unfolder.mesh.pages)))
-            return {'FINISHED'}
-        except UnfoldError as error:
-            self.report(type={'ERROR_INVALID_INPUT'}, message=error.args[0])
-            return {'CANCELLED'}
+            self.report(set(['INFO']), "Saved a {}-page document".format(len(self.unfolder.mesh.pages)))
+            return set(['FINISHED'])
+        except UnfoldError, error:
+            self.report(type=set(['ERROR_INVALID_INPUT']), message=error.args[0])
+            return set(['CANCELLED'])
         except:
             raise
 
@@ -1864,7 +1866,7 @@ class ExportPaperModel(bpy.types.Operator):
         wm.fileselect_add(self)
 
         bpy.ops.object.mode_set(mode=recall_mode)
-        return {'RUNNING_MODAL'}
+        return set(['RUNNING_MODAL'])
 
     def draw(self, context):
         layout = self.layout
@@ -2137,7 +2139,7 @@ bpy.utils.register_class(IslandList)
 class PaperModelSettings(bpy.types.PropertyGroup):
     display_islands = bpy.props.BoolProperty(name="Highlight selected island",
         description="Highlight faces corresponding to the selected island in the 3D View",
-        options={'SKIP_SAVE'}, update=display_islands_changed)
+        options=set(['SKIP_SAVE']), update=display_islands_changed)
     islands_alpha = bpy.props.FloatProperty(name="Opacity",
         description="Opacity of island highlighting", min=0.0, max=1.0, default=0.3)
     limit_by_page = bpy.props.BoolProperty(name="Limit Island Size",
@@ -2160,11 +2162,11 @@ def register():
     bpy.types.Scene.paper_model = bpy.props.PointerProperty(type=PaperModelSettings,
         name="Paper Model",
         description="Settings of the Export Paper Model script",
-        options={'SKIP_SAVE'})
+        options=set(['SKIP_SAVE']))
     bpy.types.Mesh.paper_island_list = bpy.props.CollectionProperty(type=IslandList,
         name="Island List", description="")
     bpy.types.Mesh.paper_island_index = bpy.props.IntProperty(name="Island List Index",
-        default=-1, min=-1, max=100, options={'SKIP_SAVE'})
+        default=-1, min=-1, max=100, options=set(['SKIP_SAVE']))
     bpy.types.INFO_MT_file_export.append(menu_func)
 
 

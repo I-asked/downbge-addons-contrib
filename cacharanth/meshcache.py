@@ -18,6 +18,7 @@
 
 # <pep8 compliant>
 
+from __future__ import absolute_import
 import bpy
 from bpy.types import Operator
 from bpy.props import *
@@ -75,10 +76,10 @@ def meshcache_import(context, objects):
             ob.modifiers[mc_mod_name].filepath = filename
             ob.modifiers[mc_mod_name].frame_start = scene.meshcache_frame_start
         else:
-            print("! No Meshcache found for {0}".format(ob.name))
+            print "! No Meshcache found for {0}".format(ob.name)
 
 
-class MeshcacheOperator():
+class MeshcacheOperator(object):
     @classmethod
     def poll(cls, context):
         if context.scene.meshcache_apply_to == 'GROUP':
@@ -97,7 +98,7 @@ class MeshcacheOperator():
             objects = context.selected_objects
 
         if scene.use_meshcache_exclude_names:
-            excluded = { ex.name for ex in scene.meshcache_exclude_names if ex.name }
+            excluded = set( ex.name for ex in scene.meshcache_exclude_names if ex.name)
         else:
             excluded = []
 
@@ -119,24 +120,24 @@ class MESH_OP_MeshcacheExport(MeshcacheOperator, Operator):
 
     def report_used(self, ob):
         MESH_OP_MeshcacheExport.howmany_exported += 1
-        print("{0} - Exported".format(ob.name))
+        print "{0} - Exported".format(ob.name)
 
     def report_excluded(self, ob):
         MESH_OP_MeshcacheExport.howmany_excluded += 1
-        print("** {0} - Excluded".format(ob.name))
+        print "** {0} - Excluded".format(ob.name)
 
     def execute(self, context):
-        print("\n== Meshcache Export Start ==")
+        print "\n== Meshcache Export Start =="
         MESH_OP_MeshcacheExport.howmany_exported = 0
         MESH_OP_MeshcacheExport.howmany_excluded = 0
         meshcache_export(context, self.meshcache_objects(context))
-        print("\n== Meshcache Export Finished ==")
-        print("== {0} Exported, {1} Excluded ==".format(
+        print "\n== Meshcache Export Finished =="
+        print "== {0} Exported, {1} Excluded ==".format(
               MESH_OP_MeshcacheExport.howmany_exported,
-              MESH_OP_MeshcacheExport.howmany_excluded))
+              MESH_OP_MeshcacheExport.howmany_excluded)
 
-        self.report({'INFO'}, "Meshcache Exported")
-        return {'FINISHED'}
+        self.report(set(['INFO']), "Meshcache Exported")
+        return set(['FINISHED'])
 
 
 class MESH_OP_MeshcacheImport(MeshcacheOperator, Operator):
@@ -148,24 +149,24 @@ class MESH_OP_MeshcacheImport(MeshcacheOperator, Operator):
 
     def report_used(self, ob):
         MESH_OP_MeshcacheImport.howmany_imported += 1
-        print("{0} - Imported".format(ob.name))
+        print "{0} - Imported".format(ob.name)
 
     def report_excluded(self, ob):
         MESH_OP_MeshcacheImport.howmany_excluded += 1
-        print("** {0} - Excluded".format(ob.name))
+        print "** {0} - Excluded".format(ob.name)
 
     def execute(self, context):
-        print("\n== Meshcache Import Start ==")
+        print "\n== Meshcache Import Start =="
         MESH_OP_MeshcacheImport.howmany_imported = 0
         MESH_OP_MeshcacheImport.howmany_excluded = 0
         meshcache_import(context, self.meshcache_objects(context))
-        print("\n== Meshcache Import Finished ==")
-        print("== {0} Imported, {1} Excluded ==".format(
+        print "\n== Meshcache Import Finished =="
+        print "== {0} Imported, {1} Excluded ==".format(
               MESH_OP_MeshcacheImport.howmany_imported,
-              MESH_OP_MeshcacheImport.howmany_excluded))
+              MESH_OP_MeshcacheImport.howmany_excluded)
 
-        self.report({'INFO'}, "Meshcache Imported")
-        return {'FINISHED'}
+        self.report(set(['INFO']), "Meshcache Imported")
+        return set(['FINISHED'])
 
 
 def register():

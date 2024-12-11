@@ -22,6 +22,8 @@
 ########################################################
 # <pep8 compliant>
 
+from __future__ import division
+from __future__ import absolute_import
 import bpy
 from bpy.props import *
 import math
@@ -29,7 +31,7 @@ import mathutils as Math
 from mathutils import Matrix, Euler, Vector, Quaternion
 
 ### Save Properties ###########################################################
-class SaveProperties:
+class SaveProperties(object):
 	def __init__(self):
 		self.data = {}
 
@@ -88,7 +90,7 @@ class SaveProperties:
 
 op_prop_values = SaveProperties()
 
-class WatchProperties:
+class WatchProperties(object):
 	'''?????????????????????
 	'''
 	def __init__(self, operator, attrs):
@@ -125,7 +127,7 @@ def get_matrix_element_square(mat, wmat, center, r):
 		
 
 ### Utils #####################################################################
-class Null():
+class Null(object):
 	def __init__(self):
 		pass
 
@@ -162,7 +164,7 @@ def print_event(event):
 
 	if event.type in ('MOUSEMOVE'):
 		if modlist:
-			print(mods)
+			print mods
 	else:
 		if event.value == 'PRESS':
 			if event.type not in('LEFT_SHIFT', 'RIGHT_SHIFT',
@@ -172,4 +174,4 @@ def print_event(event):
 					text = mods + ' + ' + event.type
 				else:
 					text = event.type
-				print(text)
+				print text

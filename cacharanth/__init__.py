@@ -18,6 +18,7 @@
 
 # <pep8 compliant>
 
+from __future__ import absolute_import
 bl_info = {
     "name": "Cacharanth",
     "author": "Pablo Vazquez, Lukas Toenne",

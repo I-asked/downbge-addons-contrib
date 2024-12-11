@@ -1,8 +1,11 @@
+from __future__ import with_statement
+from __future__ import absolute_import
 import bpy
 import sys
 import os
 import stat
 import time
+from io import open
 
 
 ##--------------------------OVERRIDES-----------------------------
@@ -13,7 +16,7 @@ bpy.types.Scene.overrides = bpy.props.StringProperty(default="[]")
 ## ------------------------------------ APPLY AND RESTORE OVERRIDES --------------------------------------
 
 def DefOscApplyOverrides(self):
-    types = {'MESH','META','CURVE'}
+    types = set(['MESH','META','CURVE'])
     for ob in bpy.data.objects:
         if ob.type in types:
             if not len(ob.material_slots):
@@ -29,11 +32,11 @@ def DefOscApplyOverrides(self):
             if object.type in types:
                 if len(object.data.materials):
                     object.data.materials.clear()
-                    for newslot in range(lenslots):                    
+                    for newslot in xrange(lenslots):                    
                         object.data.materials.append(bpy.data.materials[material])                 
  
 def DefOscRestoreOverrides(self):
-    types = {'MESH','META','CURVE'}
+    types = set(['MESH','META','CURVE'])
     with open("%s_override.txt" % (os.path.join(os.path.dirname(bpy.data.filepath),bpy.context.scene.name)), mode="r") as file:
         slotlist = eval(file.read())
         for ob,slots in slotlist.items():
@@ -45,40 +48,40 @@ def DefOscRestoreOverrides(self):
 class OscApplyOverrides(bpy.types.Operator):
     bl_idname = "render.apply_overrides"
     bl_label = "Apply Overrides in this Scene"
-    bl_options = {"REGISTER", "UNDO"}
+    bl_options = set(["REGISTER", "UNDO"])
 
     def execute (self, context):
         DefOscApplyOverrides(self)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class OscRestoreOverrides(bpy.types.Operator):
     bl_idname = "render.restore_overrides"
     bl_label = "Restore Overrides in this Scene"
-    bl_options = {"REGISTER", "UNDO"}
+    bl_options = set(["REGISTER", "UNDO"])
 
     def execute (self, context):
         DefOscRestoreOverrides(self)        
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 bpy.use_overrides = False
     
 class OscOverridesOn(bpy.types.Operator):
     bl_idname = "render.overrides_on"
     bl_label = "Turn On Overrides"
-    bl_options = {"REGISTER", "UNDO"}
+    bl_options = set(["REGISTER", "UNDO"])
 
     def execute (self, context):
         if bpy.use_overrides == False:
             bpy.app.handlers.render_pre.append(DefOscApplyOverrides)
             bpy.app.handlers.render_post.append(DefOscRestoreOverrides)  
             bpy.use_overrides = True
-            print("Overrides on!")
+            print "Overrides on!"
         else:    
             bpy.app.handlers.render_pre.remove(DefOscApplyOverrides)
             bpy.app.handlers.render_post.remove(DefOscRestoreOverrides)    
             bpy.use_overrides = False
-            print("Overrides off!")           
-        return {'FINISHED'}  
+            print "Overrides off!"           
+        return set(['FINISHED'])  
 
 
 ## ------------------------------------ CHECK OVERRIDES --------------------------------------
@@ -86,7 +89,7 @@ class OscOverridesOn(bpy.types.Operator):
 class OscCheckOverrides (bpy.types.Operator):
     bl_idname = "render.check_overrides"
     bl_label = "Check Overrides"
-    bl_options = {"REGISTER", "UNDO"}
+    bl_options = set(["REGISTER", "UNDO"])
 
 
     def execute (self, context):
@@ -94,8 +97,8 @@ class OscCheckOverrides (bpy.types.Operator):
         GLOBAL = 0
         GLOBALERROR = 0
 
-        print("==== STARTING CHECKING ====")
-        print("")
+        print "==== STARTING CHECKING ===="
+        print ""
 
         for SCENE in bpy.data.scenes[:]:
             MATLIST = []
@@ -109,40 +112,40 @@ class OscCheckOverrides (bpy.types.Operator):
                 if GROUP.users > 0:
                     GROUPLIST.append(GROUP.name)
 
-            print("   %s Scene is checking" % (SCENE.name))
+            print "   %s Scene is checking" % (SCENE.name)
 
             for OVERRIDE in list(eval(SCENE.overrides)):
                 # REVISO OVERRIDES EN GRUPOS
                 if OVERRIDE[0] in GROUPLIST:
                     pass
                 else:
-                    print("** %s group are in conflict." % (OVERRIDE[0]))
+                    print "** %s group are in conflict." % (OVERRIDE[0])
                     GROUPI = True
                     GLOBALERROR += 1
                 # REVISO OVERRIDES EN GRUPOS
                 if OVERRIDE[1] in MATLIST:
                     pass
                 else:
-                    print("** %s material are in conflict." % (OVERRIDE[1]))
+                    print "** %s material are in conflict." % (OVERRIDE[1])
                     MATI = True
                     GLOBALERROR += 1
 
             if MATI is False:
-                print("-- Materials are ok.")
+                print "-- Materials are ok."
             else:
                 GLOBAL+=1
             if GROUPI is False:
-                print("-- Groups are ok.")
+                print "-- Groups are ok."
             else:
                 GLOBAL+=1
 
         if GLOBAL < 1:
-            self.report({'INFO'}, "Materials And Groups are Ok")
+            self.report(set(['INFO']), "Materials And Groups are Ok")
         if GLOBALERROR > 0:
-            self.report({'WARNING'}, "Override Error: Look in the Console")
-        print("")
+            self.report(set(['WARNING']), "Override Error: Look in the Console")
+        print ""
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 ##--------------------------------- OVERRIDES PANEL ---------------------------------- 
    
@@ -178,7 +181,7 @@ class OscOverridesGUI(bpy.types.Panel):
 class OscOverridesUp (bpy.types.Operator): 
     bl_idname = 'ovlist.move_up'
     bl_label = 'Move Override up'
-    bl_options = {'INTERNAL'}
+    bl_options = set(['INTERNAL'])
    
     index = bpy.props.IntProperty(min=0)
    
@@ -189,12 +192,12 @@ class OscOverridesUp (bpy.types.Operator):
         ovlist = context.scene.ovlist
         ovlist.move(self.index,self.index-1) 
 
-        return {'FINISHED'}   
+        return set(['FINISHED'])   
 
 class OscOverridesDown (bpy.types.Operator): 
     bl_idname = 'ovlist.move_down'
     bl_label = 'Move Override down'
-    bl_options = {'INTERNAL'}
+    bl_options = set(['INTERNAL'])
    
     index = bpy.props.IntProperty(min=0)
    
@@ -204,12 +207,12 @@ class OscOverridesDown (bpy.types.Operator):
     def execute(self,context):
         ovlist = context.scene.ovlist
         ovlist.move(self.index,self.index+1) 
-        return {'FINISHED'}              
+        return set(['FINISHED'])              
 
 class OscOverridesKill (bpy.types.Operator): 
     bl_idname = 'ovlist.kill'
     bl_label = 'Kill Override'
-    bl_options = {'INTERNAL'}
+    bl_options = set(['INTERNAL'])
    
     index = bpy.props.IntProperty(min=0)
    
@@ -219,7 +222,7 @@ class OscOverridesKill (bpy.types.Operator):
     def execute(self,context):
         ovlist = context.scene.ovlist  
         ovlist.remove(self.index)  
-        return {'FINISHED'}              
+        return set(['FINISHED'])              
 
 
 class OscOverridesProp(bpy.types.PropertyGroup):
@@ -241,7 +244,7 @@ class OscTransferOverrides (bpy.types.Operator):
         OSCOV = [[OVERRIDE.grooverride,OVERRIDE.matoverride]for OVERRIDE in bpy.context.scene.ovlist[:] if OVERRIDE.matoverride != "" if OVERRIDE.grooverride != ""]
 
         bpy.context.scene.overrides = str(OSCOV)
-        return {'FINISHED'}   
+        return set(['FINISHED'])   
     
 class OscAddOverridesSlot (bpy.types.Operator):    
     """Tooltip"""
@@ -252,7 +255,7 @@ class OscAddOverridesSlot (bpy.types.Operator):
         prop = bpy.context.scene.ovlist.add()
         prop.matoverride = ""
         prop.grooverride = ""
-        return {'FINISHED'}      
+        return set(['FINISHED'])      
 
 class OscRemoveOverridesSlot (bpy.types.Operator):    
     """Tooltip"""
@@ -261,7 +264,7 @@ class OscRemoveOverridesSlot (bpy.types.Operator):
 
     def execute(self, context):
         bpy.context.scene.ovlist.remove(len(bpy.context.scene.ovlist)-1)
-        return {'FINISHED'} 
+        return set(['FINISHED']) 
     
 bpy.utils.register_class(OscTransferOverrides)
 bpy.utils.register_class(OscAddOverridesSlot)

@@ -1,3 +1,5 @@
+from __future__ import with_statement
+from __future__ import absolute_import
 import bpy
 import math
 import sys
@@ -9,6 +11,8 @@ import random
 import bgl
 import blf
 from bpy_extras.view3d_utils import location_3d_to_region_2d
+from io import open
+from itertools import imap
 
 C = bpy.context
 D = bpy.data
@@ -45,7 +49,7 @@ def defReconst(self, OFFSET):
 class reConst (bpy.types.Operator):
     bl_idname = "mesh.reconst_osc"
     bl_label = "ReConst Mesh"
-    bl_options = {"REGISTER", "UNDO"}
+    bl_options = set(["REGISTER", "UNDO"])
     OFFSET=bpy.props.FloatProperty(name="Offset", default=0.001, min=-0, max=0.1)
 
     @classmethod
@@ -54,7 +58,7 @@ class reConst (bpy.types.Operator):
 
     def execute(self,context):
         defReconst(self, self.OFFSET)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 ## -----------------------------------SELECT LEFT---------------------
 def side (self, nombre, offset):
@@ -80,7 +84,7 @@ def side (self, nombre, offset):
 class SelectMenor (bpy.types.Operator):
     bl_idname = "mesh.select_side_osc"
     bl_label = "Select Side"
-    bl_options = {"REGISTER", "UNDO"}
+    bl_options = set(["REGISTER", "UNDO"])
 
     @classmethod
     def poll(cls, context):
@@ -92,7 +96,7 @@ class SelectMenor (bpy.types.Operator):
 
         side(self, self.side, self.offset)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 ##-------------------------RESYM VG----------------------------------
@@ -102,7 +106,7 @@ class SelectMenor (bpy.types.Operator):
 class resymVertexGroups (bpy.types.Operator):
     bl_idname = "mesh.resym_vertex_weights_osc"
     bl_label = "Resym Vertex Weights"
-    bl_options = {"REGISTER", "UNDO"}    
+    bl_options = set(["REGISTER", "UNDO"])    
 
     @classmethod
     def poll(cls, context):
@@ -122,7 +126,7 @@ class resymVertexGroups (bpy.types.Operator):
             bpy.context.object.data.update()                
 
  
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 ###------------------------IMPORT EXPORT GROUPS--------------------
@@ -130,7 +134,7 @@ class resymVertexGroups (bpy.types.Operator):
 class OscExportVG (bpy.types.Operator):
     bl_idname = "file.export_groups_osc"
     bl_label = "Export Groups"
-    bl_options = {"REGISTER", "UNDO"}
+    bl_options = set(["REGISTER", "UNDO"])
 
     @classmethod
     def poll(cls, context):
@@ -140,7 +144,7 @@ class OscExportVG (bpy.types.Operator):
         
         ob = bpy.context.object
         with open(os.path.join(os.path.dirname(bpy.data.filepath),ob.name+".txt"), mode="w") as file:
-            vgindex =  {vg.index : vg.name for vg in ob.vertex_groups[:]}
+            vgindex =  dict((vg.index, vg.name) for vg in ob.vertex_groups[:])
             vgdict = {}
             for vert in ob.data.vertices:
                 for vg in vert.groups:
@@ -148,12 +152,12 @@ class OscExportVG (bpy.types.Operator):
             file.write(str(vgdict)+"\n")      
             file.write(str(vgindex))              
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class OscImportVG (bpy.types.Operator):
     bl_idname = "file.import_groups_osc"
     bl_label = "Import Groups"
-    bl_options = {"REGISTER", "UNDO"}
+    bl_options = set(["REGISTER", "UNDO"])
 
     @classmethod
     def poll(cls, context):
@@ -173,7 +177,7 @@ class OscImportVG (bpy.types.Operator):
             for index, weight in vdata:
                 ob.vertex_groups[group].add(index=[index],weight=weight,type="REPLACE")                    
         
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 
@@ -190,8 +194,8 @@ def reSymSave (self,quality):
     rd = lambda x : round(x,rdqual)
     absol = lambda x : (abs(x[0]),x[1],x[2])
 
-    inddict = { tuple(map(rd, vert.co[:])) : vert.index for vert in object.data.vertices[:]}
-    reldict = { inddict[vert] : inddict.get(absol(vert),inddict[vert]) for vert in inddict if vert[0] <= 0  }       
+    inddict = dict(( tuple(imap(rd, vert.co[:])), vert.index) for vert in object.data.vertices[:])
+    reldict = dict(( inddict[vert], inddict.get(absol(vert),inddict[vert])) for vert in inddict if vert[0] <= 0)       
         
     ENTFILEPATH= "%s_%s_SYM_TEMPLATE.xml" %  (os.path.join(os.path.dirname(bpy.data.filepath), bpy.context.scene.name), bpy.context.object.name)
     with open(ENTFILEPATH ,mode="w") as file:   
@@ -245,7 +249,7 @@ def reSymMesh (self, SELECTED, SIDE):
 class OscResymSave (bpy.types.Operator):
     bl_idname = "mesh.resym_save_map"
     bl_label = "Resym save XML Map"
-    bl_options = {"REGISTER", "UNDO"}
+    bl_options = set(["REGISTER", "UNDO"])
 
     @classmethod
     def poll(cls, context):
@@ -255,12 +259,12 @@ class OscResymSave (bpy.types.Operator):
     
     def execute (self, context):
         reSymSave(self,self.quality)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class OscResymMesh (bpy.types.Operator):
     bl_idname = "mesh.resym_mesh"
     bl_label = "Resym save Apply XML"
-    bl_options = {"REGISTER", "UNDO"}
+    bl_options = set(["REGISTER", "UNDO"])
 
     @classmethod
     def poll(cls, context):
@@ -278,7 +282,7 @@ class OscResymMesh (bpy.types.Operator):
     
     def execute (self, context):
         reSymMesh(self, self.selected,self.side)
-        return {'FINISHED'}
+        return set(['FINISHED'])
     
 
 
@@ -300,7 +304,7 @@ class OscObjectToMesh(bpy.types.Operator):
 
     def execute(self, context):
         DefOscObjectToMesh()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 ## ----------------------------- OVERLAP UV --------------------------------------------
@@ -326,16 +330,16 @@ def DefOscOverlapUv(valpresicion):
         vertexvert[vertex.index]=vertex.vertex_index  
 
     # posicion de cada vertice y cada face 
-    vertloc = { rounder(vert.co[:]) : vert for vert in ob.data.vertices} 
-    faceloc = { rounder(poly.center[:]) : poly for poly in ob.data.polygons} 
+    vertloc = dict(( rounder(vert.co[:]), vert) for vert in ob.data.vertices) 
+    faceloc = dict(( rounder(poly.center[:]), poly) for poly in ob.data.polygons) 
 
     # relativo de cada vertice y cada face
-    verteq = {vert : vertloc.get(absco(co),vertloc[co]) for co,vert in vertloc.items() if co[0] <= 0}  
-    verteqind = {vert.index : vertloc.get(absco(co),vertloc[co]).index for co,vert in vertloc.items() if co[0] <= 0}     
-    polyeq = {face : faceloc.get(absco(center),faceloc[center]) for center,face in faceloc.items() if center[0] <= 0}  
+    verteq = dict((vert, vertloc.get(absco(co),vertloc[co])) for co,vert in vertloc.items() if co[0] <= 0)  
+    verteqind = dict((vert.index, vertloc.get(absco(co),vertloc[co]).index) for co,vert in vertloc.items() if co[0] <= 0)     
+    polyeq = dict((face, faceloc.get(absco(center),faceloc[center])) for center,face in faceloc.items() if center[0] <= 0)  
 
     # loops in faces
-    lif = {poly : [i for i in poly.loop_indices] for poly in ob.data.polygons}
+    lif = dict((poly, [i for i in poly.loop_indices]) for poly in ob.data.polygons)
 
     # acomoda
     vertexeq = {}
@@ -349,14 +353,14 @@ def DefOscOverlapUv(valpresicion):
 
     bpy.ops.object.mode_set(mode=mode, toggle=False) 
    
-    print("Time elapsed: %4s seconds" % (time.time()-inicio))          
+    print "Time elapsed: %4s seconds" % (time.time()-inicio)          
     
 
 
 class OscOverlapUv(bpy.types.Operator):
     bl_idname = "mesh.overlap_uv_faces"
     bl_label = "Overlap Uvs"
-    bl_options = {"REGISTER", "UNDO"}
+    bl_options = set(["REGISTER", "UNDO"])
 
     @classmethod
     def poll(cls, context):
@@ -366,7 +370,7 @@ class OscOverlapUv(bpy.types.Operator):
     
     def execute(self, context):
         DefOscOverlapUv(self.presicion)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 ## ------------------------------- IO VERTEX COLORS --------------------
 
@@ -385,7 +389,7 @@ def DefOscImportVC():
 class OscExportVC (bpy.types.Operator):
     bl_idname = "mesh.export_vertex_colors"
     bl_label = "Export Vertex Colors"
-    bl_options = {"REGISTER", "UNDO"}
+    bl_options = set(["REGISTER", "UNDO"])
 
     @classmethod
     def poll(cls, context):
@@ -393,12 +397,12 @@ class OscExportVC (bpy.types.Operator):
 
     def execute(self, context):
         DefOscExportVC()
-        return {'FINISHED'}    
+        return set(['FINISHED'])    
     
 class OscImportVC (bpy.types.Operator):
     bl_idname = "mesh.import_vertex_colors"
     bl_label = "Import Vertex Colors"
-    bl_options = {"REGISTER", "UNDO"}
+    bl_options = set(["REGISTER", "UNDO"])
 
     @classmethod
     def poll(cls, context):
@@ -406,7 +410,7 @@ class OscImportVC (bpy.types.Operator):
 
     def execute(self, context):
         DefOscImportVC()
-        return {'FINISHED'}              
+        return set(['FINISHED'])              
     
     
 ## ------------------ PRINT VERTICES ----------------------
@@ -437,17 +441,17 @@ class ModalIndexOperator(bpy.types.Operator):
             self.matr = context.object.matrix_world
         elif event.type == 'LEFTMOUSE':
             bpy.types.SpaceView3D.draw_handler_remove(self._handle, 'WINDOW')
-            return {'FINISHED'}
+            return set(['FINISHED'])
         elif event.type == 'PAGE_UP':
             self.tsize += 1
         elif event.type == 'PAGE_DOWN':
             self.tsize -= 1            
-        elif event.type in {'RIGHTMOUSE', 'ESC', 'TAB'}:
+        elif event.type in set(['RIGHTMOUSE', 'ESC', 'TAB']):
             bpy.types.SpaceView3D.draw_handler_remove(self._handle, 'WINDOW')
             context.area.header_text_set()
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
 
-        return {'PASS_THROUGH'}
+        return set(['PASS_THROUGH'])
     
     def invoke(self, context, event):
         if context.area.type == "VIEW_3D":
@@ -457,10 +461,10 @@ class ModalIndexOperator(bpy.types.Operator):
             args = (self, context)
             self._handle = bpy.types.SpaceView3D.draw_handler_add(dibuja_callback, args, "WINDOW", "POST_PIXEL")  
             context.window_manager.modal_handler_add(self)
-            return{'RUNNING_MODAL'}
+            returnset(['RUNNING_MODAL'])
         else:
-            self.report({"WARNING"}, "Is not a 3D Space")
-            return {'CANCELLED'}
+            self.report(set(["WARNING"]), "Is not a 3D Space")
+            return set(['CANCELLED'])
                 
 
 

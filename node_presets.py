@@ -16,6 +16,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import with_statement
+from __future__ import absolute_import
 bl_info = {
     "name": "Node Presets",
     "description": "Useful and time-saving tools for rendering workflow",
@@ -61,7 +63,7 @@ def node_template_add(context, filepath, node_group, ungroup, report):
     node_selected = context.selected_nodes
 
     if node_tree is None:
-        report({'ERROR'}, "No node tree available")
+        report(set(['ERROR']), "No node tree available")
         return
 
     with bpy.data.libraries.load(filepath, link=False) as (data_from, data_to):
@@ -86,7 +88,7 @@ def node_template_add(context, filepath, node_group, ungroup, report):
 
     is_fail = (node.node_tree is None)
     if is_fail:
-        report({'WARNING'}, "Incompatible node type")
+        report(set(['WARNING']), "Incompatible node type")
 
     node.select = True
     node_tree.nodes.active = node
@@ -130,7 +132,7 @@ class NODE_OT_template_add(Operator):
     bl_idname = "node.template_add"
     bl_label = "Add node group template"
     bl_description = "Add node group template"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     filepath = StringProperty(
             subtype='FILE_PATH',
@@ -141,12 +143,12 @@ class NODE_OT_template_add(Operator):
     def execute(self, context):
         node_template_add(context, self.filepath, self.group_name, True, self.report)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def invoke(self, context, event):
         node_template_add(context, self.filepath, self.group_name, event.shift, self.report)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 # -----------------------------------------------------------------------------
 # node menu list

@@ -21,6 +21,8 @@
 """Functions for dealing with PDF files.
 """
 
+from __future__ import absolute_import
+from io import open
 __author__ = "howard.trickey@gmail.com"
 
 import re
@@ -54,18 +56,18 @@ ONULL = 7
 OINDIRECTDEF = 8
 OINDIRECTREF = 9
 
-_re_psbool = re.compile(br'true|false')
-_re_psint = re.compile(br'(\+|-)?[0-9]+')
-_re_psreal = re.compile(br'((\+|-)?([0-9]+\.[0-9]*)|(\.[0-9]+))')
-_re_psstring = re.compile(br'\((\\.|.)*?\)')
-_re_pshexstring = re.compile(br'<[0-9A-Fa-f]*>')
-_re_psname = re.compile(br'/([^\0\t\n\f\r \(\)<>[\]{}/%]*)')
-_re_psnull = re.compile(br'null')
-_re_pskeyword = re.compile(br'[A-Za-z]+')
-_re_psstreameol = re.compile(br'\r\n|\n')
-_re_psendstream = re.compile(br'endstream')
-_re_pseol = re.compile(br'(\r\n|\n|\r)')
-_re_pswhitespaceandcomments = re.compile(br'([\0\t\n\f\r ]|%[^\n\r]*[\n\r]+)*')
+_re_psbool = re.compile(r'true|false')
+_re_psint = re.compile(r'(\+|-)?[0-9]+')
+_re_psreal = re.compile(r'((\+|-)?([0-9]+\.[0-9]*)|(\.[0-9]+))')
+_re_psstring = re.compile(r'\((\\.|.)*?\)')
+_re_pshexstring = re.compile(r'<[0-9A-Fa-f]*>')
+_re_psname = re.compile(r'/([^\0\t\n\f\r \(\)<>[\]{}/%]*)')
+_re_psnull = re.compile(r'null')
+_re_pskeyword = re.compile(r'[A-Za-z]+')
+_re_psstreameol = re.compile(r'\r\n|\n')
+_re_psendstream = re.compile(r'endstream')
+_re_pseol = re.compile(r'(\r\n|\n|\r)')
+_re_pswhitespaceandcomments = re.compile(r'([\0\t\n\f\r ]|%[^\n\r]*[\n\r]+)*')
 
 # Object Notes:
 # The string re is not really right - the spec allows
@@ -137,7 +139,7 @@ def GetPDFObject(s, i):
             return ((ONUM, int(m.group())), m.end())
     m = _re_psbool.match(s, i)
     if m:
-        if m.group == b'true':
+        if m.group == 'true':
             v = True
         else:
             v = False
@@ -158,11 +160,11 @@ def GetPDFObject(s, i):
         (o, j) = GetPDFDict(s, i)
         # check if followed by stream
         (w, k) = GetPDFKeyword(s, j)
-        if w == b'stream':
+        if w == 'stream':
             m = _re_psstreameol.match(s, k)
             if m:
                 streamstart = m.end()
-                streamend = s.find(b'endstream', streamstart)
+                streamend = s.find('endstream', streamstart)
                 if streamend > 0:
                     # just return byte offsets in s where stream
                     # contents start and (most probably) end
@@ -189,13 +191,13 @@ def GetPDFIndirectObjectRefOrDef(s, i):
         return (None, i)
     (obj_number, gen_number) = v
     (w, j) = GetPDFKeyword(s, j)
-    if w == b'R':
+    if w == 'R':
         return ((OINDIRECTREF, (obj_number, gen_number)), j)
-    elif w == b'obj':
+    elif w == 'obj':
         (obj, j) = GetPDFObject(s, j)
         if obj is not None:
             (w, j) = GetPDFKeyword(s, j)
-            if w == b'endobj':
+            if w == 'endobj':
                 return ((OINDIRECTDEF, (obj_number, gen_number, obj)), j)
     return (None, i)
 
@@ -249,11 +251,11 @@ def GetPDFKeyword(s, i):
     if m:
         j = m.end()
     if j == len(s):
-        return (b'', i)
+        return ('', i)
     m = _re_pskeyword.match(s, j)
     if m:
         return (m.group(), m.end())
-    return (b'', i)
+    return ('', i)
 
 
 def GetPDFLiteralString(s, i):
@@ -275,7 +277,7 @@ def GetPDFLiteralString(s, i):
             j += 1
             if j == len(s):
                 if WARN:
-                    print("unterminated string at", i)
+                    print "unterminated string at", i
                 return ((OSTRING, ''.join(v)), j)
             c = ordat(s, j)
             if c == ord('n'):
@@ -317,7 +319,7 @@ def GetPDFLiteralString(s, i):
                 v += chr(c)
         j += 1
     if WARN:
-        print('unterminated string at', i)
+        print 'unterminated string at', i
     return ((OSTRING, ''.join(v)), j)
 
 
@@ -352,7 +354,7 @@ def FromHexPair(a, b):
         v = int(a + b, 16)
     except TypeError:
         if WARN:
-            print('funny hex pair', a + b)
+            print 'funny hex pair', a + b
         v = 0
     return chr(v)
 
@@ -375,7 +377,7 @@ def GetPDFArray(s, i):
             break
         v.append(o)
     if WARN:
-        print('unterminated array starting at', i)
+        print 'unterminated array starting at', i
     return ((OARRAY, v), j)
 
 
@@ -397,7 +399,7 @@ def GetPDFDict(s, i):
             break
         if o[0] != ONAME:
             if WARN:
-                print('expected name at', i)
+                print 'expected name at', i
             break
         name = o[1]
         (o, j) = GetPDFObject(s, j)
@@ -405,7 +407,7 @@ def GetPDFDict(s, i):
             break
         v[name] = o
     if WARN:
-        print('unterminated dict starting at', i)
+        print 'unterminated dict starting at', i
     return ((ODICT, v), j)
 
 
@@ -419,10 +421,10 @@ def GetPDFTrailerAndCrossrefs(s):
       (trailer dict, crossref dict)
     """
 
-    startxrefi = s.rfind(b'startxref')
+    startxrefi = s.rfind('startxref')
     if startxrefi == -1:
         if WARN:
-            print('cannot find startxref')
+            print 'cannot find startxref'
         return (None, None)
     crossrefi = -1
     m = _re_pseol.match(s, startxrefi + 9)
@@ -432,15 +434,15 @@ def GetPDFTrailerAndCrossrefs(s):
             crossrefi = int(m2.group())
     if crossrefi <= 0:
         if WARN:
-            print('cannot find crossref index')
+            print 'cannot find crossref index'
         return (None, None)
     crossrefs = {}
     last_trailerdict = None
     while crossrefi > 0:
         i = crossrefi
-        if s[i:i + 4] != b'xref':
+        if s[i:i + 4] != 'xref':
             if WARN:
-                print('cannot find xref')
+                print 'cannot find xref'
             break
         m = _re_pseol.match(s, i + 4)
         if m:
@@ -454,7 +456,7 @@ def GetPDFTrailerAndCrossrefs(s):
             m = _re_pswhitespaceandcomments.match(s, i)
             if m:
                 i = m.end()
-            for k in range(idstart, idstart + nentries):
+            for k in xrange(idstart, idstart + nentries):
                 byteoffset = int(s[i:i + 10])
                 gen = int(s[i + 11:i + 16])
                 inuse = (ordat(s, i + 17) == ord('n'))
@@ -463,14 +465,14 @@ def GetPDFTrailerAndCrossrefs(s):
                 i += 20
         # Should be at 'trailer' now
         (w, i) = GetPDFKeyword(s, i)
-        if w != b'trailer':
+        if w != 'trailer':
             if WARN:
-                print('cannot find trailer')
+                print 'cannot find trailer'
             break
         (trailero, i) = GetPDFObject(s, i)
         if trailero is None or trailero[0] != ODICT:
             if WARN:
-                print('cannot find trailer dict')
+                print 'cannot find trailer dict'
                 break
         trailerdict = trailero[1]
         if last_trailerdict is None:
@@ -495,7 +497,7 @@ def ReadPDFPageOneContents(filename):
         f = open(filename, "rb")  # binary since some parts may be compressed
     except IOError:
         if WARN:
-            print("Can't open file", filename)
+            print "Can't open file", filename
         return ''
     contents = f.read()
     f.close()
@@ -523,21 +525,21 @@ def GetPDFPageOneContents(s):
     (trailerdict, crossrefs) = GetPDFTrailerAndCrossrefs(s)
     if not trailerdict or not crossrefs:
         if WARN:
-            print('problem finding trailer or crossrefs')
+            print 'problem finding trailer or crossrefs'
         return ''
     if 'Root' not in trailerdict:
         if WARN:
-            print('cannot find Root object')
+            print 'cannot find Root object'
         return ''
     root = GetTypedValFromDictEntry(trailerdict, 'Root', ODICT, s, crossrefs)
     if root is None:
         if WARN:
-            print('cannot find root dictionary')
+            print 'cannot find root dictionary'
             return ''
     pagesdict = GetTypedValFromDictEntry(root, 'Pages', ODICT, s, crossrefs)
     if pagesdict is None:
         if WARN:
-            print('cannot find Pages dictionary')
+            print 'cannot find Pages dictionary'
         return ''
     pnode = pagesdict
     while pnode:
@@ -547,18 +549,18 @@ def GetPDFPageOneContents(s):
                 crossrefs)
             if not kidsarray:
                 if WARN:
-                    print('cannot find Kids in Pages')
+                    print 'cannot find Kids in Pages'
                 return ''
             if len(kidsarray) == 0:
                 if WARN:
-                    print('Kids array has no Page')
+                    print 'Kids array has no Page'
                 return ''
             pnodeobj = GetPDFObjFromIndirectRef(kidsarray[0], s, crossrefs)
             if PDFObjHasType(pnodeobj, ODICT):
                 pnode = pnodeobj[1]
             else:
                 if WARN:
-                    print('Kids element has unexpected type')
+                    print 'Kids element has unexpected type'
                     return ''
         elif pnodetype == 'Page':
             contentsobj = GetPDFObjFromDictEntry(pnode, 'Contents', s,
@@ -567,7 +569,7 @@ def GetPDFPageOneContents(s):
                 # it is legal for there to be no contents object:
                 # means empty page
                 if WARN:
-                    print('First Page is empty')
+                    print 'First Page is empty'
                 return ''
             if contentsobj[0] == OSTREAM:
                 return GetPDFStreamContents(contentsobj, s, crossrefs)
@@ -576,23 +578,23 @@ def GetPDFPageOneContents(s):
                 for c in contentsobj[1]:
                     if not PDFObjHasType(c, OINDIRECTREF):
                         if WARN:
-                            print('Contents obj child not an indirect ref')
+                            print 'Contents obj child not an indirect ref'
                         return ''
                     o = GetPDFObjFromIndirectRef(c, s, crossrefs)
                     if not PDFObjHasType(o, OSTREAM):
                         if WARN:
-                            print('Contents obj child not a stream')
+                            print 'Contents obj child not a stream'
                         return ''
                     pieces.append(GetPDFStreamContents(o, s, crossrefs))
                 return '\n'.join(pieces)
             else:
                 if WARN:
-                    print('Contents object has unexpected type',
-                        contentsobj[0])
+                    print 'Contents object has unexpected type',
+                        contentsobj[0]
                 return ''
         else:
             if WARN:
-                print('Page tree node has unexpected type', pnodetype)
+                print 'Page tree node has unexpected type', pnodetype
             return ''
     # shouldn't get here
     return ''
@@ -706,7 +708,7 @@ def GetPDFStreamContents(contentsobj, s, crossrefs):
             ans = ans.decode()
         else:
             if WARN:
-                print('unhandled stream filter', fname)
+                print 'unhandled stream filter', fname
             return ''
     return ans
 

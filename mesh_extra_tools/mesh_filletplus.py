@@ -54,7 +54,7 @@ def get_adj_v_(list_):
 		return tmp
 
 # ------ ------
-class f_buf():
+class f_buf(object):
 	an = 0
 
 # ------ ------
@@ -109,7 +109,7 @@ def f_(list_0, startv, vertlist, face, adj, n, out, flip, radius):
 	elif out == True:
 		rot_ang = (2 * pi) - vec1.angle(vec2)
 
-	for j in range(n + 1):
+	for j in xrange(n + 1):
 		new_angle = rot_ang * j / n
 		mtrx = Matrix.Rotation(new_angle, 3, axis)
 		if out == False:
@@ -140,7 +140,7 @@ def f_(list_0, startv, vertlist, face, adj, n, out, flip, radius):
 	list_clear_(list_2)
 
 	n1 = len(list_3)
-	for t in range(n1 - 1):
+	for t in xrange(n1 - 1):
 		bm.edges.new([list_3[t], list_3[(t + 1) % n1]])
 
 		v = bm.verts.new(p)
@@ -199,7 +199,7 @@ def do_filletplus(pair):
 	v1, v2, v3 = vertset
 
 	if len(list_0) != 2:
-		self.report({'INFO'}, 'Two adjacent edges must be selected.')
+		self.report(set(['INFO']), 'Two adjacent edges must be selected.')
 		return
 	else:
 		inaction = 1
@@ -245,11 +245,13 @@ class f_p0(bpy.types.Panel):
 		row.operator('f.op1_id', text = '?')
 '''
 # ------ operator 0 ------
+from __future__ import division
+from __future__ import absolute_import
 class fillet_op0(bpy.types.Operator):
 	bl_idname = 'fillet.op0_id'
 	bl_label = 'Fillet'
 	bl_description = 'Fillet ajoining edges'
-	bl_options = {'REGISTER', 'UNDO'}
+	bl_options = set(['REGISTER', 'UNDO'])
 
 	adj = FloatProperty( name = '', default = 0.1, min = 0.00001, max = 100.0, step = 1, precision = 3 )
 	n = IntProperty( name = '', default = 3, min = 1, max = 100, step = 1 )
@@ -332,9 +334,9 @@ class fillet_op0(bpy.types.Operator):
 					bm.verts.remove(v)
 			bpy.ops.object.editmode_toggle()
 			bpy.ops.object.editmode_toggle()
-			return {'FINISHED'}
+			return set(['FINISHED'])
 		else:
-			return {'CANCELLED'}
+			return set(['CANCELLED'])
 
 # ------ operator 1 ------
 class filletedgehelp(bpy.types.Operator):
@@ -349,7 +351,7 @@ class filletedgehelp(bpy.types.Operator):
 		layout.label('best used on flat plane.')
 
 	def execute(self, context):
-		return {'FINISHED'}
+		return set(['FINISHED'])
 
 	def invoke(self, context, event):
 		return context.window_manager.invoke_popup(self, width = 350)
@@ -361,7 +363,7 @@ class fillet_op2(bpy.types.Operator):
 
 	def execute(self, context):
 		bpy.ops.f.op1_id('INVOKE_DEFAULT')
-		return {'FINISHED'}
+		return set(['FINISHED'])
 '''
 # ------ ------
 class_list = [ f_op0, f_op1, f_op2, f_p0]

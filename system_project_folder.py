@@ -19,6 +19,7 @@
 #
 # ***** END GPL LICENCE BLOCK *****
 
+from __future__ import absolute_import
 bl_info = {
     "name": "Project Folder",
     "author": "Dany Lebel (Axon_D), Spirou4D",
@@ -47,13 +48,13 @@ class ProjectFolder(bpy.types.Operator):
         try :
             path = self.path()
         except ValueError:
-            self.report({'INFO'}, "No project folder yet")
-            return {'FINISHED'}
+            self.report(set(['INFO']), "No project folder yet")
+            return set(['FINISHED'])
 
         bpy.ops.wm.path_open(filepath=path)
 
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def path(self):
         filepath = bpy.data.filepath

@@ -56,6 +56,8 @@ bl_info = {
 #           to console.
 #
 
+from __future__ import division
+from __future__ import absolute_import
 import bpy
 
 from bpy_extras import object_utils
@@ -76,7 +78,7 @@ def create_mesh (self, context, name, verts, faces, debug):
     mesh.update(calc_edges=True)
 
     if debug:
-        print("create_mesh function called and finished")
+        print "create_mesh function called and finished"
 
     return object_utils.object_data_add(context, mesh, operator=self)
 
@@ -94,11 +96,11 @@ def recalc_normals(debug):
         bpy.ops.mesh.normals_make_consistent()
         bpy.ops.object.editmode_toggle()
         if debug:
-            print("\nObjectMode")
+            print "\nObjectMode"
     else:
         bpy.ops.mesh.normals_make_consistent()
         if debug:
-            print("\nEditMode")
+            print "\nEditMode"
 
     return
 
@@ -125,7 +127,7 @@ def create_end_faces(verts_list, thick, debug):
         num_of_verts = int(num_of_verts / 2)
 
         # Create a list of the front faces
-        for index in range(num_of_verts):
+        for index in xrange(num_of_verts):
             if index == (num_of_verts - 1):
                 faces_temp.append(verts_list[index])
                 faces_temp.append(verts_list[index-index])
@@ -147,7 +149,7 @@ def create_end_faces(verts_list, thick, debug):
             center_vert = verts_list[num_of_verts - 1]
             verts_list[num_of_verts - 1] = verts_list[0]
 
-            for index in range(int(num_of_verts - 1)):
+            for index in xrange(int(num_of_verts - 1)):
                 faces_temp.append(verts_list[index])
                 faces_temp.append(verts_list[index + 1])
                 faces_temp.append(center_vert)
@@ -156,16 +158,16 @@ def create_end_faces(verts_list, thick, debug):
 
         else:
             # create 1 end face
-            for index in range(num_of_verts):
+            for index in xrange(num_of_verts):
                 faces_temp.append(verts_list[index])
             faces.append(tuple(faces_temp))
 
     # print debug info to console
     if debug:
-        print("\ncreate_end_faces Function Starts")
-        print("\n End Face Verts list :", verts_list)
-        print("\n End Faces: ", faces)
-        print("\ncreate_end_faces Function Ends\n\n")
+        print "\ncreate_end_faces Function Starts"
+        print "\n End Face Verts list :", verts_list
+        print "\n End Faces: ", faces
+        print "\ncreate_end_faces Function Ends\n\n"
 
     return faces
 
@@ -190,16 +192,16 @@ def create_side_faces(front_verts, back_verts, debug):
     back_verts.append(back_verts[0])
 
     # Build the new_faces list with tuples defining each face
-    for index in range(num_of_faces):
+    for index in xrange(num_of_faces):
         facestemp = (front_verts[index], front_verts[index+1], back_verts[index+1], back_verts[index])
         new_faces.append(facestemp)
 
     # print debug info to console
     if debug:
-        print("\ncreate_side_faces Function Starts")
-        print("\n Number of faces to create: ", num_of_faces)
-        print("\n New faces :", new_faces)
-        print("\ncreate_side_faces Function Ends\n\n")
+        print "\ncreate_side_faces Function Starts"
+        print "\n Number of faces to create: ", num_of_faces
+        print "\n New faces :", new_faces
+        print "\ncreate_side_faces Function Ends\n\n"
 
     return new_faces
 
@@ -219,9 +221,9 @@ def calc_end_verts(size, y_off, thick, debug):
     verts = []
 
     if debug:
-        print ("\ncalc_end_verts Function Starts\n")
-        print("\nsize = ",size)
-        print("y_off = ",y_off)
+        print "\ncalc_end_verts Function Starts\n"
+        print "\nsize = ",size
+        print "y_off = ",y_off
 
     # Create vertices by calculation
     x_pos = 0 + size[0]/2
@@ -266,8 +268,8 @@ def calc_end_verts(size, y_off, thick, debug):
         verts.append((x_pos, y_off, z_pos))
 
     if debug:
-        print ("verts :", verts)
-        print ("\ncalc_end_verts Function Ends.\n\n")
+        print "verts :", verts
+        print "\ncalc_end_verts Function Ends.\n\n"
 
     return verts
 
@@ -307,11 +309,11 @@ def adjust_c_beam_verts(verts, taper, debug):
     vert_new = (vert_x,vert_temp[1],vert_z)
 
     if debug:
-        print ("\nadjust_c_beam_verts function starting")
-        print ("vert_orig = ",vert_orig[0])
-        print ("vert_x = ",vert_x)
-        print("vert_temp =",vert_temp)
-        print("vert_new =",vert_new)
+        print "\nadjust_c_beam_verts function starting"
+        print "vert_orig = ",vert_orig[0]
+        print "vert_x = ",vert_x
+        print "vert_temp =",vert_temp
+        print "vert_new =",vert_new
 
     # update 5th vert with new value
     verts[4] = vert_new
@@ -335,17 +337,17 @@ def adjust_c_beam_verts(verts, taper, debug):
     vert_new = (vert_x,vert_temp[1],vert_z)
 
     if debug:
-        print ("vert_orig = ",vert_orig[0])
-        print ("vert_x = ",vert_x)
-        print("vert_temp =",vert_temp)
-        print("vert_new =",vert_new)
+        print "vert_orig = ",vert_orig[0]
+        print "vert_x = ",vert_x
+        print "vert_temp =",vert_temp
+        print "vert_new =",vert_new
 
     # update 6th vert with new value
     verts[5] = vert_new
 
     if debug:
-        print("\n adjust_c_beam_verts function ending")
-        print("verts =", verts)
+        print "\n adjust_c_beam_verts function ending"
+        print "verts =", verts
 
     return verts
 
@@ -407,10 +409,10 @@ def create_rectangular_beam(size, thick, debug):
 
     # Print debug info to console
     if debug:
-        print("\ncreate_multi_side_box Function Start")
-        print("\n Front vertices :", verts_front_temp)
-        print("\n Back vertices:", verts_back_temp)
-        print("\n All vertices:", verts_final)
+        print "\ncreate_multi_side_box Function Start"
+        print "\n Front vertices :", verts_front_temp
+        print "\n Back vertices:", verts_back_temp
+        print "\n All vertices:", verts_final
 
     # Create front face
     faces_front_temp = []
@@ -418,7 +420,7 @@ def create_rectangular_beam(size, thick, debug):
     numofverts = len(verts_front_temp)
 
     # Build vertex list
-    for index in range(numofverts):
+    for index in xrange(numofverts):
         verts_front_list.append(index)
 
     faces_front_temp = create_end_faces(verts_front_list, thick, debug)
@@ -429,7 +431,7 @@ def create_rectangular_beam(size, thick, debug):
     numofverts = len(verts_back_temp)
 
     # Build vertex list
-    for index in range(numofverts):
+    for index in xrange(numofverts):
         verts_back_list.append(index + len(verts_back_temp))
 
     faces_back_temp = create_end_faces(verts_back_list, thick, debug)
@@ -460,9 +462,9 @@ def create_rectangular_beam(size, thick, debug):
 
     # print debug info to console
     if debug:
-        print("\ncreate_multi_side_box Function")
-        print("\nAll faces :",faces_final)
-        print("\ncreate_multi_side_box Function Ends\n\n")
+        print "\ncreate_multi_side_box Function"
+        print "\nAll faces :",faces_final
+        print "\ncreate_multi_side_box Function Ends\n\n"
 
     return verts_final, faces_final
 
@@ -481,7 +483,7 @@ def create_C_beam(size, thick, taper, debug):
 
     # print debug info to console
     if debug:
-        print ("\ncreate_C_beam - function called")
+        print "\ncreate_C_beam - function called"
 
     # Get y offset of vertices from center
     y_off = size[1] / 2
@@ -511,10 +513,10 @@ def create_C_beam(size, thick, taper, debug):
 
     # Print debug info to console
     if debug:
-        print("\ncreate_C_beam function start")
-        print("\n Front vertices :", verts_front_temp)
-        print("\n Back vertices:", verts_back_temp)
-        print("\n All vertices:", verts_final)
+        print "\ncreate_C_beam function start"
+        print "\n Front vertices :", verts_front_temp
+        print "\n Back vertices:", verts_back_temp
+        print "\n All vertices:", verts_final
 
     # Create front face
     faces_front_temp = []
@@ -522,7 +524,7 @@ def create_C_beam(size, thick, taper, debug):
     numofverts = len(verts_front_temp)
 
     # Build vertex list
-    for index in range(numofverts):
+    for index in xrange(numofverts):
         verts_front_list.append(index)
     # problem area
     faces_front_temp = create_end_faces(verts_front_list, thick, debug)
@@ -535,7 +537,7 @@ def create_C_beam(size, thick, taper, debug):
     numofverts = len(verts_back_temp)
 
     # Build vertex list
-    for index in range(numofverts):
+    for index in xrange(numofverts):
         verts_back_list.append(index + len(verts_back_temp))
 
     faces_back_temp = create_end_faces(verts_back_list, thick, debug)
@@ -570,9 +572,9 @@ def create_C_beam(size, thick, taper, debug):
 
     # Print debug info to console
     if debug:
-        print("\ncreate_C_beam function")
-        print("\nAll faces =", faces_final)
-        print("\ncreate_C_beam function ending")
+        print "\ncreate_C_beam function"
+        print "\nAll faces =", faces_final
+        print "\ncreate_C_beam function ending"
 
     return verts_final, faces_final
 
@@ -590,7 +592,7 @@ def create_L_beam(size, thick, taper, debug):
     # faces_final - a list of tuples of the vertices that make up each face
 
     if debug:
-        print("\ncreate_L_beam function starting")
+        print "\ncreate_L_beam function starting"
 
     # Get offset of vertices from center
     x_off = size[0] / 2
@@ -638,9 +640,9 @@ def create_L_beam(size, thick, taper, debug):
     verts_final = verts_front_temp + verts_back_temp
 
     if debug:
-        print("\n verts_front_temp =", verts_front_temp)
-        print("\n verts_back_temp =", verts_back_temp)
-        print("\n verts_final =", verts_final)
+        print "\n verts_front_temp =", verts_front_temp
+        print "\n verts_back_temp =", verts_back_temp
+        print "\n verts_final =", verts_final
 
     # define end faces, only 4 so just coded
     faces_front_temp = []
@@ -655,9 +657,9 @@ def create_L_beam(size, thick, taper, debug):
     num_of_verts = len(verts_front_temp)
 
     # build lists of back and front verts for create_side_faces function
-    for index in range(num_of_verts):
+    for index in xrange(num_of_verts):
         verts_front_list.append(index)
-    for index in range(num_of_verts):
+    for index in xrange(num_of_verts):
         verts_back_list.append(index  + 6)
 
     faces_side_temp = create_side_faces(verts_front_list, verts_back_list, debug)
@@ -665,11 +667,11 @@ def create_L_beam(size, thick, taper, debug):
     faces_final = faces_front_temp + faces_back_temp + faces_side_temp
 
     if debug:
-        print("\n faces_front_temp =", faces_front_temp)
-        print("\n faces_back_temp =", faces_back_temp)
-        print("\n faces_side_temp =", faces_side_temp)
-        print("\n faces_final =", faces_final)
-        print("\ncreate_L_beam function ending")
+        print "\n faces_front_temp =", faces_front_temp
+        print "\n faces_back_temp =", faces_back_temp
+        print "\n faces_side_temp =", faces_side_temp
+        print "\n faces_final =", faces_final
+        print "\ncreate_L_beam function ending"
 
     return verts_final, faces_final
 
@@ -689,7 +691,7 @@ def create_T_beam(size, thick, taper, debug):
     debug = 0
 
     if debug:
-        print("\ncreate_T_beam function starting")
+        print "\ncreate_T_beam function starting"
 
     # Get offset of vertices from center
     x_off = size[0] / 2
@@ -784,9 +786,9 @@ def create_T_beam(size, thick, taper, debug):
     num_of_verts = len(verts_front_temp)
 
     # build lists of back and front verts for create_side_faces function
-    for index in range(num_of_verts):
+    for index in xrange(num_of_verts):
         verts_front_list.append(index)
-    for index in range(num_of_verts):
+    for index in xrange(num_of_verts):
         verts_back_list.append(index  + 10)
 
     faces_side_temp = create_side_faces(verts_front_list, verts_back_list, debug)
@@ -794,7 +796,7 @@ def create_T_beam(size, thick, taper, debug):
     faces_final = faces_front_temp + faces_back_temp + faces_side_temp
 
     if debug:
-        print("\ncreate_T_beam function ending")
+        print "\ncreate_T_beam function ending"
 
     return verts_final, faces_final
 
@@ -813,7 +815,7 @@ def create_I_beam(size, thick, taper, debug):
     debug = 0
 
     if debug:
-        print("\ncreate_I_beam function starting")
+        print "\ncreate_I_beam function starting"
 
     # Get offset of vertices from center
     x_off = size[0] / 2
@@ -918,9 +920,9 @@ def create_I_beam(size, thick, taper, debug):
     num_of_verts = len(verts_front_temp)
 
     # build lists of back and front verts for create_side_faces function
-    for index in range(num_of_verts):
+    for index in xrange(num_of_verts):
         verts_front_list.append(index)
-    for index in range(num_of_verts):
+    for index in xrange(num_of_verts):
         verts_back_list.append(index  + 16)
 
     faces_side_temp = create_side_faces(verts_front_list, verts_back_list, debug)
@@ -928,7 +930,7 @@ def create_I_beam(size, thick, taper, debug):
     faces_final = faces_front_temp + faces_back_temp + faces_side_temp
 
     if debug:
-        print("\ncreate_I_beam function ending")
+        print "\ncreate_I_beam function ending"
 
     return verts_final, faces_final
 
@@ -941,7 +943,7 @@ class Add_Rectangular_Beam(bpy.types.Operator):
     bl_idname = "mesh.primitive_rectangle_add"
     bl_label = "Add Rectangluar Beam"
     bl_description = "Create a Rectangular Beam mesh"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     mesh_z_size = bpy.props.FloatProperty(name = "Height(z)",
         description = "Height (along the z-axis) of mesh",
@@ -1015,14 +1017,14 @@ class Add_Rectangular_Beam(bpy.types.Operator):
         verts, faces = create_rectangular_beam(size, thick, debug)
 
         if debug:
-            print("\nCreated Verts:", verts)
-            print("\nCreated Faces:", faces)
+            print "\nCreated Verts:", verts
+            print "\nCreated Faces:", faces
 
         create_mesh(self, context, "Rectangular Beam", verts, faces, debug)
 
         recalc_normals(debug)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 '''
     def invoke(self, context, event):
@@ -1038,7 +1040,7 @@ class Add_C_Beam(bpy.types.Operator):
     bl_idname = "mesh.primitive_c_beam_add"
     bl_label = "Add C or U Channel"
     bl_description = "Create a C or U channel mesh"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
 
     mesh_z_size = bpy.props.FloatProperty(name = "Height(z)",
@@ -1122,8 +1124,8 @@ class Add_C_Beam(bpy.types.Operator):
         verts, faces = create_C_beam(size, self.thick, self.taper, debug)
 
         if debug:
-            print("\nCreated Verts:", verts)
-            print("\nCreated Faces:", faces)
+            print "\nCreated Verts:", verts
+            print "\nCreated Faces:", faces
 
         create_mesh(self, context, mesh_name, verts, faces, debug)
 
@@ -1138,7 +1140,7 @@ class Add_C_Beam(bpy.types.Operator):
             bpy.ops.transform.rotate(value=[1.570796], constraint_axis=[False, True, False])
             bpy.ops.object.transform_apply(location=False, rotation =True, scale=False)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 '''
     def invoke(self, context, event):
@@ -1154,7 +1156,7 @@ class Add_L_Beam(bpy.types.Operator):
     bl_idname = "mesh.primitive_l_beam_add"
     bl_label = "Add L Beam"
     bl_description = "Create a L shaped mesh"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     mesh_z_size = bpy.props.FloatProperty(name = "Height(z)",
         description = "Height (along the z-axis) of mesh",
@@ -1226,14 +1228,14 @@ class Add_L_Beam(bpy.types.Operator):
         verts, faces = create_L_beam(size, self.thick, self.taper, debug)
 
         if debug:
-            print("\nCreated Verts:", verts)
-            print("\nCreated Faces:", faces)
+            print "\nCreated Verts:", verts
+            print "\nCreated Faces:", faces
 
         create_mesh(self, context, "L Beam", verts, faces, debug)
 
         recalc_normals(debug)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 '''
     def invoke(self, context, event):
@@ -1249,7 +1251,7 @@ class Add_T_Beam(bpy.types.Operator):
     bl_idname = "mesh.primitive_t_beam_add"
     bl_label = "Add T Beam"
     bl_description = "Create a T shaped mesh"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     mesh_z_size = bpy.props.FloatProperty(name = "Height(z)",
         description = "Height (along the z-axis) of mesh",
@@ -1321,14 +1323,14 @@ class Add_T_Beam(bpy.types.Operator):
         verts, faces = create_T_beam(size, self.thick, self.taper, debug)
 
         if debug:
-            print("\nCreated Verts:", verts)
-            print("\nCreated Faces:", faces)
+            print "\nCreated Verts:", verts
+            print "\nCreated Faces:", faces
 
         create_mesh(self, context, "T Beam", verts, faces, debug)
 
         recalc_normals(debug)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 '''
     def invoke(self, context, event):
@@ -1344,7 +1346,7 @@ class Add_I_Beam(bpy.types.Operator):
     bl_idname = "mesh.primitive_i_beam_add"
     bl_label = "Add I Beam"
     bl_description = "Create a I shaped mesh"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     mesh_z_size = bpy.props.FloatProperty(name = "Height(z)",
         description = "Height (along the z-axis) of mesh",
@@ -1416,14 +1418,14 @@ class Add_I_Beam(bpy.types.Operator):
         verts, faces = create_I_beam(size, self.thick, self.taper, debug)
 
         if debug:
-            print("\nCreated Verts:", verts)
-            print("\nCreated Faces:", faces)
+            print "\nCreated Verts:", verts
+            print "\nCreated Faces:", faces
 
         create_mesh(self, context, "I Beam", verts, faces, debug)
 
         recalc_normals(debug)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 '''

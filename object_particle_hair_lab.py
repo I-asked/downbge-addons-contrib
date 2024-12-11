@@ -59,12 +59,13 @@ class saveSelectionPanel(bpy.types.Panel):
         col.operator("save.selection", text="Save Selection 1")
 """
 ######GRASS########################
+from __future__ import absolute_import
 class grassLabPanel(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
     bl_label = "Grass Lab"
     bl_context = "objectmode"
-    bl_options = {'DEFAULT_CLOSED'}
+    bl_options = set(['DEFAULT_CLOSED'])
     bl_category = "Create"
 
     def draw(self, context):
@@ -112,7 +113,7 @@ class testScene1(bpy.types.Operator):
         scene = bpy.context.scene
         bpy.data.scenes.remove(scene)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class testScene2(bpy.types.Operator):
@@ -199,7 +200,7 @@ class testScene2(bpy.types.Operator):
         bpy.ops.mesh.primitive_uv_sphere_add(size=0.1)
         bpy.ops.object.shade_smooth()
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class Generategrass(bpy.types.Operator):
@@ -515,7 +516,7 @@ class Generategrass(bpy.types.Operator):
 
 
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 ####
 ######### HAIR LAB ##########
@@ -525,7 +526,7 @@ class HairLabPanel(bpy.types.Panel):
     bl_region_type = 'TOOLS'
     bl_label = "Hair Lab"
     bl_context = "objectmode"
-    bl_options = {'DEFAULT_CLOSED'}
+    bl_options = set(['DEFAULT_CLOSED'])
     bl_category = "Create"
 
     def draw(self, context):
@@ -573,7 +574,7 @@ class testScene3(bpy.types.Operator):
         scene = bpy.context.scene
         bpy.data.scenes.remove(scene)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class testScene4(bpy.types.Operator):
@@ -658,7 +659,7 @@ class testScene4(bpy.types.Operator):
 # add sphere
         bpy.ops.mesh.primitive_uv_sphere_add(size=0.1)
         bpy.ops.object.shade_smooth()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class GenerateHair(bpy.types.Operator):
@@ -968,7 +969,7 @@ class GenerateHair(bpy.types.Operator):
 
 
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 ####
 ######## FUR LAB ########
 ####
@@ -978,7 +979,7 @@ class FurLabPanel(bpy.types.Panel):
     bl_region_type = 'TOOLS'
     bl_label = "Fur Lab"
     bl_context = "objectmode"
-    bl_options = {'DEFAULT_CLOSED'}
+    bl_options = set(['DEFAULT_CLOSED'])
     bl_category = "Create"
 
     def draw(self, context):
@@ -1026,7 +1027,7 @@ class testScene5(bpy.types.Operator):
         scene = bpy.context.scene
         bpy.data.scenes.remove(scene)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class testScene6(bpy.types.Operator):
@@ -1111,7 +1112,7 @@ class testScene6(bpy.types.Operator):
 # add sphere
         bpy.ops.mesh.primitive_uv_sphere_add(size=0.1)
         bpy.ops.object.shade_smooth()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class GenerateFur(bpy.types.Operator):
@@ -1463,7 +1464,7 @@ class GenerateFur(bpy.types.Operator):
             furParticles.settings.roughness_2 = 0.003
             furParticles.settings.roughness_2_size = 0.230
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 def register():
     bpy.utils.register_module(__name__)
     bpy.types.Scene.grass_type = EnumProperty(

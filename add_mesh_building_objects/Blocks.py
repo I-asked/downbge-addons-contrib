@@ -43,6 +43,8 @@
 
 # <pep8-80 compliant>
 
+from __future__ import division
+from __future__ import absolute_import
 import bpy, time, math
 from random import random
 from math import fmod, sqrt, sin, cos, atan
@@ -137,7 +139,7 @@ def rndd(): return (random() - 0.5)*2.0
 def test(TestN = 13):
     dims = {'s':-29., 'e':29., 'b':-6., 't':TestN*7.5}
     openingSpecs = []
-    for i in range(TestN):
+    for i in xrange(TestN):
         x = (random() - 0.5) * 6
         z = i*7.5
         v = .2 + i*(3./TestN)
@@ -285,7 +287,7 @@ def MakeABlock(bounds, segsize, vll=0, Offsets=None, FaceExclude=[],
 
     faces.append([vll,vll+3,vll+2,vll+1])
 
-    for x in range(len(slices)-1):
+    for x in xrange(len(slices)-1):
         faces.append([vll,vll+1,vll+5,vll+4])
         vll+=1
         faces.append([vll,vll+1,vll+5,vll+4])
@@ -320,7 +322,7 @@ def MakeAKeystone(xpos, width, zpos, ztop, zbtm, thick, bevel, vll=0, FaceExclud
 
     points = []
     faces = []
-    faceinclude = [1 for x in range(6)]
+    faceinclude = [1 for x in xrange(6)]
     for x in FaceExclude: faceinclude[x]=0
     Top = zpos + ztop
     Btm = zpos - zbtm
@@ -349,8 +351,8 @@ def MakeAKeystone(xpos, width, zpos, ztop, zbtm, thick, bevel, vll=0, FaceExclud
     faces.append([6,5,1,2])
     faces.append([7,6,2,3])
     # Offset the vertex numbers by the number of verticies already in the list
-    for i in range(len(faces)):
-        for j in range(len(faces[i])): faces[i][j] += vll
+    for i in xrange(len(faces)):
+        for j in xrange(len(faces[i])): faces[i][j] += vll
 
     return points, faces
 
@@ -369,7 +371,7 @@ def circ(offs=0.,r=1.):
 
 
 #class openings in the wall
-class opening:
+class opening(object):
     __doc__ = """\
     This is the class for holding the data for the openings in the wall.
     It has methods for returning the edges of the opening for any given position value,
@@ -549,8 +551,8 @@ class opening:
                 else: return self.z-self.h/2-self.vl+self.rl-circVal
 
     # and this never happens - but, leave it as failsafe :)
-        print("got all the way out of the edgeV!  Not good!")
-        print("opening x = ", self.x, ", opening z = ", self.z)
+        print "got all the way out of the edgeV!  Not good!"
+        print "opening x = ", self.x, ", opening z = ", self.z
         return 0.0
     #
     def edgeBev(self, ht):
@@ -620,7 +622,7 @@ class OpeningInv(opening):
         return opening.edgeV(self, ht, -s)
 
 #class rows in the wall
-class rowOb:
+class rowOb(object):
     __doc__ = """\
     This is the class for holding the data for individual rows of blocks.
     each row is required to have some edge blocks, and can also have
@@ -674,7 +676,7 @@ class rowOb:
             divs = fill(segment[0]+grtOffset, segment[1]-grtOffset, avgDist, minDist, deviation)
 
             #loop through the divisions, adding blocks for each one
-            for i in range(len(divs)-1):
+            for i in xrange(len(divs)-1):
                 ThisBlockx = (divs[i]+divs[i+1])/2
                 ThisBlockw = divs[i+1]-divs[i]-grt
 
@@ -761,7 +763,7 @@ def arch(ra,rt,x,z, archStart, archEnd, bevel, bevAngle, vll):
     #make the divisions in the "length" of the arch
     divs = fill(archStart, archEnd, settings['w']/ra, settings['wm']/ra, settings['wv']/ra)
 
-    for i in range(len(divs)-1):
+    for i in xrange(len(divs)-1):
         if i == 0:
             ThisOffset = offsets[:]
             bevelEdgeOffset(ThisOffset, bevAngle, -1)
@@ -818,7 +820,7 @@ def sketch():
 
             divs = fill(dims['s'],dims['e'],spacing,minspacing,center=1)
 
-            for posidx in range(len(divs)-2):
+            for posidx in xrange(len(divs)-2):
                 boundlist.append(opening(divs[posidx+1],x['z'],x['w'],x['h'],x['v'],x['t'],x['vl'],x['tl'],x['b']))
 
         else: boundlist.append(opening(x['x'],x['z'],x['w'],x['h'],x['v'],x['t'],x['vl'],x['tl'],x['b']))
@@ -837,7 +839,7 @@ def wedgeBlocks(row, opening, leftPos, rightPos, edgeBinary, r1):
     wedgeEdges = fill(leftPos, rightPos, settings['w']/r1, settings['wm']/r1,
                       settings['wv']/r1)
 
-    for i in range(len(wedgeEdges)-1):
+    for i in xrange(len(wedgeEdges)-1):
         x = (wedgeEdges[i+1] + wedgeEdges[i])/2
         grt = (settings['g'] + rndd()*settings['gv'])/r1
         w = wedgeEdges[i+1] - wedgeEdges[i] - grt
@@ -960,7 +962,7 @@ def rowProcessing(row, Thesketch, WallBoundaries):
     #make those edge blocks and rows!  Wooo!
     #This loop goes through each section, (a pair of points in edgetop)
     #and places the edge blocks and inbetween normal block zones into the row object
-    for OpnSplitNo in range(int(len(edgetop)/2)):
+    for OpnSplitNo in xrange(int(len(edgetop)/2)):
         #left edge is edge<x>[2*OpnSplitNo], right edge edgex[2*OpnSplitNo+1]
         leftEdgeIndex = 2*OpnSplitNo
         rightEdgeIndex = 2*OpnSplitNo + 1
@@ -1149,8 +1151,8 @@ def plan(Thesketch, oldrows = 0):
         divs = fill(splits[0],splits[-1],settings['h'],settings['hm']+settings['g'],settings['hv'])[1:-1]
 
         #remove the divisions that are too close to the splits, so we don't get tiny thin rows
-        for i in range(len(divs)-1,-1,-1):
-            for j in range(len(splits)):
+        for i in xrange(len(divs)-1,-1,-1):
+            for j in xrange(len(splits)):
                 diff = abs(divs[i] - splits[j])
                 #(settings['hm']+settings['g']) is the old minimum value
                 if diff < (settings['h']-settings['hv']+settings['g']):
@@ -1199,7 +1201,7 @@ def plan(Thesketch, oldrows = 0):
     WallBoundaries = OpeningInv(x,z,w,h)
 
     #Go over each row in the list, set up edge blocks and block sections
-    for rownum in range(len(rows)):
+    for rownum in xrange(len(rows)):
         rowProcessing(rows[rownum], Thesketch, WallBoundaries)
 
     #now return the things everyone needs
@@ -1306,7 +1308,7 @@ def archGeneration(hole, vlist, flist, sideSign):
             vlist += avlist
             flist += aflist
 # remove "debug note" once bevel is finalized.
-        else: print("keystone was too narrow - " + str(Wdth))
+        else: print "keystone was too narrow - " + str(Wdth)
 
     else: # only one arc - curve not peak.
 #bottom (sideSign -1) arch has poorly sized blocks...
@@ -1455,7 +1457,7 @@ def build(Aplan):
     #AllBlocks = [[x,z,w,h,d,[corner offset matrix]],[etc.]]
 
     #loop through each row, adding the normal old blocks
-    for rowidx in range(len(rows)):#row = row object
+    for rowidx in xrange(len(rows)):#row = row object
         rows[rowidx].FillBlocks()
 
     AllBlocks = []
@@ -1463,7 +1465,7 @@ def build(Aplan):
     #  If the wall is set to merge blocks, check all the blocks to see if you can merge any
 #seems to only merge vertical, should do horizontal too
     if bigBlock:
-        for rowidx in range(len(rows)-1):
+        for rowidx in xrange(len(rows)-1):
             if radialized:
                 if slope: r1 = dims['t']*sin(abs(rows[rowidx].z)*PI/(dims['t']*2))
                 else: r1 = abs(rows[rowidx].z)
@@ -1534,7 +1536,7 @@ def build(Aplan):
             divs = fill(ShelfLft, ShelfEnd, SetBW, SetBWMin, SetBWVar)
 
             #loop through the row divisions, adding blocks for each one
-            for i in range(len(divs)-1):
+            for i in xrange(len(divs)-1):
                 ThisBlockx = (divs[i]+divs[i+1])/2
                 ThisBlockw = divs[i+1]-divs[i]-SetGrtOff
 
@@ -1588,7 +1590,7 @@ def build(Aplan):
                 divs = fill(StepLft, StepRt, StepXMod, SetWidMin, SetWidVar)
 
                 #loop through the row divisions, adding blocks for each one
-                for i in range(len(divs)-1):
+                for i in xrange(len(divs)-1):
                     ThisBlockx = (divs[i]+divs[i+1])/2
                     ThisBlockw = divs[i+1]-divs[i]-SetGrtOff
 

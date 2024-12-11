@@ -142,6 +142,8 @@ Vlassius
 
 """
 
+from __future__ import division
+from __future__ import absolute_import
 import bpy
 from bpy.props import *
 #from io_utils import ImportHelper
@@ -166,7 +168,7 @@ class VIEW3D_PT_CustomMenuPanel(bpy.types.Panel):
     bl_region_type = "WINDOW"
     bl_context = "object"
     bl_label = "Import Movement From Wav File"
-    bl_options = {'DEFAULT_CLOSED'}
+    bl_options = set(['DEFAULT_CLOSED'])
 
     def draw(self, context):
         layout = self.layout
@@ -593,7 +595,7 @@ class ImpSoundtoAnim(bpy.types.PropertyGroup):
             default=0)
 
         # globais do dialog open wave
-        filter_glob = StringProperty(default="*.wav", options={'HIDDEN'})
+        filter_glob = StringProperty(default="*.wav", options=set(['HIDDEN']))
         path =        StringProperty(name="File Path", description="Filepath used for importing the WAV file", \
                                                                                         maxlen= 1024, default= "")
         filename =    StringProperty(name="File Name", description="Name of the file")
@@ -619,11 +621,11 @@ class OBJECT_OT_Botao_uDirect(bpy.types.Operator):
         context.scene.imp_sound_to_anim.bTypeImport= 1
         if context.scene.imp_sound_to_anim.frames_per_second == 0:
              context.scene.imp_sound_to_anim.frames_per_second= bpy.context.scene.render.fps
-        return{'FINISHED'}
+        returnset(['FINISHED'])
 
     def invoke(self, context, event):
         self.execute(context)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 #
 #==================================================================================================
@@ -836,12 +838,12 @@ class OBJECT_OT_Botao_Import(bpy.types.Operator):
         if iMaxValue!= 255: bLimitValue= True
 
         if obi.RunFrom==0:
-            print('')
-            print("================================================================")
+            print ''
+            print "================================================================"
             from time import strftime
-            print(strftime("Start Import:  %H:%M:%S"))
-            print("================================================================")
-            print('')
+            print strftime("Start Import:  %H:%M:%S")
+            print "================================================================"
+            print ''
 
         ilocationXAnt=0
         ilocationYAnt=0
@@ -853,7 +855,7 @@ class OBJECT_OT_Botao_Import(bpy.types.Operator):
 
         # variavel global _Interna_Globals
         if context.scene.imp_sound_to_anim.bArrayCriado:
-            for i in range(loop):
+            for i in xrange(loop):
                 ival=array[i+obi.RunFrom]/iDivScala
                 #valor pequeno demais, vai dar zero na hora de aplicar
                 if ival < 0.001:
@@ -867,8 +869,8 @@ class OBJECT_OT_Botao_Import(bpy.types.Operator):
 
                 # opcao de NAO colocar valores iguais sequenciais
                 if i>0 and bNaoValorIgual and arrayIL1== arrayI:
-                    print("Importing Blender Frame: "+str(i+obi.RunFrom+1)+"\tof "+str(len(array)-1) + \
-                                                                            "\t(skipped by optimizer)")
+                    print "Importing Blender Frame: "+str(i+obi.RunFrom+1)+"\tof "+str(len(array)-1) + \
+                                                                            "\t(skipped by optimizer)"
                     obi.iSumOptimizerP3+=1
                 else:
                     # otimizacao - nao preciso mais que 2 valores iguais.
@@ -877,8 +879,8 @@ class OBJECT_OT_Botao_Import(bpy.types.Operator):
                     # valor atual == anterior e posterior -> pula
                     if i>0 and i< len(array)-1 and abs(arrayI - arrayIL1)<=iDestructiveOptimizer and \
                                                         abs(arrayI - arrayIP1)<=iDestructiveOptimizer:
-                            print("Importing Blender Frame: "+str(i+obi.RunFrom+1)+"\tof "+str(len(array)-1) + \
-                                                                                    "\t(skipped by optimizer)")
+                            print "Importing Blender Frame: "+str(i+obi.RunFrom+1)+"\tof "+str(len(array)-1) + \
+                                                                                    "\t(skipped by optimizer)"
                             if iDestructiveOptimizer>0 and arrayI != arrayIL1 or arrayI != arrayIP1:
                                 obi.iSumOptimizerP1+=1
                             else: obi.iSumOptimizerP2+=1
@@ -1005,7 +1007,7 @@ class OBJECT_OT_Botao_Import(bpy.types.Operator):
                             if bEscala:
                                 ob.keyframe_insert(data_path="scale")
 
-                            print("Importing Blender Frame: "+str(i+obi.RunFrom+1)+"\tof "+str(len(array)-1) + "\tValue: "+ str(ival))
+                            print "Importing Blender Frame: "+str(i+obi.RunFrom+1)+"\tof "+str(len(array)-1) + "\tValue: "+ str(ival)
 
                             obi.iSumImportFrames+=1
                     # Fim do ELSE otimizador
@@ -1015,16 +1017,16 @@ class OBJECT_OT_Botao_Import(bpy.types.Operator):
                 bpy.context.scene.frame_current = 1
                 context.scene.imp_sound_to_anim.Info_Import="Done. Imported " + str(obi.iSumImportFrames) + " Frames"
                 from time import strftime
-                print('')
-                print("================================================================")
-                print("Imported: " +str(obi.iSumImportFrames) + " Key Frames")
-                print("Optimizer Pass 1 prepared to optimize: " +str(obi.iSumOptimizerP1) + " blocks of Frames")
-                print("Optimizer Pass 2 has optimized: " +str(obi.iSumOptimizerP2) + " Frames")
-                print("Optimizer Pass 3 has optimized: " +str(obi.iSumOptimizerP3) + " Frames")
-                print("Optimizer has optimized: " +str(obi.iSumOptimizerP1 + obi.iSumOptimizerP2 + obi.iSumOptimizerP3) + " Frames")
-                print(strftime("End Import:  %H:%M:%S - by Vlassius"))
-                print("================================================================")
-                print('')
+                print ''
+                print "================================================================"
+                print "Imported: " +str(obi.iSumImportFrames) + " Key Frames"
+                print "Optimizer Pass 1 prepared to optimize: " +str(obi.iSumOptimizerP1) + " blocks of Frames"
+                print "Optimizer Pass 2 has optimized: " +str(obi.iSumOptimizerP2) + " Frames"
+                print "Optimizer Pass 3 has optimized: " +str(obi.iSumOptimizerP3) + " Frames"
+                print "Optimizer has optimized: " +str(obi.iSumOptimizerP1 + obi.iSumOptimizerP2 + obi.iSumOptimizerP3) + " Frames"
+                print strftime("End Import:  %H:%M:%S - by Vlassius")
+                print "================================================================"
+                print ''
                 obi.RunFrom=0
                 obi.iSumImportFrames=0
                 obi.iSumOptimizerP1=0
@@ -1046,7 +1048,7 @@ class OBJECT_OT_Botao_Import(bpy.types.Operator):
 
     def invoke(self, context, event):
         self.execute(context)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 
@@ -1062,7 +1064,7 @@ class OBJECT_OT_Botao_Go(bpy.types.Operator):
     bl_description = "Process a .wav file, take movement from the sound and import to the scene as Key"
     bl_label = "Process Wav"
 
-    filter_glob = StringProperty(default="*.wav", options={'HIDDEN'})
+    filter_glob = StringProperty(default="*.wav", options=set(['HIDDEN']))
     path = StringProperty(name="File Path", description="Filepath used for importing the WAV file", \
                                                                             maxlen= 1024, default= "")
     filename = StringProperty(name="File Name", description="Name of the file")
@@ -1087,8 +1089,8 @@ class OBJECT_OT_Botao_Go(bpy.types.Operator):
         if obg.RunFrom==0:
             try:
                 obg.Wave_read= wave.open(File, 'rb')
-            except IOError as e:
-                print("File Open Error: ", e)
+            except IOError, e:
+                print "File Open Error: ", e
                 return False
 
         NumCh=      obg.Wave_read.getnchannels()
@@ -1098,13 +1100,13 @@ class OBJECT_OT_Botao_Go(bpy.types.Operator):
         ChkCompr=   obg.Wave_read.getcomptype()
 
         if ChkCompr != "NONE":
-            print('Sorry, this compressed Format is NOT Supported ', ChkCompr)
+            print 'Sorry, this compressed Format is NOT Supported ', ChkCompr
             context.scene.imp_sound_to_anim.Info_Import= "Sorry, this compressed Format is NOT Supported "
             return False
 
         if SampW > 2:
             context.scene.imp_sound_to_anim.Info_Import= "Sorry, supported .wav files 8 and 16 bits only"
-            print('Sorry, supported .wav files 8 and 16 bits only')
+            print 'Sorry, supported .wav files 8 and 16 bits only'
             return False
 
         context.scene.imp_sound_to_anim.Info_Import=""
@@ -1112,9 +1114,9 @@ class OBJECT_OT_Botao_Go(bpy.types.Operator):
         # controla numero do canal
         if AudioChannel > NumCh:
             if obg.RunFrom==0:
-                print("Channel number " + str(AudioChannel) + " is selected but this audio file has just " + \
+                print "Channel number " + str(AudioChannel) + " is selected but this audio file has just " + \
                                                             str(NumCh) + " channels, so selecting channel " \
-                                                                                            + str(NumCh) + "!")
+                                                                                            + str(NumCh) + "!"
             AudioChannel = NumCh
 
         # apenas para por na tela
@@ -1137,28 +1139,28 @@ class OBJECT_OT_Botao_Go(bpy.types.Operator):
         if obg.RunFrom==0:   # primeira rodada
             # inicia array
             _Interna_Globals(BytesDadosTotProcess, context)
-            print('')
-            print("================================================================")
+            print ''
+            print "================================================================"
             from time import strftime
-            print(strftime("Go!  %H:%M:%S"))
-            print("================================================================")
-            print('')
-            print('Total Audio Time: \t ' + str(NumFr//FrameR) + 's (' + str(NumFr//FrameR//60) + 'min)')
-            print('Total # Interactions: \t', BytesDadosTotProcess)
-            print('Total Audio Frames: \t', NumFr)
-            print('Frames/s: \t\t ' + str(FrameR))
-            print('# Chanels in File: \t', NumCh)
-            print('Channel to use:\t\t', tmpAudioChannel)
-            print('Bit/Sample/Chanel: \t ' + str(SampW*8))
-            print('# Frames/Act: \t\t', DivSens)
+            print strftime("Go!  %H:%M:%S")
+            print "================================================================"
+            print ''
+            print 'Total Audio Time: \t ' + str(NumFr//FrameR) + 's (' + str(NumFr//FrameR//60) + 'min)'
+            print 'Total # Interactions: \t', BytesDadosTotProcess
+            print 'Total Audio Frames: \t', NumFr
+            print 'Frames/s: \t\t ' + str(FrameR)
+            print '# Chanels in File: \t', NumCh
+            print 'Channel to use:\t\t', tmpAudioChannel
+            print 'Bit/Sample/Chanel: \t ' + str(SampW*8)
+            print '# Frames/Act: \t\t', DivSens
 
             if bAutoSense==0:
-                print('Audio Sensitivity: \t', Sensibil+1)
+                print 'Audio Sensitivity: \t', Sensibil+1
             else:
-                print('Using Auto Audio Sentivity. This is pass 1 of 2.')
+                print 'Using Auto Audio Sentivity. This is pass 1 of 2.'
 
-            print('')
-            print ("Sample->[value]\tAudio Frame #   \t\t[Graph Value]")
+            print ''
+            print "Sample->[value]\tAudio Frame #   \t\t[Graph Value]"
 
         if obg.RunFrom==0 and bAutoSense!=0:
             Sensibil=0  # if auto sense, Sensibil must be zero here
@@ -1172,7 +1174,7 @@ class OBJECT_OT_Botao_Go(bpy.types.Operator):
         j=0  # usado de indice
         # laco total leitura bytes
         # armazena dado de pico
-        for jj in range(loop):
+        for jj in xrange(loop):
             # caso de 2 canais (esterio)
             # uso apenas 2 bytes em 16 bits, ie, apenas canal esquerdo
             # [0] e [1] para CH L
@@ -1181,7 +1183,7 @@ class OBJECT_OT_Botao_Go(bpy.types.Operator):
             # sterio: 2 byte to 8 bits, 4 bytes to 16 bits
             ValorPico=0
             # leio o numero de frames de audio para cada frame de video, valor em torno de 1000
-            for i in range(BytesResol):
+            for i in xrange(BytesResol):
                 #loop exterior copia DivSens frames a cada frame calculado
                 frame = obg.Wave_read.readframes(DivSens)
 
@@ -1216,16 +1218,16 @@ class OBJECT_OT_Botao_Go(bpy.types.Operator):
                                 frame0= frame[1+AudioChannel]
 
                             elif Sensibil ==4:
-                                frame0= ((frame[AudioChannel] & 0b11111100) >> 2) | ((frame[1+AudioChannel] & 0b00000011) << 6)
+                                frame0= ((frame[AudioChannel] & __builtins__.long("11111100", 2)) >> 2) | ((frame[1+AudioChannel] & __builtins__.long("00000011", 2)) << 6)
 
                             elif Sensibil ==3:
-                                frame0= ((frame[AudioChannel] & 0b11110000) >> 4) | ((frame[1+AudioChannel] & 0b00001111) << 4)
+                                frame0= ((frame[AudioChannel] & __builtins__.long("11110000", 2)) >> 4) | ((frame[1+AudioChannel] & __builtins__.long("00001111", 2)) << 4)
 
                             elif Sensibil ==2:
-                                frame0= ((frame[AudioChannel] & 0b11100000) >> 5) | ((frame[1+AudioChannel] & 0b00011111) << 3)
+                                frame0= ((frame[AudioChannel] & __builtins__.long("11100000", 2)) >> 5) | ((frame[1+AudioChannel] & __builtins__.long("00011111", 2)) << 3)
 
                             elif Sensibil ==1:
-                                frame0= ((frame[AudioChannel] & 0b11000000) >> 6) | ((frame[1+AudioChannel] & 0b00111111) << 2)
+                                frame0= ((frame[AudioChannel] & __builtins__.long("11000000", 2)) >> 6) | ((frame[1+AudioChannel] & __builtins__.long("00111111", 2)) << 2)
 
                             elif Sensibil ==5:
                                 frame0=frame[AudioChannel]
@@ -1254,13 +1256,13 @@ class OBJECT_OT_Botao_Go(bpy.types.Operator):
 
             if bAutoSense==0:    #autoaudiosense desligado
                 # repito o valor de frames por actions (OTIMIZAR)
-                for ii in range(DivSens):
+                for ii in xrange(DivSens):
                     array[j+obg.RunFrom]=ValorPico  # valor de pico encontrado
                     j +=1           # incrementa indice prox local
             else:
                 idx=obg.RunFrom*2 # porque sao dois bytes
-                arrayAutoSense[j+idx]= (ValorPico & 0b0000000011111111) #copia valores baixos
-                arrayAutoSense[j+1+idx]= (ValorPico & 0b1111111100000000) >> 8   #copia valores altos
+                arrayAutoSense[j+idx]= (ValorPico & __builtins__.long("0000000011111111", 2)) #copia valores baixos
+                arrayAutoSense[j+1+idx]= (ValorPico & __builtins__.long("1111111100000000", 2)) >> 8   #copia valores altos
                 j+=2
 
             if bAutoSense==0:    #autoaudiosense desligado
@@ -1273,22 +1275,22 @@ class OBJECT_OT_Botao_Go(bpy.types.Operator):
                     igraph= ValorPico//10
 
             stgraph="["
-            for iii in range(igraph):
+            for iii in xrange(igraph):
                 stgraph+="+"
 
-            for iiii in range(26-igraph):
+            for iiii in xrange(26-igraph):
                 stgraph+=" "
             stgraph+="]"
 
-            print ("Sample-> " + str(ValorPico) + "\tAudio Frame #  " + str(jj+obg.RunFrom) + " of " + str(looptot-1) + "\t"+ stgraph)
+            print "Sample-> " + str(ValorPico) + "\tAudio Frame #  " + str(jj+obg.RunFrom) + " of " + str(looptot-1) + "\t"+ stgraph
 
         # acabou primeira fase roda toda de uma vez
         if obg.RunFrom+loop == looptot:
             if bAutoSense==1:
-                print("")
-                print("================================================================")
-                print('Calculating Auto Audio Sentivity, pass 2 of 2.')
-                print("================================================================")
+                print ""
+                print "================================================================"
+                print 'Calculating Auto Audio Sentivity, pass 2 of 2.'
+                print "================================================================"
 
                 # caso usar batida, procurar por valores proximos do maximo e zerar restante.
                 # caso retirar batida, zerar valores proximos do maximo
@@ -1296,7 +1298,7 @@ class OBJECT_OT_Botao_Go(bpy.types.Operator):
                 UseMax=0
 
                 if bUseBeat==1:
-                    print("Trying to use just the beat.")
+                    print "Trying to use just the beat."
                     UseMinim= obg.MaxAudio*0.8
                     if bMoreSensible:
                         UseMinim= obg.MaxAudio*0.7
@@ -1304,14 +1306,14 @@ class OBJECT_OT_Botao_Go(bpy.types.Operator):
                         UseMinim= obg.MaxAudio*0.9
 
                 if bRemoveBeat==1:
-                    print("Trying to exclude the beat.")
+                    print "Trying to exclude the beat."
                     UseMax= obg.MaxAudio*0.7
                     if bMoreSensible:
                         UseMax= obg.MaxAudio*0.8
                     elif bLessSensible:
                         UseMax= obg.MaxAudio*0.7
 
-                print("")
+                print ""
                 # para transformar 15 bits em 8 calibrando valor maximo -> fazer regra de 3
                 # obg.MaxAudio -> 255
                 # outros valores => valor calibrado= (255 * Valor) / obg.MaxAudio
@@ -1319,9 +1321,9 @@ class OBJECT_OT_Botao_Go(bpy.types.Operator):
 
                 j=0
                 jj=0
-                print ("Sample->[value]\tAudio Frame #    \t\t[Graph Value]")
+                print "Sample->[value]\tAudio Frame #    \t\t[Graph Value]"
 
-                for i in range(BytesDadosTotProcess // DivSens):
+                for i in xrange(BytesDadosTotProcess // DivSens):
 
                     ValorOriginal= arrayAutoSense[j+1] << 8
                     ValorOriginal+= arrayAutoSense[j]
@@ -1334,22 +1336,22 @@ class OBJECT_OT_Botao_Go(bpy.types.Operator):
                         if ValorOriginal > UseMax:
                             ValorOriginal = 0
 
-                    ValorOriginal= ((round(ValorOriginal * scale)) & 0b11111111)    #aplica a escala
+                    ValorOriginal= ((round(ValorOriginal * scale)) & __builtins__.long("11111111", 2))    #aplica a escala
 
-                    for ii in range(DivSens):
+                    for ii in xrange(DivSens):
                         array[jj] = ValorOriginal
                         jj += 1   # se autoaudiosense, o array tem dois bytes para cada valor
 
                     j+=2
                     igraph= round(array[jj-1]/10)
                     stgraph="["
-                    for iii in range(igraph):
+                    for iii in xrange(igraph):
                         stgraph+="+"
 
-                    for iiii in range(26-igraph):
+                    for iiii in xrange(26-igraph):
                         stgraph+=" "
                     stgraph+="]"
-                    print ("Sample-> " + str(array[jj-1]) + "\tAudio Frame #  " + str(i) + " of " + str(looptot-1) + "\t"+ stgraph)
+                    print "Sample-> " + str(array[jj-1]) + "\tAudio Frame #  " + str(i) + " of " + str(looptot-1) + "\t"+ stgraph
 
                 #limpa array tmp
                 del arrayAutoSense[:]
@@ -1357,15 +1359,15 @@ class OBJECT_OT_Botao_Go(bpy.types.Operator):
             # mensagens finais
             context.scene.imp_sound_to_anim.Info_Import= "Click \"Import Key frames\" to begin import" #this set the initial text
 
-            print("================================================================")
+            print "================================================================"
             from time import strftime
-            print(strftime("End Process:  %H:%M:%S"))
-            print("================================================================")
+            print strftime("End Process:  %H:%M:%S")
+            print "================================================================"
 
             try:
                 obg.Wave_read.close()
             except:
-                print('File Close Error')
+                print 'File Close Error'
 
             obg.RunFrom=0
             return obg.RunFrom   # acabou tudo
@@ -1394,13 +1396,13 @@ class OBJECT_OT_Botao_Go(bpy.types.Operator):
         f= os.path.normpath(f)
 
         if obg.RunFrom==0:
-            print ("")
-            print ("")
-            print ("Selected file = ",f)
+            print ""
+            print ""
+            print "Selected file = ",f
         checktype = f.split('\\')[-1].split('.')[1]
         if checktype.upper() != 'WAV':
-            print ("ERROR!! Selected file = ", f)
-            print ("ERROR!! Its not a .wav file")
+            print "ERROR!! Selected file = ", f
+            print "ERROR!! Its not a .wav file"
             return
 
         #sensibilidade volume do audio 0 a 5. Quanto maior, mais sensibilidade
@@ -1419,7 +1421,7 @@ class OBJECT_OT_Botao_Go(bpy.types.Operator):
         iMovPorSeg= int(context.scene.imp_sound_to_anim.action_per_second)
 
         #iDivMovPorSeg Padrao - taxa 4/s ou a cada 0,25s  => iFramesPorSeg/iDivMovPorSeg= ~0.25
-        for i in range(iFramesPorSeg):
+        for i in xrange(iFramesPorSeg):
             iDivMovPorSeg=iFramesPorSeg/(i+1)
             if iFramesPorSeg/iDivMovPorSeg >=iMovPorSeg:
                 break
@@ -1448,14 +1450,14 @@ class OBJECT_OT_Botao_Go(bpy.types.Operator):
         context.scene.imp_sound_to_anim.Working= "ProcessaSom"
         bpy.ops.wm.modal_timer_operator()
         #ProcessaSom(context)
-        return{'FINISHED'}
+        returnset(['FINISHED'])
 
     def invoke(self, context, event):
         #need to set a path so so we can get the file name and path
         wm = context.window_manager
         wm.fileselect_add(self)
 
-        return {'RUNNING_MODAL'}
+        return set(['RUNNING_MODAL'])
 
 
 #
@@ -1484,9 +1486,9 @@ class OBJECT_OT_Botao_Check_SmartRender(bpy.types.Operator):
 
         if obc.RunFrom==0:
             if loop !=1: # loop==1 quando estou chamando de dentro da funcao render
-                print("")
-                print("================================================================")
-                print('Running Check Smart Render...')
+                print ""
+                print "================================================================"
+                print 'Running Check Smart Render...'
 
         #garante ao menos locrotscale ligado
         if context.scene.imp_sound_to_anim.check_smartrender_loc_rot_sc==False and \
@@ -1508,10 +1510,10 @@ class OBJECT_OT_Botao_Check_SmartRender(bpy.types.Operator):
             loop= RunMax-obc.RunFrom
             if loop<=0:   #acabou
                 if origloop !=1: # loop==1 quando estou chamando de dentro da funcao render
-                    print("")
-                    print("Frames to copy: " + str(obc.Frames_Pular) + " Frames to really render= " + str(obc.Frames_Renderizar))
-                    print("================================================================")
-                    print("")
+                    print ""
+                    print "Frames to copy: " + str(obc.Frames_Pular) + " Frames to really render= " + str(obc.Frames_Renderizar)
+                    print "================================================================"
+                    print ""
                 obc.RunFrom=0
                 obc.Frames_Pular=0
                 obc.Frames_Renderizar=0
@@ -1521,7 +1523,7 @@ class OBJECT_OT_Botao_Check_SmartRender(bpy.types.Operator):
         #RunFrom inicia em zero - frames inicia em 1
         bpy.context.scene.frame_current = obc.RunFrom+bpy.context.scene.frame_start
 
-        for k in range(loop):
+        for k in xrange(loop):
             if obc.RunFrom==0 and k==0: #primeiro sempre renderiza
                 ToRender.append(bpy.context.scene.frame_current)
                 obc.Frames_Renderizar+=1
@@ -1602,7 +1604,7 @@ class OBJECT_OT_Botao_Check_SmartRender(bpy.types.Operator):
                                                                             a[j+8]!= obj.data.materials[0].specular_shader or \
                                                                             a[j+9]!= obj.data.materials[0].specular_hardness:
                                     dif=1
-                                    print("mat")
+                                    print "mat"
                                     j+= 10  # ajusta ponteiro j
                                     if chkMatTransp: j+=8
                                     if chkMatMirror: j+=6
@@ -1664,11 +1666,11 @@ class OBJECT_OT_Botao_Check_SmartRender(bpy.types.Operator):
         #context.scene.imp_sound_to_anim.timer_reset_func=True
         bpy.ops.wm.modal_timer_operator()
         #CheckSmartRender(context)
-        return{'FINISHED'}
+        returnset(['FINISHED'])
 
     def invoke(self, context, event):
         self.execute(context)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 #
@@ -1713,33 +1715,33 @@ class OBJECT_OT_Botao_SmartRender(bpy.types.Operator):
 
         #copia frame atual  #se o frame ja não foi renderizado
         if (obs.BaseRenderToCopy!=(index+bpy.context.scene.frame_start-1)) and index > 1:   #index!=1 and index !=0:
-            print("Copying: " + str(obs.BaseRenderToCopy) + "-> " + str(index+bpy.context.scene.frame_start-1) + \
-                                "  To " + path + str(index+bpy.context.scene.frame_start-1).zfill(pad)  + ".png")
+            print "Copying: " + str(obs.BaseRenderToCopy) + "-> " + str(index+bpy.context.scene.frame_start-1) + \
+                                "  To " + path + str(index+bpy.context.scene.frame_start-1).zfill(pad)  + ".png"
             shutil.copy2(path + str(obs.BaseRenderToCopy).zfill(pad)  + ".png", path + \
                         str(index+bpy.context.scene.frame_start-1).zfill(pad)  + ".png")
 
         if ToRender.__len__()>1:   #renderizar 1 item em ToRender nao renderiza, (sempre vem com no minimo 1)
             if index==1:
-                print("================================================================")
+                print "================================================================"
                 from time import strftime
-                print(strftime("Running Smart Render:  %H:%M:%S"))
-                print("================================================================")
+                print strftime("Running Smart Render:  %H:%M:%S")
+                print "================================================================"
                 BaseRenderToCopy=0
 
             if ToRender[0] <= bpy.context.scene.frame_end:
                 #renderiza proximo frame
-                print("Rendering-> " + str(ToRender[0]))
+                print "Rendering-> " + str(ToRender[0])
                 obs.BaseRenderToCopy= ToRender[0]
                 bpy.ops.render.render(animation=False, write_still=False)
                 bpy.data.images['Render Result'].save_render(filepath=path + str(ToRender[0]).zfill(pad)  + ".png")
                 i+=1
 
         if index==tot:
-            print("================================================================")
+            print "================================================================"
             from time import strftime
-            print(strftime("Finish Render:  %H:%M:%S"))
-            print("================================================================")
-            print(".")
+            print strftime("Finish Render:  %H:%M:%S")
+            print "================================================================"
+            print "."
 
         if index==tot+1:
             obs.BaseRenderToCopy=0
@@ -1753,11 +1755,11 @@ class OBJECT_OT_Botao_SmartRender(bpy.types.Operator):
         context.scene.imp_sound_to_anim.Working= "SmartRender"
         bpy.ops.wm.modal_timer_operator()
         #SmartRender(context)
-        return{'FINISHED'}
+        returnset(['FINISHED'])
 
     def invoke(self, context, event):
         self.execute(context)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 
@@ -1773,11 +1775,11 @@ class OBJECT_OT_Botao_Cancel(bpy.types.Operator):
 
     def execute(self, context):
         context.scene.imp_sound_to_anim.cancel_button_hit=True
-        return{'FINISHED'}
+        returnset(['FINISHED'])
 
     def invoke(self, context, event):
         self.execute(context)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 #
@@ -1802,17 +1804,17 @@ class ModalTimerOperator(bpy.types.Operator):
             #configura timer para a funcao
             context.scene.imp_sound_to_anim.Working= func
             self.Running=True
-            return {'PASS_THROUGH'}
+            return set(['PASS_THROUGH'])
         else: # posso desligar o timer e modal
             if self._timer!= None:
                 context.window_manager.event_timer_remove(self._timer)
                 self._timer= None
-            return {'FINISHED'}
+            return set(['FINISHED'])
 
 
     def modal(self, context, event):
         if event.type == 'ESC'and self.Running:
-            print("-- ESC Pressed --")
+            print "-- ESC Pressed --"
             self.cancel(context)
             context.scene.imp_sound_to_anim.Working=""
             self.Running=False
@@ -1820,7 +1822,7 @@ class ModalTimerOperator(bpy.types.Operator):
             context.scene.imp_sound_to_anim.timer_reset_func=True
             # forca update do UI
             bpy.context.scene.frame_set(bpy.context.scene.frame_current)
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
 
         if event.type == 'TIMER':
             #print("timer")
@@ -1854,7 +1856,7 @@ class ModalTimerOperator(bpy.types.Operator):
 
             #passa por aqui quando as funcoes estao sendo executadas mas
             #configuradas para nao entrar porque  context.scene.imp_sound_to_anim.Working== ""
-            return {'PASS_THROUGH'}
+            return set(['PASS_THROUGH'])
 
         # reseta e para tudo botao CANCEL pressionado
         if context.scene.imp_sound_to_anim.cancel_button_hit==True:
@@ -1864,18 +1866,18 @@ class ModalTimerOperator(bpy.types.Operator):
             if self._timer!= None:
                 context.window_manager.event_timer_remove(self._timer)
                 self._timer= None
-            print("-- Cancel Pressed --")
+            print "-- Cancel Pressed --"
             context.scene.imp_sound_to_anim.cancel_button_hit=False
-            return {'FINISHED'}
+            return set(['FINISHED'])
 
         #print("modal")
 
         # se o timer esta ativado, continua, (senao termina).
         # desligar a chamada ao modal se caso chegar aqui (nao deveria)
         if self._timer!= None:
-            return{'PASS_THROUGH'}
+            returnset(['PASS_THROUGH'])
         else:
-            return {'FINISHED'}
+            return set(['FINISHED'])
 
     def execute(self, context):
         if self._timer==None:
@@ -1884,7 +1886,7 @@ class ModalTimerOperator(bpy.types.Operator):
         #para deixar rodar sem deligar o timer
         context.scene.imp_sound_to_anim.timer_desligar=False
         self.Running=True
-        return {'RUNNING_MODAL'}
+        return set(['RUNNING_MODAL'])
 
     def cancel(self, context):
         if self._timer!= None:

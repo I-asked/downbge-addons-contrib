@@ -18,6 +18,9 @@
 
 # <pep8 compliant>
 
+from __future__ import with_statement
+from __future__ import absolute_import
+from io import open
 bl_info = {
     "name": "Splash Startup Tips",
     "description": "Show a tip on startup",
@@ -53,7 +56,7 @@ def read_random_line(f):
                 i = 0
             f_handle.seek(i, os.SEEK_SET)
             d = f_handle.read(chunk_size)
-            i_newline = d.rfind(b'\n')
+            i_newline = d.rfind('\n')
             if i_newline != -1:
                 i += i_newline + 1
                 break
@@ -70,11 +73,11 @@ def find_random_tip():
             os.path.join(os.path.dirname(__file__), "tips.txt"),
             ).rstrip()
 
-    url_index = text.rfind(b' ~')
+    url_index = text.rfind(' ~')
     if url_index != -1:
         text, url = text[:url_index], text[url_index + 2:]
     else:
-        url = b''
+        url = ''
     return text.decode("utf-8"), url.decode("utf-8")
 
 

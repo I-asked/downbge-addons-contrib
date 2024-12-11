@@ -1,3 +1,5 @@
+from __future__ import division
+from __future__ import absolute_import
 bl_info = {
     "name": "Select by index",
     "author": "liero",
@@ -14,7 +16,7 @@ class SelVert(bpy.types.Operator):
     bl_idname = 'mesh.select_vert_index'
     bl_label = 'Verts'
     bl_description = 'Select vertices by index'
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     indice = bpy.props.FloatProperty(name='Selected', default=0, min=0, max=100, description='Percentage of selected edges', precision = 2, subtype = 'PERCENTAGE')
     delta = bpy.props.BoolProperty(name='Use Cursor', default=False, description='Select by Index / Distance to Cursor')
@@ -45,22 +47,22 @@ class SelVert(bpy.types.Operator):
         bpy.ops.object.mode_set()
         valor = round(len(sel) / 100 * self.indice)
         if self.delta:
-            for i in range(len(sel[:valor])):
+            for i in xrange(len(sel[:valor])):
                 ver[sel[i][1]].select = True
         else:
-            for i in range(len(sel[:valor])):
+            for i in xrange(len(sel[:valor])):
                 if self.flip:
                     ver[len(sel)-i-1].select = True
                 else:
                     ver[i].select = True
         bpy.ops.object.mode_set(mode='EDIT')
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class SelEdge(bpy.types.Operator):
     bl_idname = 'mesh.select_edge_index'
     bl_label = 'Edges'
     bl_description = 'Select edges by index'
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     indice = bpy.props.FloatProperty(name='Selected', default=0, min=0, max=100, description='Percentage of selected edges', precision = 2, subtype = 'PERCENTAGE')
     delta = bpy.props.BoolProperty(name='Use Edges Length', default=False, description='Select Edges by Index / Length')
@@ -91,22 +93,22 @@ class SelEdge(bpy.types.Operator):
         bpy.ops.object.mode_set()
         valor = round(len(sel) / 100 * self.indice)
         if self.delta:
-            for i in range(len(sel[:valor])):
+            for i in xrange(len(sel[:valor])):
                 edg[sel[i][1]].select = True
         else:
-            for i in range(len(sel[:valor])):
+            for i in xrange(len(sel[:valor])):
                 if self.flip:
                     edg[len(sel)-i-1].select = True
                 else:
                     edg[i].select = True
         bpy.ops.object.mode_set(mode='EDIT')
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class SelFace(bpy.types.Operator):
     bl_idname = 'mesh.select_face_index'
     bl_label = 'Faces'
     bl_description = 'Select faces by index'
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     indice = bpy.props.FloatProperty(name='Selected', default=0, min=0, max=100, description='Percentage of selected faces', precision = 2, subtype = 'PERCENTAGE')
     delta = bpy.props.BoolProperty(name='Use Faces Area', default=False, description='Select Faces by Index / Area')
@@ -132,27 +134,27 @@ class SelFace(bpy.types.Operator):
         for f in fac:
             sel.append((f.area, f.index))
         sel.sort(reverse=self.flip)
-        print (sel)
+        print sel
         bpy.ops.object.mode_set()
         valor = round(len(sel) / 100 * self.indice)
         if self.delta:
-            for i in range(len(sel[:valor])):
+            for i in xrange(len(sel[:valor])):
                 fac[sel[i][1]].select = True
         else:
-            for i in range(len(sel[:valor])):
+            for i in xrange(len(sel[:valor])):
                 if self.flip:
                     fac[len(sel)-i-1].select = True
                 else:
                     fac[i].select = True
         bpy.ops.object.mode_set(mode='EDIT')
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class GUI(bpy.types.Panel):
     bl_label = 'Select mesh data'
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
     bl_category = 'Tools'
-    bl_options = {'DEFAULT_CLOSED'}
+    bl_options = set(['DEFAULT_CLOSED'])
 
     def draw(self, context):
         layout = self.layout

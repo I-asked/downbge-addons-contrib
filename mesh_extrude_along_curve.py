@@ -19,6 +19,9 @@
 # <pep8 compliant>
 
 
+from __future__ import division
+from __future__ import absolute_import
+from itertools import izip
 bl_info = {
     "name": "Extrude Along Curve",
     "author": "Andrew Hale (TrumanBlending)",
@@ -87,7 +90,7 @@ def curve_ob_enum(self, context):
 class ExtrudeAlongCurve(bpy.types.Operator):
     bl_idname = "mesh.extrude_along_curve"
     bl_label = "Extrude Along Curve"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     resolution = bpy.props.IntProperty(name="Resolution", default=1, min=1, soft_max=100)
     scale = bpy.props.FloatProperty(name="Scale", default=1.0, soft_min=0.0, soft_max=5.0)
@@ -140,14 +143,14 @@ class ExtrudeAlongCurve(bpy.types.Operator):
         ctanmat = cmat.to_3x3().inverted().transposed()
 
         # The list of parameter values to evaluate the bezier curve at
-        tvals = [t / res for t in range(res + 1)]
+        tvals = [t / res for t in xrange(res + 1)]
 
         # Get the first selected face, if none, cancel
         for f in bm.faces:
             if f.select:
                 break
         else:
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
 
         # Get the position vecs on the curve and tangent values
         bezval = [eval_bez(cmat, p, t) for t in tvals]
@@ -159,7 +162,7 @@ class ExtrudeAlongCurve(bpy.types.Operator):
         fquat = bezquat[0].inverted()
 
         # Calculate the min twist orientations
-        for i in range(1, res + 1):
+        for i in xrange(1, res + 1):
             ang = beztan[i - 1].angle(beztan[i], 0.0)
             if ang > 0.0:
                 axis = beztan[i - 1].cross(beztan[i])
@@ -171,13 +174,13 @@ class ExtrudeAlongCurve(bpy.types.Operator):
         # Get the faces to be modified
         fprev = f
         # no = f.normal.copy()
-        faces = [f.copy() for i in range(res)]
+        faces = [f.copy() for i in xrange(res)]
 
         # Offset if we need to snap to the face
         offset = Vector() if not self.snapto else (f.calc_center_median() - bezval[0])
 
         # For each of the faces created, set their vert positions and create side faces
-        for i, data in enumerate(zip(faces, bezval[1:], bezquat[1:])):
+        for i, data in enumerate(izip(faces, bezval[1:], bezquat[1:])):
 
             fn, pos, quat = data
             cen = fn.calc_center_median()
@@ -187,7 +190,7 @@ class ExtrudeAlongCurve(bpy.types.Operator):
             for v in fn.verts:
                 v.co = quat * rotquat * fquat * (v.co - cen) * (1 - (i + 1) * dscale) + pos + offset
 
-            for ll, ul in zip(fprev.loops, fn.loops):
+            for ll, ul in izip(fprev.loops, fn.loops):
                 ff = bm.faces.new((ll.vert, ll.link_loop_next.vert, ul.link_loop_next.vert, ul.vert))
                 ff.normal_update()
 
@@ -198,7 +201,7 @@ class ExtrudeAlongCurve(bpy.types.Operator):
         me.calc_normals()
         me.update()
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 def register():

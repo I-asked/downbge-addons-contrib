@@ -12,6 +12,7 @@
 #  along with this program; if not, write to the Free Software Foundation,
 #  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
+from __future__ import absolute_import
 import bpy
 from mathutils import Vector
 
@@ -20,7 +21,7 @@ class AMTH_NODE_OT_AddTemplateVignette(bpy.types.Operator):
     bl_idname = "node.template_add_vignette"
     bl_label = "Add Vignette"
     bl_description = "Add a vignette effect"
-    bl_options = {"REGISTER", "UNDO"}
+    bl_options = set(["REGISTER", "UNDO"])
 
     @classmethod
     def poll(cls, context):
@@ -97,4 +98,4 @@ class AMTH_NODE_OT_AddTemplateVignette(bpy.types.Operator):
     def execute(self, context):
         self._setupNodes(context)
 
-        return {"FINISHED"}
+        return set(["FINISHED"])

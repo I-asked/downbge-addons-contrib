@@ -1,3 +1,5 @@
+from __future__ import division
+from __future__ import absolute_import
 import bpy
 import math
 import sys
@@ -45,7 +47,7 @@ def DefSplitShapes(self,ACTIVESHAPE,LAYOUTCOMPAT):
 class CreaShapes(bpy.types.Operator):
     bl_idname = "mesh.split_lr_shapes_osc"
     bl_label = "Split LR Shapes"
-    bl_options = {"REGISTER", "UNDO"}
+    bl_options = set(["REGISTER", "UNDO"])
 
     @classmethod
     def poll(cls, context):
@@ -58,7 +60,7 @@ class CreaShapes(bpy.types.Operator):
 
         DefSplitShapes(self,self.activeshape,self.layoutcompat)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 ##----------------------------SHAPES LAYOUT-----------------------
@@ -66,7 +68,7 @@ class CreaShapes(bpy.types.Operator):
 class CreaShapesLayout(bpy.types.Operator):
     bl_idname = "mesh.create_symmetrical_layout_osc"
     bl_label = "Symmetrical Layout"
-    bl_options = {"REGISTER", "UNDO"}
+    bl_options = set(["REGISTER", "UNDO"])
     def execute(self, context):
 
         SEL_OBJ= bpy.context.active_object
@@ -174,7 +176,7 @@ class CreaShapesLayout(bpy.types.Operator):
                     CNS.subtarget = ob.pose.bones[keyblock.name].name
                     CNS.use_offset = True
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 ##----------------------------CREATE LMR GROUPS-------------------
 def createLMRGroups(self, FACTORVG, ADDVG):
@@ -217,7 +219,7 @@ class CreaGrupos(bpy.types.Operator):
     bl_idname = "mesh.create_lmr_groups_osc"
     bl_label = "Create Mix groups"
     bl_description = "Create Mix groups"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     FACTORVG= bpy.props.FloatProperty(name="Factor", default=1, min=0, max=1000)
     ADDVG= bpy.props.FloatProperty(name="Addition", default=.5, min=0, max=1000)
@@ -226,7 +228,7 @@ class CreaGrupos(bpy.types.Operator):
 
         createLMRGroups(self, self.FACTORVG, self.ADDVG)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 ##------------------------ SHAPES LAYOUT SYMMETRICA ------------------------
@@ -235,7 +237,7 @@ class CreaGrupos(bpy.types.Operator):
 class CreateLayoutAsymmetrical(bpy.types.Operator):
     bl_idname = "mesh.create_asymmetrical_layout_osc"
     bl_label = "Asymmetrical Layout"
-    bl_options = {"REGISTER", "UNDO"}
+    bl_options = set(["REGISTER", "UNDO"])
     def execute(self, context):
 
         SEL_OBJ= bpy.context.active_object
@@ -336,7 +338,7 @@ class CreateLayoutAsymmetrical(bpy.types.Operator):
                     CNS.subtarget = obas.pose.bones[keyblock.name].name
                     CNS.use_offset = True  
                               
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 ##---------------------------SHAPES TO OBJECTS------------------
@@ -344,17 +346,17 @@ class CreateLayoutAsymmetrical(bpy.types.Operator):
 class ShapeToObjects (bpy.types.Operator):
     bl_idname = "object.shape_key_to_objects_osc"
     bl_label = "Shapes To Objects"
-    bl_options = {"REGISTER", "UNDO"}
+    bl_options = set(["REGISTER", "UNDO"])
     def execute(self,context):
         OBJACT=bpy.context.active_object
         for SHAPE in OBJACT.data.shape_keys.key_blocks[:]:
-            print(SHAPE.name)
+            print SHAPE.name
             bpy.ops.object.shape_key_clear()
             SHAPE.value=1
             mesh=OBJACT.to_mesh(bpy.context.scene, True, 'PREVIEW')
             object=bpy.data.objects.new(SHAPE.name, mesh)
             bpy.context.scene.objects.link(object)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 

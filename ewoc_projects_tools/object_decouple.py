@@ -38,6 +38,7 @@ Save as Default (Optional).
 """
 
 
+from __future__ import absolute_import
 bl_info = {
 	"name": "DeCouple",
 	"author": "Gert De Roost",
@@ -63,7 +64,7 @@ class DeCouple(bpy.types.Operator):
 	bl_idname = "object.decouple"
 	bl_label = "DeCouple"
 	bl_description = "Temporarily decouples parent and children"
-	bl_options = {"REGISTER", "UNDO"}
+	bl_options = set(["REGISTER", "UNDO"])
 
 
 	@classmethod
@@ -78,7 +79,7 @@ class DeCouple(bpy.types.Operator):
 		self.do_decouple(context)
 		unparented = True
 
-		return {'FINISHED'}
+		return set(['FINISHED'])
 
 
 	def do_decouple(self, context):
@@ -104,7 +105,7 @@ class ReCouple(bpy.types.Operator):
 	bl_idname = "object.recouple"
 	bl_label = "ReCouple"
 	bl_description = "Recouples decoupled parent and children"
-	bl_options = {"REGISTER", "UNDO"}
+	bl_options = set(["REGISTER", "UNDO"])
 
 	@classmethod
 	def poll(cls, context):
@@ -118,7 +119,7 @@ class ReCouple(bpy.types.Operator):
 		self.do_recouple(context)
 		unparented = False
 
-		return {'FINISHED'}
+		return set(['FINISHED'])
 
 	def do_recouple(self, context):
 

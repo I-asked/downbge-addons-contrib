@@ -46,6 +46,8 @@ ALSO - dont forget to Apply rotation and scale to have your object
 show up correctly
 """
 
+from __future__ import absolute_import
+from io import open
 bl_info = {
     "name": "CreaPrim",
     "author": "Gert De Roost",
@@ -86,7 +88,7 @@ class CreaPrim(bpy.types.Operator):
 	bl_idname = "object.creaprim"
 	bl_label = "CreaPrim"
 	bl_description = "Create primitive addon"
-	bl_options = {"REGISTER"}
+	bl_options = set(["REGISTER"])
 
 
 	@classmethod
@@ -119,9 +121,9 @@ class CreaPrim(bpy.types.Operator):
 				os.makedirs(addondir)
 		else:
 			groupname = scn.Name
-			print (bpy.utils.script_paths())
+			print bpy.utils.script_paths()
 			addondir = direc + os.sep + "addons" + os.sep
-			print (addondir)
+			print addondir
 			if not os.path.exists(addondir):
 				os.makedirs(addondir)
 
@@ -144,7 +146,7 @@ class CreaPrim(bpy.types.Operator):
 				bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
 			txt = do_creaprim(self, mesh, objname, addondir)
 			if txt == 0:
-				return {'CANCELLED'}
+				return set(['CANCELLED'])
 			txtlist.append(txt)
 		oldname = actobj.name
 		scn.objects.active = actobj
@@ -161,7 +163,7 @@ class CreaPrim(bpy.types.Operator):
 			message = "Add Mesh addon " + groupname + " saved to main scripts directory."
 		bpy.ops.creaprim.message('INVOKE_DEFAULT')
 
-		return {'FINISHED'}
+		return set(['FINISHED'])
 
 
 class MessageOperator(bpy.types.Operator):
@@ -171,7 +173,7 @@ class MessageOperator(bpy.types.Operator):
 	def invoke(self, context, event):
 		wm = context.window_manager
 		return wm.invoke_popup(self, width=500, height=20)
-		return {'FINISHED'}
+		return set(['FINISHED'])
 
 	def draw(self, context):
 

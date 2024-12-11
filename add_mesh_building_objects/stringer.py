@@ -40,12 +40,14 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import division
+from __future__ import absolute_import
 from math import atan, cos, radians, tan
 from mathutils import Matrix, Vector
 from mathutils.geometry import (intersect_line_plane,
                                 intersect_line_line)
 
-class Stringer:
+class Stringer(object):
     def  __init__(self,G,typ,typ_s,rise,run,w,h,nT,hT,wT,tT,tO,tw,tf,tp,g,
                   nS=1,dis=False,notMulti=True,deg=4):
         self.G = G #General
@@ -121,8 +123,8 @@ class Stringer:
                     offset = (self.wT / (self.nS + 1)) - (self.w / 2)
                 else:
                     offset = 0
-                for i in range(self.nS):
-                    for j in range(self.nT):
+                for i in xrange(self.nS):
+                    for j in xrange(self.nT):
                         coords = []
                         coords.append(Vector([0, offset, -self.rise]))
                         coords.append(Vector([self.run, offset, -self.rise]))
@@ -130,7 +132,7 @@ class Stringer:
                         coords.append(Vector([self.run, offset, -self.hT]))
                         coords.append(Vector([self.run, offset, 0]))
                         coords.append(Vector([self.run * 2, offset, 0]))
-                        for k in range(6):
+                        for k in xrange(6):
                             coords.append(coords[k]+Vector([0, self.w, 0]))
                         for k in coords:
                             k += j*Vector([self.run, 0, self.rise])
@@ -152,7 +154,7 @@ class Stringer:
                 coords.append(Vector([self.nT * self.run, -self.w, self.nT * self.rise]))
                 coords.append(Vector([(self.nT * self.run) - self.tT, -self.w,
                                       self.nT * self.rise]))
-                for i in range(6):
+                for i in xrange(6):
                     coords.append(coords[i] + Vector([0, self.w, 0]))
                 self.G.Make_mesh(coords, self.faces2, 'stringer')
                 for i in coords:
@@ -164,25 +166,25 @@ class Stringer:
                 self.housed_C_beam()
         elif self.typ == "id3":
             h = (self.rise - self.hT) - self.rise #height of top section
-            for i in range(self.nT):
+            for i in xrange(self.nT):
                 coords = []
                 coords.append(Vector([i * self.run,0,-self.rise]))
                 coords.append(Vector([(i + 1) * self.run,0,-self.rise]))
                 coords.append(Vector([i * self.run,0,h + (i * self.rise)]))
                 coords.append(Vector([(i + 1) * self.run,0,h + (i * self.rise)]))
-                for j in range(4):
+                for j in xrange(4):
                     coords.append(coords[j] + Vector([0,self.wT,0]))
                 self.G.Make_mesh(coords, self.G.faces, 'stringer')
         elif self.typ == "id4":
             offset = (self.wT / (self.nS + 1)) - (self.w / 2)
-            for s in range(self.nS):
+            for s in xrange(self.nS):
                 base = self.tO + (offset * (s + 1))
                 start = [Vector([0, -base, -self.hT]),
                          Vector([0, -base, -self.hT - self.rise]),
                          Vector([0, -base - self.w, -self.hT]),
                          Vector([0, -base - self.w, -self.hT - self.rise])]
                 self.d = radians(self.run) / self.nT
-                for i in range(self.nT):
+                for i in xrange(self.nT):
                     coords = []
                     # Base faces.  Should be able to append more sections:
                     tId4_faces = [[0, 1, 3, 2]]
@@ -193,7 +195,7 @@ class Stringer:
                     coords.append((t_outer * start[2]) + Vector([0, 0, self.rise * i]))
                     coords.append((t_outer * start[3]) + Vector([0, 0, self.rise * i]))
                     k = 0
-                    for j in range(self.deg):
+                    for j in xrange(self.deg):
                         k = (j * 4) + 4
                         tId4_faces.append([k, k - 4, k - 3, k + 1])
                         tId4_faces.append([k - 2, k - 1, k + 3, k + 2])
@@ -202,14 +204,14 @@ class Stringer:
                         rot = Matrix.Rotation(((self.d * (j + 1)) / self.deg) + (self.d * i), 3, 'Z')
                         for v in start:
                             coords.append((rot * v) + Vector([0, 0, self.rise * i]))
-                    for j in range(self.deg):
+                    for j in xrange(self.deg):
                         k = ((j + self.deg) * 4) + 4
                         tId4_faces.append([k, k - 4, k - 3, k + 1])
                         tId4_faces.append([k - 2, k - 1, k + 3, k + 2])
                         tId4_faces.append([k + 1, k - 3, k - 1, k + 3])
                         tId4_faces.append([k, k - 4, k - 2, k + 2])
                         rot = Matrix.Rotation(((self.d * ((j + self.deg) + 1)) / self.deg) + (self.d * i), 3, 'Z')
-                        for v in range(4):
+                        for v in xrange(4):
                             if v in [1, 3]:
                                 incline = (self.rise * i) + (self.rise / self.deg) * (j + 1)
                                 coords.append((rot * start[v]) + Vector([0, 0, incline]))
@@ -217,7 +219,7 @@ class Stringer:
                                 coords.append((rot * start[v]) + Vector([0, 0, self.rise * i]))
                     self.G.Make_mesh(coords, tId4_faces, 'treads')
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
     def I_beam(self):
@@ -237,7 +239,7 @@ class Stringer:
 
         # taper < 100%:
         if self.tp > 0:
-            for i in range(self.nS):
+            for i in xrange(self.nS):
                 coords = []
                 coords.append(Vector([0, offset,                baseZ]))
                 coords.append(Vector([0, offset,                baseZ + taper]))
@@ -255,14 +257,14 @@ class Stringer:
                 coords.append(Vector([0, offset + self.w,       baseZ]))
                 coords.append(Vector([0, offset + (mid + web),  baseZ]))
                 coords.append(Vector([0, offset + (mid - web),  baseZ]))
-                for j in range(16):
+                for j in xrange(16):
                     coords.append(coords[j]+Vector([self.run * self.nT, 0, self.rise * self.nT]))
                 # If the bottom meets the ground:
                 #   Bottom be flat with the xy plane, but shifted down.
                 #   Either project onto the plane along a vector (hard) or use the built in
                 #       interest found in mathutils.geometry (easy).  Using intersect:
                 if self.g:
-                    for j in range(16):
+                    for j in xrange(16):
                         coords[j] = intersect_line_plane(coords[j], coords[j + 16],
                                                          Vector([0, 0, topZ]),
                                                          Vector([0, 0, 1]))
@@ -274,7 +276,7 @@ class Stringer:
                     offset += (self.wT - self.w) / (self.nS - 1)
         # taper = 100%:
         else:
-            for i in range(self.nS):
+            for i in xrange(self.nS):
                 coords = []
                 coords.append(Vector([0, offset,                baseZ]))
                 coords.append(Vector([0, offset + (mid - web),  baseZ + self.tf]))
@@ -284,12 +286,12 @@ class Stringer:
                 coords.append(Vector([0, offset + (mid + web),  topZ - self.tf]))
                 coords.append(Vector([0, offset + (mid + web),  baseZ + self.tf]))
                 coords.append(Vector([0, offset + self.w,       baseZ]))
-                for j in range(8):
+                for j in xrange(8):
                     coords.append(coords[j]+Vector([self.run * self.nT, 0, self.rise * self.nT]))
                 self.G.Make_mesh(coords, self.faces3b, 'stringer')
                 offset += self.wT / (self.nS + 1)
                 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
     def housed_I_beam(self):
@@ -342,15 +344,15 @@ class Stringer:
             coords.append(coords[3] + Vector([0, flange_y, 0]))
             coords.append(coords[2] + Vector([0, flange_y, 0]))
             # Upper-Inner flange and lower-inner flange:
-            for i in range(16):
+            for i in xrange(16):
                 coords.append(coords[i] + Vector([0, self.w, 0]))
             # Inner web:
-            for i in range(8):
+            for i in xrange(8):
                 coords.append(coords[i + 16] + Vector([0, self.tw, 0]))
             # Mid nodes to so faces will be quads:
             for i in [0,7,6,5,9,10,11,12]:
                 coords.append(coords[i] + Vector([0, flange_y, 0]))
-            for i in range(8):
+            for i in xrange(8):
                 coords.append(coords[i + 48] + Vector([0, self.tw, 0]))
 
             self.G.Make_mesh(coords, self.faces3c, 'stringer')
@@ -362,7 +364,7 @@ class Stringer:
 
         # @TODO Taper = 100%
         
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
     def C_Beam(self):
@@ -382,7 +384,7 @@ class Stringer:
 
         # taper < 100%:
         if self.tp > 0:
-            for i in range(self.nS):
+            for i in xrange(self.nS):
                 coords = []
                 coords.append(Vector([0, offset,                baseZ]))
                 coords.append(Vector([0, offset,                baseZ + taper]))
@@ -400,14 +402,14 @@ class Stringer:
                 coords.append(Vector([0, offset + self.w,       baseZ]))
                 coords.append(Vector([0, offset + (mid + web),  baseZ]))
                 coords.append(Vector([0, offset + (mid - web),  baseZ]))
-                for j in range(16):
+                for j in xrange(16):
                     coords.append(coords[j]+Vector([self.run * self.nT, 0, self.rise * self.nT]))
                 # If the bottom meets the ground:
                 #   Bottom be flat with the xy plane, but shifted down.
                 #   Either project onto the plane along a vector (hard) or use the built in
                 #       interest found in mathutils.geometry (easy).  Using intersect:
                 if self.g:
-                    for j in range(16):
+                    for j in xrange(16):
                         coords[j] = intersect_line_plane(coords[j], coords[j + 16],
                                                          Vector([0, 0, topZ]),
                                                          Vector([0, 0, 1]))
@@ -419,7 +421,7 @@ class Stringer:
                     offset += (self.wT - self.w) / (self.nS - 1)
         # taper = 100%:
         else:
-            for i in range(self.nS):
+            for i in xrange(self.nS):
                 coords = []
                 coords.append(Vector([0, offset,                baseZ]))
                 coords.append(Vector([0, offset + (mid - web),  baseZ + self.tf]))
@@ -429,12 +431,12 @@ class Stringer:
                 coords.append(Vector([0, offset + (mid + web),  topZ - self.tf]))
                 coords.append(Vector([0, offset + (mid + web),  baseZ + self.tf]))
                 coords.append(Vector([0, offset + self.w,       baseZ]))
-                for j in range(8):
+                for j in xrange(8):
                     coords.append(coords[j]+Vector([self.run * self.nT, 0, self.rise * self.nT]))
                 self.G.Make_mesh(coords, self.faces3b, 'stringer')
                 offset += self.wT / (self.nS + 1)
                 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
     def housed_C_beam(self):
@@ -492,13 +494,13 @@ class Stringer:
 
             self.G.Make_mesh(coords, self.faces4c, 'stringer')
 
-            for i in range(16):
+            for i in xrange(16):
                 coords[i] += Vector([0, -outer * 2, 0])
-            for i in range(8):
+            for i in xrange(8):
                 coords[i + 16] += Vector([0, (-outer - flange_y) * 2, 0])
             for i in coords:
                 i += Vector([0, (self.tO * 2) + self.wT, 0])
 
             self.G.Make_mesh(coords, self.faces4c, 'stringer')
         
-        return {'FINISHED'}
+        return set(['FINISHED'])

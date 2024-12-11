@@ -19,6 +19,7 @@
 #
 # ***** END GPL LICENCE BLOCK *****
 
+from __future__ import absolute_import
 bl_info = {
     "name": "Mangle Tools",
     "author": "Phil Cote",
@@ -61,7 +62,7 @@ class MeshManglerOperator(bpy.types.Operator):
     """directions to create a crumpled look"""
     bl_idname = "ba.mesh_mangler"
     bl_label = "Mangle Mesh"
-    bl_options = { "REGISTER", "UNDO" }
+    bl_options = set([ "REGISTER", "UNDO"])
 
     @classmethod
     def poll(cls, context):
@@ -77,8 +78,8 @@ class MeshManglerOperator(bpy.types.Operator):
         random.seed( time.time() )
 
         if mesh.shape_keys != None:
-            self.report({'INFO'}, "Cannot mangle mesh: Shape keys present")
-            return {'CANCELLED'}
+            self.report(set(['INFO']), "Cannot mangle mesh: Shape keys present")
+            return set(['CANCELLED'])
 
         for vert in verts:
             xVal = .01 * random.randrange( -randomMag, randomMag )
@@ -90,7 +91,7 @@ class MeshManglerOperator(bpy.types.Operator):
 
         bm.to_mesh(mesh)
         mesh.update()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class AnimanglerOperator(bpy.types.Operator):
@@ -115,14 +116,14 @@ class AnimanglerOperator(bpy.types.Operator):
         for vert in verts:
             move_coordinate(context, vert.co, is_curve=ob.type=='CURVE')
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class CurveManglerOp(bpy.types.Operator):
     """Mangle a curve to the degree the user specifies"""
     bl_idname = "ba.curve_mangler"
     bl_label = "Mangle Curve"
-    bl_options = { 'REGISTER', 'UNDO' }
+    bl_options = set([ 'REGISTER', 'UNDO'])
 
     @classmethod
     def poll(cls, context):
@@ -134,20 +135,20 @@ class CurveManglerOp(bpy.types.Operator):
 
         ob = context.active_object
         if ob.data.shape_keys != None:
-            self.report({'INFO'}, "Cannot mangle curve.  Shape keys present")
-            return {'CANCELLED'}
+            self.report(set(['INFO']), "Cannot mangle curve.  Shape keys present")
+            return set(['CANCELLED'])
         splines = context.object.data.splines
 
         for spline in splines:
             if spline.type == 'BEZIER':
                 points = spline.bezier_points
-            elif spline.type in {'POLY', 'NURBS'}:
+            elif spline.type in set(['POLY', 'NURBS']):
                 points = spline.points
 
             for point in points:
                 move_coordinate(context, point.co, is_curve=True)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class MangleToolsPanel(bpy.types.Panel):
@@ -156,7 +157,7 @@ class MangleToolsPanel(bpy.types.Panel):
     bl_context = "objectmode"
     bl_region_type="TOOLS"
     bl_category = "Tools"
-    bl_options = {'DEFAULT_CLOSED'}
+    bl_options = set(['DEFAULT_CLOSED'])
 
 
     def draw(self, context):

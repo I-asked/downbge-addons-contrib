@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import bpy
 from bpy.types import Mesh, PointLamp, SpotLamp, HemiLamp, AreaLamp, SunLamp, Camera, TextCurve, MetaBall, Lattice, Armature
 
@@ -106,7 +107,7 @@ def removeData(data) :
             elif data_type == Armature :
                 bpy.data.armatures.remove(data)
             else :
-                print('  data still here : forgot %s type'%type(data))
+                print '  data still here : forgot %s type'%type(data)
         #except :
             # empty, field
         #    print('%s has no user_clear attribute ? (%s).'%(data.name,type(data)))

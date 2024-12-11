@@ -19,6 +19,7 @@ Developed during Caminandes Open Movie Project
 """
 
 
+from __future__ import absolute_import
 import bpy
 
 KEYMAPS = list()

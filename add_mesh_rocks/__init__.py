@@ -32,6 +32,7 @@
 
 # <pep8 compliant>
 
+from __future__ import absolute_import
 bl_info = {
     "name": "Rock Generator",
     "author": "Paul Marshall (brikbot)",

@@ -21,6 +21,8 @@
 # based completely on addon by zmj100
 # added some distance limits to prevent overlap - max12345
 # ------ ------
+from __future__ import division
+from __future__ import absolute_import
 import bpy
 import bmesh
 from bpy.props import FloatProperty, IntProperty, BoolProperty, EnumProperty
@@ -55,7 +57,7 @@ def face_inset_fillet(bme, face_index_list, inset_amount, distance, number_of_si
         dict_0 = {}
         orientation_vertex_list = []
         n = len(vertex_index_list)
-        for i in range(n):
+        for i in xrange(n):
             #loops through the vertices
             dict_0[i] = []
             bme.verts.ensure_lookup_table()
@@ -96,7 +98,7 @@ def face_inset_fillet(bme, face_index_list, inset_amount, distance, number_of_si
         new_inner_face = []
         orientation_vertex_list_length = len(orientation_vertex_list)
         ovll=orientation_vertex_list_length
-        for j in range(ovll):
+        for j in xrange(ovll):
             q = orientation_vertex_list[j]
             q1 = orientation_vertex_list[(j - 1) % ovll]
             q2 = orientation_vertex_list[(j + 1) % ovll]
@@ -143,7 +145,7 @@ def face_inset_fillet(bme, face_index_list, inset_amount, distance, number_of_si
                 rot_ang = vec3_.angle(vec4_)
                 cornerverts = []
                 
-                for o in range(number_of_sides + 1):
+                for o in xrange(number_of_sides + 1):
                     
                     #this calculates the actual new vertices
                     
@@ -168,7 +170,7 @@ def face_inset_fillet(bme, face_index_list, inset_amount, distance, number_of_si
 
         n2_ = len(dict_0)
         #these are the new side faces, those that don't depend on cornertype
-        for o in range(n2_):
+        for o in xrange(n2_):
             list_a = dict_0[o]
             list_b = dict_0[(o + 1) % n2_]
             bme.faces.new( [ list_a[0], list_b[0], list_b[-1], list_a[1] ] )
@@ -185,7 +187,7 @@ def face_inset_fillet(bme, face_index_list, inset_amount, distance, number_of_si
                 q_ = dict_0[k_][0]
                 dict_0[k_].pop(0)
                 n3_ = len(dict_0[k_])
-                for kk in range(n3_ - 1):
+                for kk in xrange(n3_ - 1):
                     bme.faces.new( [ dict_0[k_][kk], dict_0[k_][(kk + 1) % n3_], q_ ] )
                     bme.faces.index_update()
 
@@ -198,7 +200,7 @@ class faceinfillet_op0(bpy.types.Operator):
     bl_idname = 'faceinfillet.op0_id'
     bl_label = 'Face Inset Fillet'
     bl_description = 'inset selected faces'
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     inset_amount = FloatProperty( name = '', default = 0.04, min = 0, max = 100.0, step = 1, precision = 3 )      # inset amount
     number_of_sides = IntProperty( name = '', default = 4, min = 1, max = 100, step = 1 )      # number of sides
@@ -248,15 +250,15 @@ class faceinfillet_op0(bpy.types.Operator):
         face_index_list = [ f.index for f in bme.faces if f.select and f.is_valid ]
 
         if len(face_index_list) == 0:
-            self.report({'INFO'}, 'No faces selected unable to continue.')
+            self.report(set(['INFO']), 'No faces selected unable to continue.')
             edit_mode_in()
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
         elif len(face_index_list) != 0:
             face_inset_fillet(bme, face_index_list, inset_amount, distance, number_of_sides, out, radius, type_enum, kp)
 
         bme.to_mesh(ob_act.data)
         edit_mode_in()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class inset_help(bpy.types.Operator):
     bl_idname = 'help.face_inset'
@@ -272,7 +274,7 @@ class inset_help(bpy.types.Operator):
         layout.label('Outset: select & use normals flip before extruding.')
     
     def execute(self, context):
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def invoke(self, context, event):
         return context.window_manager.invoke_popup(self, width = 350)

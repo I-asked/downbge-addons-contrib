@@ -37,6 +37,8 @@ Press ENTER to finalize the selection projection operation.
 """
 
 
+from __future__ import division
+from __future__ import absolute_import
 bl_info = {
 	"name": "SelProject",
 	"author": "Gert De Roost",
@@ -89,7 +91,7 @@ class SelProject(bpy.types.Operator):
 	bl_idname = "mesh.selproject"
 	bl_label = "SelProject"
 	bl_description = "Use object projection as selection tool"
-	bl_options = {'REGISTER', 'UNDO'}
+	bl_options = set(['REGISTER', 'UNDO'])
 
 	def invoke(self, context, event):
 
@@ -106,14 +108,14 @@ class SelProject(bpy.types.Operator):
 
 		self._handle = bpy.types.SpaceView3D.draw_handler_add(self.redraw, (), 'WINDOW', 'POST_PIXEL')
 
-		return {'RUNNING_MODAL'}
+		return set(['RUNNING_MODAL'])
 
 
 	def modal(self, context, event):
 
 		global started
 
-		if event.type in {'RET', 'NUMPAD_ENTER'}:
+		if event.type in set(['RET', 'NUMPAD_ENTER']):
 			self.area.header_text_set()
 			if self.obhide != None:
 				bpy.ops.object.select_all(action = 'DESELECT')
@@ -143,7 +145,7 @@ class SelProject(bpy.types.Operator):
 			self.bmT.free()
 			bpy.types.SpaceView3D.draw_handler_remove(self._handle, 'WINDOW')
 			bpy.ops.object.editmode_toggle()
-			return {'FINISHED'}
+			return set(['FINISHED'])
 
 		elif event.type == 'ESC':
 			self.area.header_text_set()
@@ -168,13 +170,13 @@ class SelProject(bpy.types.Operator):
 			bpy.types.SpaceView3D.draw_handler_remove(self._handle, 'WINDOW')
 			if self.oldmode == 'EDIT':
 				bpy.ops.object.editmode_toggle()
-			return {'CANCELLED'}
+			return set(['CANCELLED'])
 
-		elif event.type in {'LEFTMOUSE', 'MIDDLEMOUSE', 'RIGHTMOUSE', 'WHEELDOWNMOUSE', 'WHEELUPMOUSE', 'G', 'S', 'R', 'X', 'Y', 'Z', 'MOUSEMOVE'}:
+		elif event.type in set(['LEFTMOUSE', 'MIDDLEMOUSE', 'RIGHTMOUSE', 'WHEELDOWNMOUSE', 'WHEELUPMOUSE', 'G', 'S', 'R', 'X', 'Y', 'Z', 'MOUSEMOVE']):
 			context.region.tag_redraw()
-			return {'PASS_THROUGH'}
+			return set(['PASS_THROUGH'])
 
-		return {'RUNNING_MODAL'}
+		return set(['RUNNING_MODAL'])
 
 
 	def getmatrix(self, selobj):
@@ -422,7 +424,7 @@ def sceneupdate_handler(dummy):
 				description = "Object to project onto")
 		oldobjs = list(scn.objects)
 
-	return {'RUNNING_MODAL'}
+	return set(['RUNNING_MODAL'])
 
 
 

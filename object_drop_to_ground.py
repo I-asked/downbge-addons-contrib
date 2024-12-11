@@ -16,6 +16,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import absolute_import
 bl_info = {
     'name': 'Drop to Ground',
     'author': 'Unnikrishnan(kodemax), Florian Meyer(testscreenings)',
@@ -102,12 +103,12 @@ def drop_objects(self, context):
         else:
             lowest_world_co = get_lowest_world_co(context, ob)
         if not lowest_world_co:
-            print(ob.type, 'is not supported. Failed to drop', ob.name)
+            print ob.type, 'is not supported. Failed to drop', ob.name
             continue
         hit_location, hit_normal, hit_index = tmp_ground.ray_cast(lowest_world_co,
                                                                   lowest_world_co + down)
         if hit_index == -1:
-            print(ob.name, 'didn\'t hit the ground')
+            print ob.name, 'didn\'t hit the ground'
             continue
 
         # simple drop down
@@ -144,7 +145,7 @@ class OBJECT_OT_drop_to_ground(Operator):
     """Drop selected objects on active object"""
     bl_idname = "object.drop_on_active"
     bl_label = "Drop to Ground"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
     bl_description = "Drop selected objects on active object"
 
     align = BoolProperty(
@@ -163,9 +164,9 @@ class OBJECT_OT_drop_to_ground(Operator):
 
     ##### EXECUTE #####
     def execute(self, context):
-        print('\nDropping Objects')
+        print '\nDropping Objects'
         drop_objects(self, context)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 #################################################################
 class drop_help(bpy.types.Operator):
@@ -180,7 +181,7 @@ class drop_help(bpy.types.Operator):
 		layout.label("Then Shift Select 'Ground'")
 
 	def execute(self, context):
-		return {'FINISHED'}
+		return set(['FINISHED'])
 
 	def invoke(self, context, event):
 		return context.window_manager.invoke_popup(self, width = 300)
@@ -189,7 +190,7 @@ class Drop_Operator_Panel(bpy.types.Panel):
     bl_label = "Drop To Ground"
     bl_region_type = "TOOLS" #UI possible too
     bl_space_type = "VIEW_3D"
-    bl_options = {'DEFAULT_CLOSED'}
+    bl_options = set(['DEFAULT_CLOSED'])
     bl_context = "objectmode"
     bl_category = "Tools"
 

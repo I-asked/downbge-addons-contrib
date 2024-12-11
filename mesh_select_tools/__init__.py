@@ -18,6 +18,7 @@
 # menu & updates by meta-androcto #
 # contributed to by Macouno, dustractor, liero, CoDEmanX, meta-androcto #
 
+from __future__ import absolute_import
 bl_info = {
     "name": "Select Tools",
     "author": "Multiple Authors",

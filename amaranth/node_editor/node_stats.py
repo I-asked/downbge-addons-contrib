@@ -18,6 +18,7 @@ Display the number of selected and total nodes on the compositor. On the
 Compositing Nodes Editor.
 """
 
+from __future__ import absolute_import
 import bpy
 
 

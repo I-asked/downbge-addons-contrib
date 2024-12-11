@@ -37,6 +37,8 @@
 
 
 
+from __future__ import division
+from __future__ import absolute_import
 import bpy
 import bgl
 import math
@@ -53,16 +55,16 @@ class VIEW3D_OT_cursor_to_origin(bpy.types.Operator):
     """Move to world origin"""
     bl_idname = "view3d.cursor_to_origin"
     bl_label = "Move to world origin"
-    bl_options = {'REGISTER'}
+    bl_options = set(['REGISTER'])
 
     def modal(self, context, event):
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def execute(self, context):
         cc = context.scene.cursor_control
         cc.hideLinexChoice()
         cc.setCursor([0,0,0])
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 
@@ -70,16 +72,16 @@ class VIEW3D_OT_cursor_to_active_object_center(bpy.types.Operator):
     """Move to active object origin"""
     bl_idname = "view3d.cursor_to_active_object_center"
     bl_label = "Move to active object origin"
-    bl_options = {'REGISTER'}
+    bl_options = set(['REGISTER'])
 
     def modal(self, context, event):
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def execute(self, context):
         cc = context.scene.cursor_control
         cc.hideLinexChoice()
         cc.setCursor(context.active_object.location)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 
@@ -125,10 +127,10 @@ class VIEW3D_OT_cursor_to_sl(bpy.types.Operator):
     """Move to saved location"""
     bl_idname = "view3d.cursor_to_sl"
     bl_label = "Move to saved location"
-    bl_options = {'REGISTER'}
+    bl_options = set(['REGISTER'])
 
     def modal(self, context, event):
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def execute(self, context):
         cc = context.scene.cursor_control
@@ -136,7 +138,7 @@ class VIEW3D_OT_cursor_to_sl(bpy.types.Operator):
             cm = context.scene.cursor_memory
             cc.hideLinexChoice()
             cc.setCursor(cm.savedLocation)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 
@@ -144,10 +146,10 @@ class VIEW3D_OT_cursor_to_sl_mirror(bpy.types.Operator):
     """Mirror cursor around SL or selection"""
     bl_idname = "view3d.cursor_to_sl_mirror"
     bl_label = "Mirror cursor around SL or selection"
-    bl_options = {'REGISTER'}
+    bl_options = set(['REGISTER'])
 
     def modal(self, context, event):
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def mirror(self, cc, p):
         v = p - Vector(CursorAccess.getCursor())
@@ -163,14 +165,14 @@ class VIEW3D_OT_cursor_to_sl_mirror(bpy.types.Operator):
             if hasattr(context.scene, "cursor_memory"):
                 cm = context.scene.cursor_memory
                 self.mirror(cc, Vector(cm.savedLocation))
-            return {'FINISHED'}
+            return set(['FINISHED'])
 
         mat = obj.matrix_world
 
         if obj.data.total_vert_sel==1:
             sf = [f for f in obj.data.vertices if f.select == 1]
             self.mirror(cc, mat*Vector(sf[0].co))
-            return {'FINISHED'}
+            return set(['FINISHED'])
 
         mati = mat.copy()
         mati.invert()
@@ -180,7 +182,7 @@ class VIEW3D_OT_cursor_to_sl_mirror(bpy.types.Operator):
             sf = [f for f in obj.data.vertices if f.select == 1]
             p = G3.closestP2L(c, Vector(sf[0].co), Vector(sf[1].co))
             self.mirror(cc, mat*p)
-            return {'FINISHED'}
+            return set(['FINISHED'])
             
         if obj.data.total_vert_sel==3:
             sf = [f for f in obj.data.vertices if f.select == 1]
@@ -191,7 +193,7 @@ class VIEW3D_OT_cursor_to_sl_mirror(bpy.types.Operator):
             normal.normalize();            
             p = G3.closestP2S(c, v0, normal)
             self.mirror(cc, mat*p)
-            return {'FINISHED'}
+            return set(['FINISHED'])
               
         if obj.data.total_face_sel==1:
             sf = [f for f in obj.data.faces if f.select == 1]
@@ -202,19 +204,19 @@ class VIEW3D_OT_cursor_to_sl_mirror(bpy.types.Operator):
             normal.normalize();            
             p = G3.closestP2S(c, v0, normal)
             self.mirror(cc, mat*p)
-            return {'FINISHED'}
+            return set(['FINISHED'])
 
-        return {'CANCELLED'}
+        return set(['CANCELLED'])
 
 
 class VIEW3D_OT_cursor_to_vertex(bpy.types.Operator):
     """Move to closest vertex"""
     bl_idname = "view3d.cursor_to_vertex"
     bl_label = "Move to closest vertex"
-    bl_options = {'REGISTER'}
+    bl_options = set(['REGISTER'])
 
     def modal(self, context, event):
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def execute(self, context):
         BlenderFake.forceUpdate()
@@ -239,17 +241,17 @@ class VIEW3D_OT_cursor_to_vertex(bpy.types.Operator):
         if v==None:
             return
         cc.setCursor(mat*v)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class VIEW3D_OT_cursor_to_line(bpy.types.Operator):
     """Move to closest point on line"""
     bl_idname = "view3d.cursor_to_line"
     bl_label = "Move to closest point on line"
-    bl_options = {'REGISTER'}
+    bl_options = set(['REGISTER'])
 
     def modal(self, context, event):
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def execute(self, context):
         BlenderFake.forceUpdate()
@@ -264,9 +266,9 @@ class VIEW3D_OT_cursor_to_line(bpy.types.Operator):
             v1 = mat*sf[1].co
             q = G3.closestP2L(p, v0, v1)
             cc.setCursor(q)
-            return {'FINISHED'}
+            return set(['FINISHED'])
         if obj.data.total_edge_sel<2:
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
         mati = mat.copy()
         mati.invert()
         c = mati*Vector(CursorAccess.getCursor())
@@ -283,19 +285,19 @@ class VIEW3D_OT_cursor_to_line(bpy.types.Operator):
                 q = qq
                 d = dd
         if q==None:
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
         cc.setCursor(mat*q)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class VIEW3D_OT_cursor_to_edge(bpy.types.Operator):
     """Move to closest point on edge"""
     bl_idname = "view3d.cursor_to_edge"
     bl_label = "Move to closest point on edge"
-    bl_options = {'REGISTER'}
+    bl_options = set(['REGISTER'])
 
     def modal(self, context, event):
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def execute(self, context):
         BlenderFake.forceUpdate()
@@ -310,9 +312,9 @@ class VIEW3D_OT_cursor_to_edge(bpy.types.Operator):
             v1 = mat*sf[1].co
             q = G3.closestP2E(p, v0, v1)
             cc.setCursor(q)
-            return {'FINISHED'}
+            return set(['FINISHED'])
         if obj.data.total_edge_sel<2:
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
         mati = mat.copy()
         mati.invert()
         c = mati*Vector(CursorAccess.getCursor())
@@ -329,19 +331,19 @@ class VIEW3D_OT_cursor_to_edge(bpy.types.Operator):
                 q = qq
                 d = dd
         if q==None:
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
         cc.setCursor(mat*q)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class VIEW3D_OT_cursor_to_plane(bpy.types.Operator):
     """Move to closest point on a plane"""
     bl_idname = "view3d.cursor_to_plane"
     bl_label = "Move to closest point on a plane"
-    bl_options = {'REGISTER'}
+    bl_options = set(['REGISTER'])
 
     def modal(self, context, event):
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def execute(self, context):
         BlenderFake.forceUpdate()
@@ -363,7 +365,7 @@ class VIEW3D_OT_cursor_to_plane(bpy.types.Operator):
             k = - (p-v).dot(n) / n.dot(n)
             q = p+n*k
             cc.setCursor(q)
-            return {'FINISHED'}
+            return set(['FINISHED'])
 
         mati = mat.copy()
         mati.invert()
@@ -379,19 +381,19 @@ class VIEW3D_OT_cursor_to_plane(bpy.types.Operator):
                 q = qq
                 d = dd
         if q==None:
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
         cc.setCursor(mat*q)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class VIEW3D_OT_cursor_to_face(bpy.types.Operator):
     """Move to closest point on a face"""
     bl_idname = "view3d.cursor_to_face"
     bl_label = "Move to closest point on a face"
-    bl_options = {'REGISTER'}
+    bl_options = set(['REGISTER'])
 
     def modal(self, context, event):
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def execute(self, context):
         BlenderFake.forceUpdate()
@@ -413,7 +415,7 @@ class VIEW3D_OT_cursor_to_face(bpy.types.Operator):
             normal.normalize();
             q = G3.closestP2F(c, fv, normal)
             cc.setCursor(mat*q)
-            return {'FINISHED'}
+            return set(['FINISHED'])
 
         #visual = True
 
@@ -434,7 +436,7 @@ class VIEW3D_OT_cursor_to_face(bpy.types.Operator):
                 q = qq
                 d = dd
         if q==None:
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
 
         #if visual:
             #ci = MeshEditor.addVertex(c)
@@ -443,17 +445,17 @@ class VIEW3D_OT_cursor_to_face(bpy.types.Operator):
                 #MeshEditor.addEdge(ci, qqi)
 
         cc.setCursor(mat*q)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class VIEW3D_OT_cursor_to_vertex_median(bpy.types.Operator):
     """Move to median of vertices"""
     bl_idname = "view3d.cursor_to_vertex_median"
     bl_label = "Move to median of vertices"
-    bl_options = {'REGISTER'}
+    bl_options = set(['REGISTER'])
 
     def modal(self, context, event):
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def execute(self, context):
         BlenderFake.forceUpdate()
@@ -468,20 +470,20 @@ class VIEW3D_OT_cursor_to_vertex_median(bpy.types.Operator):
             location = location + v.co
         n = len(selv)
         if (n==0):
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
         location = location / n
         cc.setCursor(mat*location)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class VIEW3D_OT_cursor_to_linex(bpy.types.Operator):
     """Alternate between closest encounter points of two lines"""
     bl_idname = "view3d.cursor_to_linex"
     bl_label = "Alternate between to closest encounter points of two lines"
-    bl_options = {'REGISTER'}
+    bl_options = set(['REGISTER'])
 
     def modal(self, context, event):
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def execute(self, context):
         BlenderFake.forceUpdate()
@@ -499,7 +501,7 @@ class VIEW3D_OT_cursor_to_linex(bpy.types.Operator):
         q = None
         if len(qq)==0:
             #print ("lx 0")
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
 
         if len(qq)==1:
             #print ("lx 1")
@@ -513,17 +515,17 @@ class VIEW3D_OT_cursor_to_linex(bpy.types.Operator):
         #q = geometry.intersect_line_line (e1v1, e1v2, e2v1, e2v2)[qc] * mat
         #i2 = geometry.intersect_line_line (e2v1, e2v2, e1v1, e1v2)[0] * mat
         cc.setCursor(mat*q)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class VIEW3D_OT_cursor_to_cylinderaxis(bpy.types.Operator):
     """Move to closest point on cylinder axis"""
     bl_idname = "view3d.cursor_to_cylinderaxis"
     bl_label = "Move to closest point on cylinder axis"
-    bl_options = {'REGISTER'}
+    bl_options = set(['REGISTER'])
 
     def modal(self, context, event):
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def execute(self, context):
         BlenderFake.forceUpdate()
@@ -543,19 +545,19 @@ class VIEW3D_OT_cursor_to_cylinderaxis(bpy.types.Operator):
         fv = [v0, v1, v2]
         q = G3.closestP2CylinderAxis(c, fv)
         if(q==None):
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
         cc.setCursor(mat*q)
-        return {'FINISHED'}     
+        return set(['FINISHED'])     
 
 
 class VIEW3D_OT_cursor_to_spherecenter(bpy.types.Operator):
     """Move to center of cylinder or sphere"""
     bl_idname = "view3d.cursor_to_spherecenter"
     bl_label = "Move to center of cylinder or sphere"
-    bl_options = {'REGISTER'}
+    bl_options = set(['REGISTER'])
 
     def modal(self, context, event):
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def execute(self, context):
         BlenderFake.forceUpdate()
@@ -577,9 +579,9 @@ class VIEW3D_OT_cursor_to_spherecenter(bpy.types.Operator):
             q = G3.closestP2CylinderAxis(c, fv)
             #q = G3.centerOfSphere(fv)
             if(q==None):
-                return {'CANCELLED'}
+                return set(['CANCELLED'])
             cc.setCursor(mat*q)
-            return {'FINISHED'}
+            return set(['FINISHED'])
         if obj.data.total_vert_sel==4:
             sf = [f for f in obj.data.vertices if f.select == 1]
             v0 = Vector(sf[0].co)
@@ -589,10 +591,10 @@ class VIEW3D_OT_cursor_to_spherecenter(bpy.types.Operator):
             fv = [v0, v1, v2, v3]
             q = G3.centerOfSphere(fv)
             if(q==None):
-                return {'CANCELLED'}
+                return set(['CANCELLED'])
             cc.setCursor(mat*q)
-            return {'FINISHED'}
-        return {'CANCELLED'}
+            return set(['FINISHED'])
+        return set(['CANCELLED'])
 
 
 
@@ -600,10 +602,10 @@ class VIEW3D_OT_cursor_to_perimeter(bpy.types.Operator):
     """Move to perimeter of cylinder or sphere"""
     bl_idname = "view3d.cursor_to_perimeter"
     bl_label = "Move to perimeter of cylinder or sphere"
-    bl_options = {'REGISTER'}
+    bl_options = set(['REGISTER'])
 
     def modal(self, context, event):
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def execute(self, context):
         BlenderFake.forceUpdate()
@@ -624,10 +626,10 @@ class VIEW3D_OT_cursor_to_perimeter(bpy.types.Operator):
             fv = [v0, v1, v2]
             q = G3.closestP2Cylinder(c, fv)
             if(q==None):
-                return {'CANCELLED'}
+                return set(['CANCELLED'])
             #q = G3.centerOfSphere(fv)
             cc.setCursor(mat*q)
-            return {'FINISHED'}
+            return set(['FINISHED'])
         if obj.data.total_vert_sel==4:
             sf = [f for f in obj.data.vertices if f.select == 1]
             v0 = Vector(sf[0].co)
@@ -637,10 +639,10 @@ class VIEW3D_OT_cursor_to_perimeter(bpy.types.Operator):
             fv = [v0, v1, v2, v3]
             q = G3.closestP2Sphere(c, fv)
             if(q==None):
-                return {'CANCELLED'}
+                return set(['CANCELLED'])
             cc.setCursor(mat*q)
-            return {'FINISHED'}
-        return {'CANCELLED'}
+            return set(['FINISHED'])
+        return set(['CANCELLED'])
 
 
 
@@ -693,16 +695,16 @@ class VIEW3D_OT_cursor_stepval_phinv(bpy.types.Operator):
     """Set step value to 1/Phi"""
     bl_idname = "view3d.cursor_stepval_phinv"
     bl_label = "Set step value to 1/Phi"
-    bl_options = {'REGISTER'}
+    bl_options = set(['REGISTER'])
 
     def modal(self, context, event):
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def execute(self, context):
         cc = context.scene.cursor_control
         cc.stepLengthValue = PHI_INV
         BlenderFake.forceRedraw()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 
@@ -710,16 +712,16 @@ class VIEW3D_OT_cursor_stepval_phi(bpy.types.Operator):
     """Set step value to Phi"""
     bl_idname = "view3d.cursor_stepval_phi"
     bl_label = "Set step value to Phi"
-    bl_options = {'REGISTER'}
+    bl_options = set(['REGISTER'])
 
     def modal(self, context, event):
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def execute(self, context):
         cc = context.scene.cursor_control
         cc.stepLengthValue = PHI
         BlenderFake.forceRedraw()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 
@@ -727,16 +729,16 @@ class VIEW3D_OT_cursor_stepval_phi2(bpy.types.Operator):
     """Set step value to Phi²"""
     bl_idname = "view3d.cursor_stepval_phi2"
     bl_label = "Set step value to Phi²"
-    bl_options = {'REGISTER'}
+    bl_options = set(['REGISTER'])
 
     def modal(self, context, event):
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def execute(self, context):
         cc = context.scene.cursor_control
         cc.stepLengthValue = PHI_SQR
         BlenderFake.forceRedraw()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 
@@ -744,10 +746,10 @@ class VIEW3D_OT_cursor_stepval_vvdist(bpy.types.Operator):
     """Set step value to distance vertex-vertex"""
     bl_idname = "view3d.cursor_stepval_vvdist"
     bl_label = "Set step value to distance vertex-vertex"
-    bl_options = {'REGISTER'}
+    bl_options = set(['REGISTER'])
 
     def modal(self, context, event):
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def execute(self, context):
         BlenderFake.forceUpdate()
@@ -767,7 +769,7 @@ class VIEW3D_OT_cursor_stepval_vvdist(bpy.types.Operator):
         cc.stepLengthValue = q
 
         BlenderFake.forceRedraw()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 
@@ -776,15 +778,15 @@ class VIEW3D_OT_ccdelta_invert(bpy.types.Operator):
     """Invert delta vector"""
     bl_idname = "view3d.ccdelta_invert"
     bl_label = "Invert delta vector"
-    bl_options = {'REGISTER'}
+    bl_options = set(['REGISTER'])
 
     def modal(self, context, event):
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def execute(self, context):
         cc = context.scene.cursor_control
         cc.invertDeltaVector()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 
@@ -792,15 +794,15 @@ class VIEW3D_OT_ccdelta_normalize(bpy.types.Operator):
     """Normalize delta vector"""
     bl_idname = "view3d.ccdelta_normalize"
     bl_label = "Normalize delta vector"
-    bl_options = {'REGISTER'}
+    bl_options = set(['REGISTER'])
 
     def modal(self, context, event):
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def execute(self, context):
         cc = context.scene.cursor_control
         cc.normalizeDeltaVector()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 
@@ -808,15 +810,15 @@ class VIEW3D_OT_ccdelta_add(bpy.types.Operator):
     """Add delta vector to 3D cursor"""
     bl_idname = "view3d.ccdelta_add"
     bl_label = "Add delta vector to 3D cursor"
-    bl_options = {'REGISTER'}
+    bl_options = set(['REGISTER'])
 
     def modal(self, context, event):
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def execute(self, context):
         cc = context.scene.cursor_control
         cc.addDeltaVectorToCursor()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 
@@ -824,15 +826,15 @@ class VIEW3D_OT_ccdelta_sub(bpy.types.Operator):
     """Subtract delta vector to 3D cursor"""
     bl_idname = "view3d.ccdelta_sub"
     bl_label = "Subtract delta vector to 3D cursor"
-    bl_options = {'REGISTER'}
+    bl_options = set(['REGISTER'])
 
     def modal(self, context, event):
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def execute(self, context):
         cc = context.scene.cursor_control
         cc.subDeltaVectorToCursor()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 
@@ -840,10 +842,10 @@ class VIEW3D_OT_ccdelta_vvdist(bpy.types.Operator):
     """Set delta vector from selection"""
     bl_idname = "view3d.ccdelta_vvdist"
     bl_label = "Set delta vector from selection"
-    bl_options = {'REGISTER'}
+    bl_options = set(['REGISTER'])
 
     def modal(self, context, event):
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def execute(self, context):
         BlenderFake.forceUpdate()
@@ -888,7 +890,7 @@ class VIEW3D_OT_ccdelta_vvdist(bpy.types.Operator):
             v1 = Vector(sf[1].co)
             cc.deltaVector = v1-v0
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 

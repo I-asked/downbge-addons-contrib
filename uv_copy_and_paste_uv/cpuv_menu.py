@@ -18,6 +18,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import absolute_import
 import bpy
 
 __author__ = "Nutti <nutti.metro@gmail.com>"

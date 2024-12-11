@@ -40,6 +40,8 @@ How to use:
     just toggle the button 'Visualize game props' in the right side panel
 """
 
+from __future__ import division
+from __future__ import absolute_import
 import bgl
 import blf
 import bpy
@@ -161,7 +163,7 @@ class GamePropertyVisualizer(bpy.types.Operator):
         if not context.scene.display_game_properties:
             return self.cancel(context)
         context.area.tag_redraw()
-        return {'PASS_THROUGH'}
+        return set(['PASS_THROUGH'])
 
     def invoke(self, context, event):
         if context.area.type == 'VIEW_3D':
@@ -170,19 +172,19 @@ class GamePropertyVisualizer(bpy.types.Operator):
                 GamePropertyVisualizer.handle_add(self, context)
                 context.scene.display_game_properties = True
                 context.window_manager.modal_handler_add(self)
-                return {'RUNNING_MODAL'}
+                return set(['RUNNING_MODAL'])
             else:
                 # operator is called again, stop displaying
                 return self.cancel(context)
         else:
-            self.report({'WARNING'}, "View3D not found, can't run operator")
-            return {'CANCELLED'}
+            self.report(set(['WARNING']), "View3D not found, can't run operator")
+            return set(['CANCELLED'])
 
     def cancel(self, context):
         GamePropertyVisualizer.handle_remove()
         context.scene.display_game_properties = False
         context.area.tag_redraw()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # defining the panel

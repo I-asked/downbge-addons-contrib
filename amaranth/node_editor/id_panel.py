@@ -22,6 +22,7 @@ The active object is highlighted between [square brackets] On the Nodes
 Editor's sidebar, when an ID Mask node is selected.
 """
 
+from __future__ import absolute_import
 import bpy
 
 
@@ -29,7 +30,7 @@ class AMTH_NODE_PT_indices(bpy.types.Panel):
     bl_space_type = "NODE_EDITOR"
     bl_region_type = "UI"
     bl_label = "Object / Material Indices"
-    bl_options = {"DEFAULT_CLOSED"}
+    bl_options = set(["DEFAULT_CLOSED"])
 
     @classmethod
     def poll(cls, context):

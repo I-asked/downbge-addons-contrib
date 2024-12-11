@@ -102,6 +102,9 @@ Borrowed code/logic:
   - OpenGL state storing/restoring; working with projection matrices.
 """
 
+from __future__ import with_statement
+from __future__ import division
+from __future__ import absolute_import
 import bpy
 import bgl
 import blf
@@ -123,6 +126,7 @@ from bpy_extras.view3d_utils import (region_2d_to_location_3d,
 
 import math
 import time
+from itertools import izip
 
 # ====== MODULE GLOBALS / CONSTANTS ====== #
 tmp_name = chr(0x10ffff) # maximal Unicode value
@@ -187,28 +191,28 @@ class EnhancedSetCursor(bpy.types.Operator):
     }
 
     key_map = {
-        "confirm":{'ACTIONMOUSE'}, # also 'RET' ?
-        "cancel":{'SELECTMOUSE', 'ESC'},
-        "free_mouse":{'F10'},
-        "make_normal_snapshot":{'W'},
-        "make_tangential_snapshot":{'Q'},
-        "use_absolute_coords":{'A'},
-        "snap_to_raw_mesh":{'D'},
-        "use_object_centers":{'T'},
-        "precision_up":{'PAGE_UP'},
-        "precision_down":{'PAGE_DOWN'},
-        "move_caret_prev":{'LEFT_ARROW'},
-        "move_caret_next":{'RIGHT_ARROW'},
-        "move_caret_home":{'HOME'},
-        "move_caret_end":{'END'},
-        "change_current_axis":{'TAB', 'RET', 'NUMPAD_ENTER'},
-        "prev_axis":{'UP_ARROW'},
-        "next_axis":{'DOWN_ARROW'},
-        "remove_next_character":{'DEL'},
-        "remove_last_character":{'BACK_SPACE'},
-        "copy_axes":{'C'},
-        "paste_axes":{'V'},
-        "cut_axes":{'X'},
+        "confirm":set(['ACTIONMOUSE']), # also 'RET' ?
+        "cancel":set(['SELECTMOUSE', 'ESC']),
+        "free_mouse":set(['F10']),
+        "make_normal_snapshot":set(['W']),
+        "make_tangential_snapshot":set(['Q']),
+        "use_absolute_coords":set(['A']),
+        "snap_to_raw_mesh":set(['D']),
+        "use_object_centers":set(['T']),
+        "precision_up":set(['PAGE_UP']),
+        "precision_down":set(['PAGE_DOWN']),
+        "move_caret_prev":set(['LEFT_ARROW']),
+        "move_caret_next":set(['RIGHT_ARROW']),
+        "move_caret_home":set(['HOME']),
+        "move_caret_end":set(['END']),
+        "change_current_axis":set(['TAB', 'RET', 'NUMPAD_ENTER']),
+        "prev_axis":set(['UP_ARROW']),
+        "next_axis":set(['DOWN_ARROW']),
+        "remove_next_character":set(['DEL']),
+        "remove_last_character":set(['BACK_SPACE']),
+        "copy_axes":set(['C']),
+        "paste_axes":set(['V']),
+        "cut_axes":set(['X']),
     }
 
     gizmo_factor = 0.15
@@ -220,7 +224,7 @@ class EnhancedSetCursor(bpy.types.Operator):
     # ====== OPERATOR METHOD OVERLOADS ====== #
     @classmethod
     def poll(cls, context):
-        area_types = {'VIEW_3D',} # also: IMAGE_EDITOR ?
+        area_types = set(['VIEW_3D',]) # also: IMAGE_EDITOR ?
         return (context.area.type in area_types) and \
                (context.region.type == "WINDOW")
 
@@ -236,7 +240,7 @@ class EnhancedSetCursor(bpy.types.Operator):
         # Don't interfere with these modes when only mouse is pressed
         if ('SCULPT' in context.mode) or ('PAINT' in context.mode):
             if "MOUSE" in event.type:
-                return {'CANCELLED'}
+                return set(['CANCELLED'])
 
         CursorDynamicSettings.active_transform_operator = self
 
@@ -295,7 +299,7 @@ class EnhancedSetCursor(bpy.types.Operator):
         self.try_process_input(context, event, True)
 
         context.window_manager.modal_handler_add(self)
-        return {'RUNNING_MODAL'}
+        return set(['RUNNING_MODAL'])
 
     def cancel(self, context):
         for particle in self.particles:
@@ -324,7 +328,7 @@ class EnhancedSetCursor(bpy.types.Operator):
         # Ensure there are no leftovers from draw_callback
         context.area.tag_redraw()
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def cleanup(self, context):
         self.particles = None
@@ -344,21 +348,21 @@ class EnhancedSetCursor(bpy.types.Operator):
         # it's always 'LEFTMOUSE' or 'RIGHTMOUSE'
         if event:
             if event.type == 'LEFTMOUSE':
-                self.key_map["confirm"] = {'LEFTMOUSE'}
-                self.key_map["cancel"] = {'RIGHTMOUSE', 'ESC'}
+                self.key_map["confirm"] = set(['LEFTMOUSE'])
+                self.key_map["cancel"] = set(['RIGHTMOUSE', 'ESC'])
             elif event.type == 'RIGHTMOUSE':
-                self.key_map["confirm"] = {'RIGHTMOUSE'}
-                self.key_map["cancel"] = {'LEFTMOUSE', 'ESC'}
+                self.key_map["confirm"] = set(['RIGHTMOUSE'])
+                self.key_map["cancel"] = set(['LEFTMOUSE', 'ESC'])
             else:
                 event = None
         if event is None:
             select_mouse = context.user_preferences.inputs.select_mouse
             if select_mouse == 'RIGHT':
-                self.key_map["confirm"] = {'LEFTMOUSE'}
-                self.key_map["cancel"] = {'RIGHTMOUSE', 'ESC'}
+                self.key_map["confirm"] = set(['LEFTMOUSE'])
+                self.key_map["cancel"] = set(['RIGHTMOUSE', 'ESC'])
             else:
-                self.key_map["confirm"] = {'RIGHTMOUSE'}
-                self.key_map["cancel"] = {'LEFTMOUSE', 'ESC'}
+                self.key_map["confirm"] = set(['RIGHTMOUSE'])
+                self.key_map["cancel"] = set(['LEFTMOUSE', 'ESC'])
 
         # Use user-defined "free mouse" key, if it exists
         wm = context.window_manager
@@ -366,7 +370,7 @@ class EnhancedSetCursor(bpy.types.Operator):
             km = wm.keyconfigs.user.keymaps['3D View']
             for kmi in KeyMapItemSearch(EnhancedSetCursor.bl_idname, km):
                 if kmi.map_type == 'KEYBOARD':
-                    self.key_map["free_mouse"] = {kmi.type,}
+                    self.key_map["free_mouse"] = set([kmi.type,])
                     break
 
     def try_process_input(self, context, event, initial_run=False):
@@ -392,7 +396,7 @@ class EnhancedSetCursor(bpy.types.Operator):
 
         if event.type in self.key_map["cancel"]:
             self.cancel(context)
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
 
         tool_settings = context.tool_settings
 
@@ -436,7 +440,7 @@ class EnhancedSetCursor(bpy.types.Operator):
                 tool_settings.use_snap_self = \
                     not tool_settings.use_snap_self
 
-            if (not event.alt) and (event.type in {'X', 'Y', 'Z'}):
+            if (not event.alt) and (event.type in set(['X', 'Y', 'Z'])):
                 axis_lock = [(event.type == 'X') != event.shift,
                              (event.type == 'Y') != event.shift,
                              (event.type == 'Z') != event.shift]
@@ -548,7 +552,7 @@ class EnhancedSetCursor(bpy.types.Operator):
 
         axes_coords = [None, None, None]
         if self.transform_mode == 'MOVE':
-            for i in range(3):
+            for i in xrange(3):
                 if self.axes_coords[i] is not None:
                     axes_coords[i] = self.axes_coords[i]
                 elif not self.allowed_axes[i]:
@@ -586,7 +590,7 @@ class EnhancedSetCursor(bpy.types.Operator):
         if make_snapshot:
             self.make_normal_snapshot(context.scene, tangential_snapshot)
 
-        return {'RUNNING_MODAL'}
+        return set(['RUNNING_MODAL'])
 
     def update_origin_projection(self, context):
         r = context.region
@@ -625,7 +629,7 @@ class EnhancedSetCursor(bpy.types.Operator):
             sys_matrix = self.csu.get_matrix()
 
             i_allowed = 0
-            for i in range(3):
+            for i in xrange(3):
                 if self.allowed_axes[i]:
                     i_allowed = i
 
@@ -633,7 +637,7 @@ class EnhancedSetCursor(bpy.types.Operator):
             if view_dir.dot(sys_matrix[i_allowed][:3]) < 0:
                 offset = -offset
 
-            for i in range(3):
+            for i in xrange(3):
                 if self.allowed_axes[i]:
                     self.raw_angles[i] += offset
         elif n_axes == 2:
@@ -646,7 +650,7 @@ class EnhancedSetCursor(bpy.types.Operator):
                 offset *= 0.5
 
             j = 0
-            for i in range(3):
+            for i in xrange(3):
                 if self.allowed_axes[i]:
                     self.raw_angles[i] += offset[1 - j]
                     j += 1
@@ -679,7 +683,7 @@ class EnhancedSetCursor(bpy.types.Operator):
         scale = delta_xy.length / self.delta_xy.length
         if self.delta_xy.dot(delta_xy) < 0:
             scale *= -1
-        for i in range(3):
+        for i in xrange(3):
             if self.allowed_axes[i]:
                 self.scales[i] = scale
 
@@ -717,7 +721,7 @@ class EnhancedSetCursor(bpy.types.Operator):
         # Seems that 4x4 matrix cannot be rotated using rotate() ?
         sys_matrix3 = sys_matrix.to_3x3()
 
-        for i in range(3):
+        for i in xrange(3):
             j = rotation_order[i]
             axis = sys_matrix3[j]
             angle = self.angles[j]
@@ -730,7 +734,7 @@ class EnhancedSetCursor(bpy.types.Operator):
             # sys_matrix3.rotate has a bug? or I don't understand how it works?
             #sys_matrix3.rotate(rot)
 
-        for i in range(3):
+        for i in xrange(3):
             sys_matrix[i][:3] = sys_matrix3[i]
 
         matrix = sys_matrix * matrix
@@ -741,14 +745,14 @@ class EnhancedSetCursor(bpy.types.Operator):
         grid_step = self.angle_grid_steps[self.grid_substep]
         grid_step *= (math.pi / 180.0)
 
-        for i in range(3):
+        for i in xrange(3):
             if self.axes_values[i] and self.axes_eval_success[i]:
                 self.raw_angles[i] = self.axes_coords[i] * (math.pi / 180.0)
 
             self.angles[i] = self.raw_angles[i]
 
         if self.su.implementation.snap_type == 'INCREMENT':
-            for i in range(3):
+            for i in xrange(3):
                 self.angles[i] = round_step(self.angles[i], grid_step)
 
         initial_matrix = particle.get_initial_matrix()
@@ -765,7 +769,7 @@ class EnhancedSetCursor(bpy.types.Operator):
             # this is some degenerate system
             pass
 
-        for i in range(3):
+        for i in xrange(3):
             sys_matrix[i] *= self.scales[i]
 
         matrix = sys_matrix * matrix
@@ -775,12 +779,12 @@ class EnhancedSetCursor(bpy.types.Operator):
     def transform_scale(self, particle):
         grid_step = self.scale_grid_steps[self.grid_substep]
 
-        for i in range(3):
+        for i in xrange(3):
             if self.axes_values[i] and self.axes_eval_success[i]:
                 self.scales[i] = self.axes_coords[i]
 
         if self.su.implementation.snap_type == 'INCREMENT':
-            for i in range(3):
+            for i in xrange(3):
                 self.scales[i] = round_step(self.scales[i], grid_step)
 
         initial_matrix = particle.get_initial_matrix()
@@ -816,13 +820,13 @@ class EnhancedSetCursor(bpy.types.Operator):
             except:
                 # this is some degenerate system
                 pass
-            for i in range(3):
+            for i in xrange(3):
                 self.set_axis_input(i, str(p[i]))
         elif self.transform_mode == 'ROTATE':
-            for i in range(3):
+            for i in xrange(3):
                 self.set_axis_input(i, "0")
         elif self.transform_mode == 'SCALE':
-            for i in range(3):
+            for i in xrange(3):
                 self.set_axis_input(i, "1")
 
     def get_axes_values(self, as_string=False):
@@ -835,7 +839,7 @@ class EnhancedSetCursor(bpy.types.Operator):
             raw_axes = Vector(self.scales)
 
         axes_values = []
-        for i in range(3):
+        for i in xrange(3):
             if as_string and self.axes_values[i]:
                 value = self.axes_values[i]
             elif self.axes_eval_success[i] and \
@@ -853,7 +857,7 @@ class EnhancedSetCursor(bpy.types.Operator):
         axes_values = self.get_axes_values(as_string=True)
 
         axes_text = []
-        for i in range(3):
+        for i in xrange(3):
             j = i
             if offset:
                 j = (i + self.current_axis) % 3
@@ -871,7 +875,7 @@ class EnhancedSetCursor(bpy.types.Operator):
         #text = text.replace(",", ".") # ???
 
         axes_text = text.split("\t")
-        for i in range(min(len(axes_text), 3)):
+        for i in xrange(min(len(axes_text), 3)):
             j = i
             if offset:
                 j = (i + self.current_axis) % 3
@@ -884,7 +888,7 @@ class EnhancedSetCursor(bpy.types.Operator):
         if event.type in self.key_map["remove_next_character"]:
             if event.ctrl:
                 # clear all
-                for i in range(3):
+                for i in xrange(3):
                     self.set_axis_input(i, "")
                 self.caret_pos = 0
                 return
@@ -1025,7 +1029,7 @@ class EnhancedSetCursor(bpy.types.Operator):
                 (Vector((p00.x, p00.y, 0)), (0, 0, 1)),
             ]
 
-            for i in range(3):
+            for i in xrange(3):
                 p1, color = axes_line_params[i]
                 p1 = sys_matrix * p1
                 constrained = (self.axes_coords[i] is not None) or \
@@ -1087,7 +1091,7 @@ class EnhancedSetCursor(bpy.types.Operator):
 
             snap_points = []
             if sui.potential_snap_elements and \
-                    (sui.snap_type in {'VERTEX', 'VOLUME'}):
+                    (sui.snap_type in set(['VERTEX', 'VOLUME'])):
                 snap_points.extend(sui.potential_snap_elements)
             if sui.extra_snap_points:
                 snap_points.extend(sui.extra_snap_points)
@@ -1207,7 +1211,7 @@ class EnhancedSetCursor(bpy.types.Operator):
         try:
             axes_text = self.get_axes_text()
 
-            for i in range(3):
+            for i in xrange(3):
                 color = tet.space.text
                 alpha = (1.0 if self.allowed_axes[i] else 0.5)
                 text = axis_prefix + axis_names[i] + " : "
@@ -1222,8 +1226,8 @@ class EnhancedSetCursor(bpy.types.Operator):
                     color = tet.space.text
                 text = axes_text[i]
                 coord_cells.append(TextCell(text, color))
-        except Exception as e:
-            print(repr(e))
+        except Exception, e:
+            print repr(e)
 
         mode_cells = []
 
@@ -1253,8 +1257,8 @@ class EnhancedSetCursor(bpy.types.Operator):
             if self.use_object_centers:
                 color = tet.syntax_special
             mode_cells.append(TextCell(text, color))
-        except Exception as e:
-            print(repr(e))
+        except Exception, e:
+            print repr(e)
 
         hdr_w, hdr_h = header_size
 
@@ -1291,7 +1295,7 @@ class EnhancedSetCursor(bpy.types.Operator):
             caret_x = 0
 
             xyz_width = 0
-            for i in range(3):
+            for i in xrange(3):
                 if i == self.current_axis:
                     curr_axis_x_start = xyz_width
 
@@ -1346,7 +1350,7 @@ class EnhancedSetCursor(bpy.types.Operator):
 
             x = xyz_x_start
             y = hdr_h / 2
-            for i in range(3):
+            for i in xrange(3):
                 cell = axis_cells[i]
                 cell.draw(x, y, (0, 0.5))
                 x += cell.w
@@ -1371,8 +1375,8 @@ class EnhancedSetCursor(bpy.types.Operator):
             bgl.glVertex2i(xyz_x_start_min, hdr_h)
             bgl.glEnd()
 
-        except Exception as e:
-            print(repr(e))
+        except Exception, e:
+            print repr(e)
 
         return
 
@@ -1385,7 +1389,7 @@ class EnhancedSetCursor(bpy.types.Operator):
             return False
 
         return self.su.implementation.snap_type \
-            not in {None, 'INCREMENT', 'VOLUME'}
+            not in set([None, 'INCREMENT', 'VOLUME'])
 
     def get_normal_params(self, tfm_opts, dest_point):
         surf_matrix = self.csu.get_matrix("Surface")
@@ -1434,7 +1438,7 @@ class EnhancedSetCursor(bpy.types.Operator):
 #============================================================================#
 
 
-class Particle:
+class Particle(object):
     pass
 
 class View3D_Cursor(Particle):
@@ -1574,10 +1578,10 @@ def gather_particles(**kwargs):
         # -> object.mode_set seem to somehow conflict
         # with Undo/Redo mechanisms.
         elif active_object and active_object.data and \
-        (context_mode in {
+        (context_mode in set([
         'EDIT_MESH', 'EDIT_METABALL',
         'EDIT_CURVE', 'EDIT_SURFACE',
-        'EDIT_ARMATURE', 'POSE'}):
+        'EDIT_ARMATURE', 'POSE'])):
 
             m = active_object.matrix_world
 
@@ -1767,8 +1771,8 @@ def gather_particles(**kwargs):
     #elif area_type == 'USER_PREFERENCES':
 
     else:
-        print("gather_particles() not implemented for '{}'".\
-              format(area_type))
+        print "gather_particles() not implemented for '{}'".\
+              format(area_type)
         return None, None
 
     # 'INDIVIDUAL_ORIGINS' is not handled here
@@ -1815,15 +1819,15 @@ def calc_median_bbox_pivots(positions):
 
 def extend_bbox(bbox, pos):
     try:
-        bbox[0] = tuple(min(e0, e1) for e0, e1 in zip(bbox[0], pos))
-        bbox[1] = tuple(max(e0, e1) for e0, e1 in zip(bbox[1], pos))
+        bbox[0] = tuple(min(e0, e1) for e0, e1 in izip(bbox[0], pos))
+        bbox[1] = tuple(max(e0, e1) for e0, e1 in izip(bbox[1], pos))
     except:
         bbox[0] = tuple(pos)
         bbox[1] = tuple(pos)
 
 
 # ====== COORDINATE SYSTEM UTILITY ====== #
-class CoordinateSystemUtility:
+class CoordinateSystemUtility(object):
     pivot_name_map = {
         'CENTER':'CENTER',
         'BOUNDING_BOX_CENTER':'CENTER',
@@ -1929,12 +1933,11 @@ class CoordinateSystemUtility:
         return to_matrix4x4(matrix, pos)
 
 # ====== TRANSFORM ORIENTATION UTILITIES ====== #
-class TransformOrientationUtility:
-    special_systems = {"Surface", "Scaled"}
-    predefined_systems = {
+class TransformOrientationUtility(object):
+    special_systems = set(["Surface", "Scaled"])
+    predefined_systems = set([
         'GLOBAL', 'LOCAL', 'VIEW', 'NORMAL', 'GIMBAL',
-        "Scaled", "Surface",
-    }
+        "Scaled", "Surface",])
 
     def __init__(self, scene, v3d, rv3d):
         self.scene = scene
@@ -1982,8 +1985,8 @@ class TransformOrientationUtility:
             self.is_custom = name not in self.predefined_systems
 
             if self.is_custom:
-                self.custom_id = next((i for i, v in \
-                    enumerate(self.custom_systems) if v.name == name), -1)
+                self.custom_id = (i for i, v in \
+                    enumerate(self.custom_systems) if v.name == name), -1.next()
 
             if name in self.special_systems:
                 # Ensure such system exists
@@ -2064,7 +2067,7 @@ def create_transform_orientation(scene, name=None, matrix=None):
     return tfm_orient
 
 # ====== VIEW UTILITY CLASS ====== #
-class ViewUtility:
+class ViewUtility(object):
     methods = dict(
         get_locks = lambda: {},
         set_locks = lambda locks: None,
@@ -2101,7 +2104,7 @@ class ViewUtility:
             for name, value in self.methods.items():
                 setattr(self, name, value)
 
-class View3DUtility:
+class View3DUtility(object):
     lock_types = {"lock_cursor": False, "lock_object": None, "lock_bone": ""}
 
     # ====== INITIALIZATION / CLEANUP ====== #
@@ -2113,7 +2116,7 @@ class View3DUtility:
     # ====== GET VIEW MATRIX AND ITS COMPONENTS ====== #
     def get_locks(self):
         v3d = self.space_data
-        return {k:getattr(v3d, k) for k in self.lock_types}
+        return dict((k, getattr(v3d, k)) for k in self.lock_types)
 
     def set_locks(self, locks):
         v3d = self.space_data
@@ -2256,7 +2259,7 @@ class View3DUtility:
         return a, b, clip
 
 # ====== SNAP UTILITY CLASS ====== #
-class SnapUtility:
+class SnapUtility(object):
     def __init__(self, context):
         if context.area.type == 'VIEW_3D':
             v3d = context.space_data
@@ -2277,7 +2280,7 @@ class SnapUtility:
     def snap(self, *args, **kwargs):
         return self.implementation.snap(*args, **kwargs)
 
-class SnapUtilityBase:
+class SnapUtilityBase(object):
     def __init__(self):
         self.targets = set()
         # TODO: set to current blend settings?
@@ -2371,7 +2374,7 @@ class SnapUtilityBase:
                     n = len(pse)
                     if self.snap_type == 'EDGE':
                         self.extra_snap_points = []
-                        for i in range(n):
+                        for i in xrange(n):
                             v0 = pse[i]
                             v1 = pse[(i + 1) % n]
                             self.extra_snap_points.append((v0 + v1) / 2)
@@ -2452,10 +2455,10 @@ class SnapUtilityBase:
 
         # don't snap when mouse hasn't moved
         if (snap_type == 'INCREMENT') and do_raycast:
-            for i in range(3):
+            for i in xrange(3):
                 _pos[i] = round_step(_pos[i], grid_step)
 
-        for i in range(3):
+        for i in xrange(3):
             if axes_coords[i] is not None:
                 _pos[i] = axes_coords[i]
 
@@ -2480,7 +2483,7 @@ class Snap3DUtility(SnapUtilityBase):
     def __init__(self, scene, shade):
         SnapUtilityBase.__init__(self)
 
-        convert_types = {'MESH', 'CURVE', 'SURFACE', 'FONT', 'META'}
+        convert_types = set(['MESH', 'CURVE', 'SURFACE', 'FONT', 'META'])
         self.cache = MeshCache(scene, convert_types)
 
         # ? seems that dict is enough
@@ -2665,7 +2668,7 @@ class Snap3DUtility(SnapUtilityBase):
             # Does ray actually intersect something?
             try:
                 lp, ln, face_id = obj.ray_cast(la, lb)
-            except Exception as e:
+            except Exception, e:
                 # Somewhy this seems to happen when snapping cursor
                 # in Local View mode at least since r55223:
                 # <<Object "\U0010ffff" has no mesh data to be used
@@ -2676,7 +2679,7 @@ class Snap3DUtility(SnapUtilityBase):
                     # in focus permits raycasting (modifiers are
                     # applied in 'PREVIEW' mode)
                     lp, ln, face_id = orig_obj.ray_cast(la, lb)
-                except Exception as e:
+                except Exception, e:
                     # However, in Edit mode in Local View we have
                     # no luck -- during the edit mode, mesh is
                     # inaccessible (thus no mesh data for raycasting).
@@ -2741,7 +2744,7 @@ class Snap3DUtility(SnapUtilityBase):
         # In this context, Volume represents BBox :P
         is_bbox = (self.snap_type == 'VOLUME')
         is_local = (csu.tou.get() in \
-            {'LOCAL', "Scaled"})
+            set(['LOCAL', "Scaled"]))
 
         res = self.raycast(a, b, clip, view_dir, \
             is_bbox, sys_matrix, sys_matrix_inv, is_local, True)
@@ -2914,7 +2917,7 @@ class Snap3DUtility(SnapUtilityBase):
 
 # ====== CONVERTED-TO-MESH OBJECTS CACHE ====== #
 #============================================================================#
-class ToggleObjectMode:
+class ToggleObjectMode(object):
     def __init__(self, mode='OBJECT'):
         if not isinstance(mode, str):
             mode = ('OBJECT' if mode else None)
@@ -2942,7 +2945,7 @@ class ToggleObjectMode:
                 bpy.ops.object.mode_set(mode=self.prev_mode)
                 edit_preferences.use_global_undo = self.global_undo
 
-class MeshCacheItem:
+class MeshCacheItem(object):
     def __init__(self):
         self.variants = {}
 
@@ -2968,14 +2971,14 @@ class MeshCacheItem:
                 bpy.data.meshes.remove(mesh)
         self.variants = None
 
-class MeshCache:
+class MeshCache(object):
     """
     Keeps a cache of mesh equivalents of requested objects.
     It is assumed that object's data does not change while
     the cache is in use.
     """
 
-    variants_enum = {'RAW', 'PREVIEW', 'RENDER'}
+    variants_enum = set(['RAW', 'PREVIEW', 'RENDER'])
     variants_normalization = {
         'MESH':{},
         'CURVE':{},
@@ -2989,8 +2992,8 @@ class MeshCache:
         'LAMP':{'RAW':'PREVIEW', 'RENDER':'PREVIEW'},
         'SPEAKER':{'RAW':'PREVIEW', 'RENDER':'PREVIEW'},
     }
-    conversible_types = {'MESH', 'CURVE', 'SURFACE', 'FONT',
-                         'META', 'ARMATURE', 'LATTICE'}
+    conversible_types = set(['MESH', 'CURVE', 'SURFACE', 'FONT',
+                         'META', 'ARMATURE', 'LATTICE'])
     convert_types = conversible_types
 
     def __init__(self, scene, convert_types=None):
@@ -3067,9 +3070,9 @@ class MeshCache:
             if reuse and ((variant == 'RAW') or (len(obj.modifiers) == 0)):
                 return (obj, False)
             else:
-                force_objectmode = (obj_mode in {'EDIT', 'SCULPT'})
+                force_objectmode = (obj_mode in set(['EDIT', 'SCULPT']))
                 return (self._to_mesh(obj, variant, force_objectmode), True)
-        elif obj_type in {'CURVE', 'SURFACE', 'FONT'}:
+        elif obj_type in set(['CURVE', 'SURFACE', 'FONT']):
             if variant == 'RAW':
                 bm = bmesh.new()
                 for spline in data.splines:
@@ -3191,7 +3194,7 @@ class PseudoIDBlockBase(bpy.types.PropertyGroup):
     # TODO: use normal metaprogramming?
 
     @staticmethod
-    def create_props(type, name, options={'ANIMATABLE'}):
+    def create_props(type, name, options=set(['ANIMATABLE'])):
         def active_update(self, context):
             # necessary to avoid recursive calls
             if self._self_update[0]:
@@ -3265,7 +3268,7 @@ class PseudoIDBlockBase(bpy.types.PropertyGroup):
             name="Choose",
             description="Choose {}".format(name),
             default=set(),
-            options={'ENUM_FLAG'},
+            options=set(['ENUM_FLAG']),
             update=enum_update)
 
         return collection, active, enum
@@ -3331,8 +3334,8 @@ class PseudoIDBlockBase(bpy.types.PropertyGroup):
             return None
 
     def indexof(self, key):
-        return next((i for i, v in enumerate(self.collection) \
-            if v.name == key), -1)
+        return (i for i, v in enumerate(self.collection) \
+            if v.name == key), -1.next()
 
         # Which is more Pythonic?
 
@@ -3352,7 +3355,7 @@ class PseudoIDBlockBase(bpy.types.PropertyGroup):
         prop_params["items"] = items
         if len(items) == 0:
             prop_params["default"] = set()
-            prop_params["options"] = {'ENUM_FLAG'}
+            prop_params["options"] = set(['ENUM_FLAG'])
         else:
             # Somewhy active may be left from previous times,
             # I don't want to dig now why that happens.
@@ -3426,13 +3429,13 @@ class TransformExtraOptionsProp(bpy.types.PropertyGroup):
         description="Use comma separator when copying/pasting"\
                     "coordinate values (instead of Tab character)",
         default=True,
-        options={'HIDDEN'})
+        options=set(['HIDDEN']))
 
 # ===== 3D VECTOR LOCATION ===== #
 class LocationProp(bpy.types.PropertyGroup):
     pos = bpy.props.FloatVectorProperty(
         name="xyz", description="xyz coords",
-        options={'HIDDEN'}, subtype='XYZ')
+        options=set(['HIDDEN']), subtype='XYZ')
 
 # ===== HISTORY ===== #
 def update_history_max_size(self, context):
@@ -3456,7 +3459,7 @@ def update_history_max_size(self, context):
         type(history).current_id = (prop_class, prop_params)
 
     # also: clear immediately?
-    for i in range(len(history.entries) - 1, int_size, -1):
+    for i in xrange(len(history.entries) - 1, int_size, -1):
         history.entries.remove(i)
 
     if str(int_size) != size:
@@ -3514,8 +3517,8 @@ class CursorHistoryProp(bpy.types.PropertyGroup):
     entries = bpy.props.CollectionProperty(
         type=LocationProp)
 
-    curr_id = bpy.props.IntProperty(options={'HIDDEN'})
-    last_id = bpy.props.IntProperty(options={'HIDDEN'})
+    curr_id = bpy.props.IntProperty(options=set(['HIDDEN']))
+    last_id = bpy.props.IntProperty(options=set(['HIDDEN']))
 
     def get_pos(self, id = None):
         if id is None:
@@ -3569,10 +3572,10 @@ class CursorHistoryProp(bpy.types.PropertyGroup):
 class BookmarkProp(bpy.types.PropertyGroup):
     name = bpy.props.StringProperty(
         name="name", description="bookmark name",
-        options={'HIDDEN'})
+        options=set(['HIDDEN']))
     pos = bpy.props.FloatVectorProperty(
         name="xyz", description="xyz coords",
-        options={'HIDDEN'}, subtype='XYZ')
+        options=set(['HIDDEN']), subtype='XYZ')
 
 class BookmarkIDBlock(PseudoIDBlockBase):
     # Somewhy instance members aren't seen in update()
@@ -3606,7 +3609,7 @@ class NewCursor3DBookmark(bpy.types.Operator):
         settings = find_settings()
         library = settings.libraries.get_item()
         if not library:
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
 
         bookmark = library.bookmarks.add(name=self.name)
 
@@ -3615,11 +3618,11 @@ class NewCursor3DBookmark(bpy.types.Operator):
         try:
             bookmark.pos = library.convert_from_abs(context.space_data,
                                                     cusor_pos, True)
-        except Exception as exc:
-            self.report({'ERROR_INVALID_CONTEXT'}, exc.args[0])
-            return {'CANCELLED'}
+        except Exception, exc:
+            self.report(set(['ERROR_INVALID_CONTEXT']), exc.args[0])
+            return set(['CANCELLED'])
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class DeleteCursor3DBookmark(bpy.types.Operator):
     bl_idname = "scene.cursor_3d_delete_bookmark"
@@ -3630,13 +3633,13 @@ class DeleteCursor3DBookmark(bpy.types.Operator):
         settings = find_settings()
         library = settings.libraries.get_item()
         if not library:
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
 
         name = library.bookmarks.active
 
         library.bookmarks.remove(key=name)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class OverwriteCursor3DBookmark(bpy.types.Operator):
     bl_idname = "scene.cursor_3d_overwrite_bookmark"
@@ -3652,24 +3655,24 @@ class OverwriteCursor3DBookmark(bpy.types.Operator):
         settings = find_settings()
         library = settings.libraries.get_item()
         if not library:
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
 
         bookmark = library.bookmarks.get_item()
         if not bookmark:
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
 
         cusor_pos = get_cursor_location(v3d=context.space_data)
 
         try:
             bookmark.pos = library.convert_from_abs(context.space_data,
                                                     cusor_pos, True)
-        except Exception as exc:
-            self.report({'ERROR_INVALID_CONTEXT'}, exc.args[0])
-            return {'CANCELLED'}
+        except Exception, exc:
+            self.report(set(['ERROR_INVALID_CONTEXT']), exc.args[0])
+            return set(['CANCELLED'])
 
         CursorDynamicSettings.recalc_csu(context, 'PRESS')
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class RecallCursor3DBookmark(bpy.types.Operator):
     bl_idname = "scene.cursor_3d_recall_bookmark"
@@ -3684,23 +3687,23 @@ class RecallCursor3DBookmark(bpy.types.Operator):
         settings = find_settings()
         library = settings.libraries.get_item()
         if not library:
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
 
         bookmark = library.bookmarks.get_item()
         if not bookmark:
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
 
         try:
             bookmark_pos = library.convert_to_abs(context.space_data,
                                                   bookmark.pos, True)
             set_cursor_location(bookmark_pos, v3d=context.space_data)
-        except Exception as exc:
-            self.report({'ERROR_INVALID_CONTEXT'}, exc.args[0])
-            return {'CANCELLED'}
+        except Exception, exc:
+            self.report(set(['ERROR_INVALID_CONTEXT']), exc.args[0])
+            return set(['CANCELLED'])
 
         CursorDynamicSettings.recalc_csu(context)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class SwapCursor3DBookmark(bpy.types.Operator):
     bl_idname = "scene.cursor_3d_swap_bookmark"
@@ -3715,11 +3718,11 @@ class SwapCursor3DBookmark(bpy.types.Operator):
         settings = find_settings()
         library = settings.libraries.get_item()
         if not library:
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
 
         bookmark = library.bookmarks.get_item()
         if not bookmark:
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
 
         cusor_pos = get_cursor_location(v3d=context.space_data)
 
@@ -3732,13 +3735,13 @@ class SwapCursor3DBookmark(bpy.types.Operator):
             bookmark.pos = library.convert_from_abs(context.space_data,
                                                     cusor_pos, True,
                 use_history=False)
-        except Exception as exc:
-            self.report({'ERROR_INVALID_CONTEXT'}, exc.args[0])
-            return {'CANCELLED'}
+        except Exception, exc:
+            self.report(set(['ERROR_INVALID_CONTEXT']), exc.args[0])
+            return set(['CANCELLED'])
 
         CursorDynamicSettings.recalc_csu(context)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 # Will this be used?
 class SnapSelectionToCursor3DBookmark(bpy.types.Operator):
@@ -3760,19 +3763,19 @@ class AddEmptyAtCursor3DBookmark(bpy.types.Operator):
         settings = find_settings()
         library = settings.libraries.get_item()
         if not library:
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
 
         bookmark = library.bookmarks.get_item()
         if not bookmark:
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
 
         try:
             matrix = library.get_matrix(use_history=False,
                                         v3d=context.space_data, warn=True)
             bookmark_pos = matrix * bookmark.pos
-        except Exception as exc:
-            self.report({'ERROR_INVALID_CONTEXT'}, exc.args[0])
-            return {'CANCELLED'}
+        except Exception, exc:
+            self.report(set(['ERROR_INVALID_CONTEXT']), exc.args[0])
+            return set(['CANCELLED'])
 
         name = "{}.{}".format(library.name, bookmark.name)
         obj = bpy.data.objects.new(name, None)
@@ -3795,16 +3798,16 @@ class AddEmptyAtCursor3DBookmark(bpy.types.Operator):
         # addition of new entry to Undo history
         bpy.ops.ed.undo_push(message="Add Object")
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 # ===== BOOKMARK LIBRARY ===== #
 class BookmarkLibraryProp(bpy.types.PropertyGroup):
     name = bpy.props.StringProperty(
         name="Name", description="Name of the bookmark library",
-        options={'HIDDEN'})
+        options=set(['HIDDEN']))
     bookmarks = bpy.props.PointerProperty(
         type=BookmarkIDBlock,
-        options={'HIDDEN'})
+        options=set(['HIDDEN']))
     system = bpy.props.EnumProperty(
         items=[
             ('GLOBAL', "Global", "Global (absolute) coordinates"),
@@ -3821,12 +3824,12 @@ class BookmarkLibraryProp(bpy.types.PropertyGroup):
         name="System",
         description="Coordinate system in which to store/recall "\
                     "cursor locations",
-        options={'HIDDEN'})
+        options=set(['HIDDEN']))
     offset = bpy.props.BoolProperty(
         name="Offset",
         description="Store/recall relative to the last cursor position",
         default=False,
-        options={'HIDDEN'})
+        options=set(['HIDDEN']))
 
     # Returned None means "operation is not aplicable"
     def get_matrix(self, use_history, v3d, warn=True, **kwargs):
@@ -3935,7 +3938,7 @@ class BookmarkLibraryProp(bpy.types.PropertyGroup):
             da = 2 * math.pi / n
             x, y = projected
             x, y = int(x), int(y)
-            for i in range(n + 1):
+            for i in xrange(n + 1):
                 a = i * da
                 dx = math.sin(a) * radius
                 dy = math.cos(a) * radius
@@ -3982,7 +3985,7 @@ class NewCursor3DBookmarkLibrary(bpy.types.Operator):
 
         settings.libraries.add(name=self.name)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class DeleteCursor3DBookmarkLibrary(bpy.types.Operator):
     bl_idname = "scene.cursor_3d_delete_bookmark_library"
@@ -3996,7 +3999,7 @@ class DeleteCursor3DBookmarkLibrary(bpy.types.Operator):
 
         settings.libraries.remove(key=name)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 # ===== MAIN PROPERTIES ===== #
 # TODO: ~a bug? Somewhy tooltip shows "Cursor3DToolsSettings.foo"
@@ -4004,7 +4007,7 @@ class DeleteCursor3DBookmarkLibrary(bpy.types.Operator):
 class Cursor3DToolsSettings(bpy.types.PropertyGroup):
     transform_options = bpy.props.PointerProperty(
         type=TransformExtraOptionsProp,
-        options={'HIDDEN'})
+        options=set(['HIDDEN']))
 
     cursor_visible = bpy.props.BoolProperty(
         name="Cursor visibility",
@@ -4046,18 +4049,18 @@ class Cursor3DToolsSettings(bpy.types.PropertyGroup):
     # HISTORY-RELATED
     history = bpy.props.PointerProperty(
         type=CursorHistoryProp,
-        options={'HIDDEN'})
+        options=set(['HIDDEN']))
 
     # BOOKMARK-RELATED
     libraries = bpy.props.PointerProperty(
         type=BookmarkLibraryIDBlock,
-        options={'HIDDEN'})
+        options=set(['HIDDEN']))
 
     show_bookmarks = bpy.props.BoolProperty(
         name="Show bookmarks",
         description="Show active bookmark in 3D view",
         default=True,
-        options={'HIDDEN'})
+        options=set(['HIDDEN']))
 
     free_coord_precision = bpy.props.IntProperty(
         name="Coord precision",
@@ -4066,7 +4069,7 @@ class Cursor3DToolsSettings(bpy.types.PropertyGroup):
         default=4,
         min=0,
         max=10,
-        options={'HIDDEN'})
+        options=set(['HIDDEN']))
     
     auto_register_keymaps = bpy.props.BoolProperty(
         name="Auto Register Keymaps",
@@ -4076,24 +4079,24 @@ class Cursor3DToolsSceneSettings(bpy.types.PropertyGroup):
     stick_obj_name = bpy.props.StringProperty(
         name="Stick-to-object name",
         description="Name of the object to stick cursor to",
-        options={'HIDDEN'})
+        options=set(['HIDDEN']))
     stick_obj_pos = bpy.props.FloatVectorProperty(
         default=(0.0, 0.0, 0.0),
-        options={'HIDDEN'},
+        options=set(['HIDDEN']),
         subtype='XYZ')
 
 # ===== CURSOR RUNTIME PROPERTIES ===== #
 class CursorRuntimeSettings(bpy.types.PropertyGroup):
     current_monitor_id = bpy.props.IntProperty(
         default=0,
-        options={'HIDDEN'})
+        options=set(['HIDDEN']))
 
     surface_pos = bpy.props.FloatVectorProperty(
         default=(0.0, 0.0, 0.0),
-        options={'HIDDEN'},
+        options=set(['HIDDEN']),
         subtype='XYZ')
 
-class CursorDynamicSettings:
+class CursorDynamicSettings(object):
     local_matrix = Matrix()
 
     active_transform_operator = None
@@ -4111,7 +4114,7 @@ class CursorDynamicSettings:
         # (otherwise, this may lead to applying operator
         # (e.g. Subdivide) in Edit Mode, even if user
         # just wants to change some operator setting)
-        clicked = (event_value in {'PRESS', 'RELEASE'}) and \
+        clicked = (event_value in set(['PRESS', 'RELEASE'])) and \
             (context.region.type == 'WINDOW')
 
         if clicked or scene_hash_changed:
@@ -4125,7 +4128,7 @@ class TransformExtraOptions(bpy.types.Panel):
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     #bl_context = "object"
-    bl_options = {'DEFAULT_CLOSED'}
+    bl_options = set(['DEFAULT_CLOSED'])
 
     def draw(self, context):
         layout = self.layout
@@ -4144,7 +4147,7 @@ class Cursor3DTools(bpy.types.Panel):
     bl_idname = "OBJECT_PT_cursor_3d_tools"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
-    bl_options = {'DEFAULT_CLOSED'}
+    bl_options = set(['DEFAULT_CLOSED'])
 
     def draw(self, context):
         layout = self.layout
@@ -4262,7 +4265,7 @@ class SetCursorDialog(bpy.types.Operator):
         pos = self.matrix * self.pos
         set_cursor_location(pos, v3d=context.space_data)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def invoke(self, context, event):
         scene = context.scene
@@ -4344,7 +4347,7 @@ class AlignOrientation(bpy.types.Operator):
     bl_label = "Align Orientation"
     bl_description = "Rotates active object to match axis of current "\
         "orientation to axis of another orientation"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     axes_items = [
         ('X', 'X', 'X axis'),
@@ -4434,7 +4437,7 @@ class AlignOrientation(bpy.types.Operator):
 
         #bpy.ops.ed.undo_push(message="Align Orientation")
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     # ATTENTION!
     # This _must_ be a dialog, because with 'UNDO' option
@@ -4470,7 +4473,7 @@ class CopyOrientation(bpy.types.Operator):
 
         tou.set(orient.name)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 def transform_orientations_panel_extension(self, context):
     row = self.layout.row()
@@ -4527,8 +4530,8 @@ class CursorMonitor(bpy.types.Operator):
             # would still be True
             return (not CursorMonitor.is_running) or \
                 (runtime_settings.current_monitor_id == 0)
-        except Exception as e:
-            print("Cursor monitor exeption in poll:\n" + repr(e))
+        except Exception, e:
+            print "Cursor monitor exeption in poll:\n" + repr(e)
             return False
 
     def modal(self, context, event):
@@ -4537,16 +4540,16 @@ class CursorMonitor(bpy.types.Operator):
         # (it would be relaunched automatically afterwards)
         for kmi in CursorMonitor.script_reload_kmis:
             if IsKeyMapItemEvent(kmi, event):
-                return {'CANCELLED'}
+                return set(['CANCELLED'])
         
         try:
             return self._modal(context, event)
-        except Exception as e:
-            print("Cursor monitor exeption in modal:\n" + repr(e))
+        except Exception, e:
+            print "Cursor monitor exeption in modal:\n" + repr(e)
             # Remove callbacks at any cost
             self.cancel(context)
             #raise
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
 
     def _modal(self, context, event):
         runtime_settings = find_runtime_settings()
@@ -4560,7 +4563,7 @@ class CursorMonitor(bpy.types.Operator):
             # this one should stop.
             # (OR addon was disabled)
             self.cancel(context)
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
 
         # Somewhy after addon re-registration
         # this permanently becomes False
@@ -4602,7 +4605,7 @@ class CursorMonitor(bpy.types.Operator):
             CursorDynamicSettings.recalc_csu(context, event.value)
         '''
 
-        return {'PASS_THROUGH'}
+        return set(['PASS_THROUGH'])
 
     def update_storage(self, runtime_settings):
         if CursorDynamicSettings.active_transform_operator:
@@ -4684,7 +4687,7 @@ class CursorMonitor(bpy.types.Operator):
         return False # self.just_initialized ?
 
     def execute(self, context):
-        print("Cursor monitor: launched")
+        print "Cursor monitor: launched"
 
         CursorMonitor.script_reload_kmis = list(KeyMapItemSearch('script.reload'))
 
@@ -4721,7 +4724,7 @@ class CursorMonitor(bpy.types.Operator):
 
         # Currently there seems to be only one window
         context.window_manager.modal_handler_add(self)
-        return {'RUNNING_MODAL'}
+        return set(['RUNNING_MODAL'])
 
     def cancel(self, context):
         CursorMonitor.is_running = False
@@ -4811,10 +4814,10 @@ def clamp_angle(ang):
 def prepare_grid_mesh(bm, nx=1, ny=1, sx=1.0, sy=1.0,
                       z=0.0, xyz_indices=(0,1,2)):
     vertices = []
-    for i in range(nx + 1):
+    for i in xrange(nx + 1):
         x = 2 * (i / nx) - 1
         x *= sx
-        for j in range(ny + 1):
+        for j in xrange(ny + 1):
             y = 2 * (j / ny) - 1
             y *= sy
             pos = (x, y, z)
@@ -4824,9 +4827,9 @@ def prepare_grid_mesh(bm, nx=1, ny=1, sx=1.0, sy=1.0,
             vertices.append(vert)
 
     nxmax = nx + 1
-    for i in range(nx):
+    for i in xrange(nx):
         i1 = i + 1
-        for j in range(ny):
+        for j in xrange(ny):
             j1 = j + 1
             verts = [vertices[j + i * nxmax],
                      vertices[j1 + i * nxmax],
@@ -4854,7 +4857,7 @@ def prepare_gridbox_mesh(subdiv=1):
     return bm
 
 # ===== DRAWING UTILITIES ===== #
-class GfxCell:
+class GfxCell(object):
     def __init__(self, w, h, color=None, alpha=None, draw=None):
         self.w = w
         self.h = h
@@ -5007,7 +5010,7 @@ def append_round_rect(verts, x, y, w, h, rw, rh=None):
 def append_oval_segment(verts, x, y, rw, rh, a0, a1, n, skip_last=False):
     nmax = n - 1
     da = a1 - a0
-    for i in range(n - int(skip_last)):
+    for i in xrange(n - int(skip_last)):
         a = a0 + da * (i / nmax)
         dx = math.sin(a) * rw
         dy = math.cos(a) * rh
@@ -5124,7 +5127,7 @@ def gl_enable(state_id, enable):
         bgl.glDisable(state_id)
 
 def gl_matrix_to_buffer(m):
-    tempMat = [m[i][j] for i in range(4) for j in range(4)]
+    tempMat = [m[i][j] for i in xrange(4) for j in xrange(4)]
     return bgl.Buffer(bgl.GL_FLOAT, 16, tempMat)
 
 
@@ -5532,6 +5535,6 @@ if __name__ == "__main__":
     # launched from the Blender text editor
     try:
         register()
-    except Exception as e:
-        print(repr(e))
+    except Exception, e:
+        print repr(e)
         raise

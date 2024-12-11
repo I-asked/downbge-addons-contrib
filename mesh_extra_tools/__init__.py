@@ -18,6 +18,7 @@
 # Contributed to by
 # meta-androcto #
 
+from __future__ import absolute_import
 bl_info = {
     "name": "Extra Tools",
     "author": "various",
@@ -86,7 +87,7 @@ class ExtrasPanel(bpy.types.Panel):
     bl_region_type = 'TOOLS'
     bl_context = 'mesh_edit'
     bl_category = 'Tools'
-    bl_options = {'DEFAULT_CLOSED'}
+    bl_options = set(['DEFAULT_CLOSED'])
 
     def draw(self, context):
         layout = self.layout
@@ -126,7 +127,7 @@ class ExtrudePanel(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
     bl_category = 'Tools'
-    bl_options = {'DEFAULT_CLOSED'}
+    bl_options = set(['DEFAULT_CLOSED'])
 
     def draw(self, context):
         layout = self.layout

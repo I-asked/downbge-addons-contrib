@@ -18,6 +18,7 @@
 
 # <pep8 compliant>
 
+from __future__ import absolute_import
 bl_info = {
     "name": "Clay Render",
     "author": "Fabio Russo <ruesp83@libero.it>",
@@ -65,11 +66,11 @@ def Alternative_Clay(self, msg):
 
     if msg is True:
         if (i == 1):
-            self.report({'INFO'}, "The material \"" + AM.name + "\" is set "\
+            self.report(set(['INFO']), "The material \"" + AM.name + "\" is set "\
                 "as Clay!")
         else:
             if (i > 1):
-                self.report({'WARNING'}, "Two or more materials are set as "\
+                self.report(set(['WARNING']), "Two or more materials are set as "\
                     "Clay. \"" + AM.name + "\" will be used!")
 
     return AM
@@ -105,7 +106,7 @@ class ClayPinned(bpy.types.Operator):
             else:
                 bpy.types.Scene.Clay_Pinned = True
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class CheckClay(bpy.types.Operator):
@@ -135,7 +136,7 @@ class CheckClay(bpy.types.Operator):
                     bpy.data.materials.remove(Get_Mat())
             bpy.types.Scene.Clay = True
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 def draw_clay_render(self, context):

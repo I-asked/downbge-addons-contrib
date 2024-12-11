@@ -16,11 +16,14 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import division
+from __future__ import absolute_import
 import os
 import bpy
 import bgl
 import blf
 import math
+from io import open
 
 
 def draw_callback(self, context):
@@ -36,7 +39,7 @@ def draw_callback(self, context):
     bgl.glColor4f(.7, .7, .7, 0.8)
     bgl.glBegin(bgl.GL_TRIANGLE_FAN)
     bgl.glVertex2i(cx, cy)
-    for i in range(mid):
+    for i in xrange(mid):
         x = cx + 20 * math.sin(math.radians(float(i)))
         y = cy + 20 * math.cos(math.radians(float(i)))
         bgl.glVertex2f(x, y)
@@ -45,7 +48,7 @@ def draw_callback(self, context):
     bgl.glColor4f(.0, .0, .0, 0.6)
     bgl.glBegin(bgl.GL_TRIANGLE_FAN)
     bgl.glVertex2i(cx, cy)
-    for i in range(mid, 360):
+    for i in xrange(mid, 360):
         x = cx + 20 * math.sin(math.radians(float(i)))
         y = cy + 20 * math.cos(math.radians(float(i)))
         bgl.glVertex2f(x, y)
@@ -91,7 +94,7 @@ class CMUMocapDownloadImport(bpy.types.Operator):
             if self.fsize == self.recv:
                 self.fout.close()
                 return self.cancel(context)
-        return {'PASS_THROUGH'}
+        return set(['PASS_THROUGH'])
 
     def cancel(self, context):
         context.window_manager.event_timer_remove(self.timer)
@@ -99,7 +102,7 @@ class CMUMocapDownloadImport(bpy.types.Operator):
         cml = context.user_preferences.addons['cmu_mocap_browser'].preferences
         if os.path.exists(self.local_file):
             return self.import_or_open(cml)
-        return {'CANCELLED'}
+        return set(['CANCELLED'])
 
     def execute(self, context):
         cml = context.user_preferences.addons['cmu_mocap_browser'].preferences
@@ -108,7 +111,7 @@ class CMUMocapDownloadImport(bpy.types.Operator):
                 os.makedirs(os.path.split(self.local_file)[0])
             except:
                 pass
-            from urllib.request import urlopen
+            from urllib2 import urlopen
             self.src = urlopen(self.remote_file)
             info = self.src.info()
             self.fsize = int(info["Content-Length"])
@@ -123,10 +126,10 @@ class CMUMocapDownloadImport(bpy.types.Operator):
             self.timer = context.window_manager.\
                 event_timer_add(0.001, context.window)
             context.window_manager.modal_handler_add(self)
-            return {'RUNNING_MODAL'}
+            return set(['RUNNING_MODAL'])
         else:
             self.import_or_open(cml)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def import_or_open(self, cml):
         if cml.automatically_import or self.do_import:
@@ -140,23 +143,23 @@ class CMUMocapDownloadImport(bpy.types.Operator):
                         use_rot_x=True, use_rot_z=True,
                         armature_name=cml.subject_import_name)
                 except AttributeError:
-                    self.report({'ERROR'}, "To use this feature "
+                    self.report(set(['ERROR']), "To use this feature "
                         "please enable the Acclaim ASF/AMC Importer addon.")
-                    return {'CANCELLED'}
+                    return set(['CANCELLED'])
             elif self.local_file.endswith("amc"):
                 ob = bpy.context.active_object
                 if not ob or ob.type != 'ARMATURE' or \
                     'source_file_path' not in ob:
-                    self.report({'ERROR'}, "Please select a CMU Armature.")
-                    return {'CANCELLED'}
+                    self.report(set(['ERROR']), "Please select a CMU Armature.")
+                    return set(['CANCELLED'])
                 try:
                     bpy.ops.import_anim.amc(
                         filepath=self.local_file,
                         frame_skip=cml.frame_skip)
                 except AttributeError:
-                    self.report({'ERROR'}, "To use this feature please "
+                    self.report(set(['ERROR']), "To use this feature please "
                         "enable the Acclaim ASF/AMC Importer addon.")
-                    return {'CANCELLED'}
+                    return set(['CANCELLED'])
             elif self.local_file.endswith("c3d"):
                 try:
                     bpy.ops.import_anim.c3d(
@@ -167,8 +170,8 @@ class CMUMocapDownloadImport(bpy.types.Operator):
                         show_names=False,
                         frame_skip=cml.frame_skip)
                 except AttributeError:
-                    self.report({'ERROR'}, "To use this feature "
+                    self.report(set(['ERROR']), "To use this feature "
                         "please enable the C3D Importer addon.")
-                    return {'CANCELLED'}
+                    return set(['CANCELLED'])
 
-        return {'FINISHED'}
+        return set(['FINISHED'])

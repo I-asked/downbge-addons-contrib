@@ -16,8 +16,10 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import absolute_import
 import bpy
 from . import import_xyz
+from io import open
 
 
 class AtomsExport(object):  
@@ -36,7 +38,7 @@ def export_xyz(obj_type, filepath_xyz):
         if "Stick" in obj.name:
             continue
             
-        if obj.type not in {'MESH', 'SURFACE', 'META'}:
+        if obj.type not in set(['MESH', 'SURFACE', 'META']):
             continue 
        
         name = ""

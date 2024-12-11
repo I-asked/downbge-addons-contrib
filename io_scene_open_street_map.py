@@ -18,6 +18,8 @@
 
 # <pep8 compliant>
 
+from __future__ import division
+from __future__ import absolute_import
 bl_info = {
     "name": "Open Street Map (.osm)",
     "author": "Michael Anthrax Schlachter, ideasman42, littleneo",
@@ -84,7 +86,7 @@ def parseBranch(nodes, bm, nmap, obj, scale=100.0, tag=False, UTM=False):
     for node in nodes:
         if node.localName == "bounds":
             if node.hasAttributes():
-                for i in range(node.attributes.length):
+                for i in xrange(node.attributes.length):
                     at = node.attributes.item(i)
                     if at.name == "minlat":
                         minlat = float(at.nodeValue)
@@ -103,7 +105,7 @@ def parseBranch(nodes, bm, nmap, obj, scale=100.0, tag=False, UTM=False):
                     dlong, dlat = geoToUTM(dlong, dlat)
                     clong, clat = geoToUTM(clong, clat)
 
-                print(dlat, dlong, clat, clong)
+                print dlat, dlong, clat, clong
 
         if node.localName == "way":
             wayid = node.getAttribute('id')
@@ -129,7 +131,7 @@ def parseBranch(nodes, bm, nmap, obj, scale=100.0, tag=False, UTM=False):
 
             for ch in node.childNodes:
                 if ch.localName == "nd":
-                    for i in range(ch.attributes.length):
+                    for i in xrange(ch.attributes.length):
                         at = ch.attributes.item(i)
                         if at.name == "ref":
                             vid = int(at.nodeValue)
@@ -187,7 +189,7 @@ def parseBranch(nodes, bm, nmap, obj, scale=100.0, tag=False, UTM=False):
                                     for mid in metagid:
                                         weigths[mid] = 1.0
                 else:
-                    print('node is missing some elements : %s %s %s' % (nid, nlat, nlong))
+                    print 'node is missing some elements : %s %s %s' % (nid, nlat, nlong)
 
         tidx += 1
         # if tidx > 1000:
@@ -220,10 +222,10 @@ def read(context, filepath, scale=100.0, tag=False, utm=False):
                     grouplookup['_V_' + val] = gid + tvid
 
     # get xml then feed bmesh
-    print("Reading xml...")
+    print "Reading xml..."
     xmldoc = minidom.parse(filepath)
 
-    print("Starting parse: %r..." % filepath)
+    print "Starting parse: %r..." % filepath
     nmap = {}
     tidx = parseBranch(xmldoc.childNodes, bm, nmap, obj, scale, tag, utm)
 
@@ -248,9 +250,9 @@ def read(context, filepath, scale=100.0, tag=False, utm=False):
     obj['tagged'] = tag
     obj['utm'] = utm
 
-    print("Parse done... %d" % tidx)
+    print "Parse done... %d" % tidx
 
-    return {'FINISHED'}
+    return set(['FINISHED'])
 
 
 # given lat and longitude in degrees, returns x and y in UTM kilometers.
@@ -323,7 +325,7 @@ class ImportOSM(Operator, ImportHelper):
     filename_ext = ".osm"
     filter_glob = StringProperty(
             default="*.osm",
-            options={'HIDDEN'},
+            options=set(['HIDDEN']),
             )
     # List of operator properties, the attributes will be assigned
     # to the class instance from the operator settings before calling.

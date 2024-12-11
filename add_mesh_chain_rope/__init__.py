@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 bl_info = {
     "name": "Oscurart Chain and Rope Maker",
     "author": "Oscurart",

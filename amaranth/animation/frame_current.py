@@ -21,6 +21,7 @@ hitting the W menu in Object mode, you can slide or click in the middle
 of the button to set the frame manually.
 """
 
+from __future__ import absolute_import
 import bpy
 
 

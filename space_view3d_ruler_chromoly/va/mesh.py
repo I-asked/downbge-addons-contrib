@@ -22,12 +22,14 @@
 ########################################################
 # <pep8 compliant>
 
+from __future__ import absolute_import
 import bpy
 from bpy.props import *
 import math
 import mathutils as Math
 from mathutils import Matrix, Euler, Vector, Quaternion
 from .utils import the_other
+from itertools import izip
 
 
 def keypath(edge_keys):
@@ -82,12 +84,12 @@ def keypath(edge_keys):
 def vert_edge_dict(me, sel=0, key=True):
     # -1 <= sel <= 2
     if sel == -1:
-        vert_edges = {v.index: [] for v in me.vertices}
+        vert_edges = dict((v.index, []) for v in me.vertices)
     elif sel:
-        vert_edges = {v.index: [] for v in me.vertices if \
-                      v.select and not v.hide}
+        vert_edges = dict((v.index, []) for v in me.vertices if \
+                      v.select and not v.hide)
     else:
-        vert_edges = {v.index: [] for v in me.vertices if not v.hide}
+        vert_edges = dict((v.index, []) for v in me.vertices if not v.hide)
     if sel == -1:
         for ed in me.edges:
             edkey = ed.key
@@ -112,12 +114,12 @@ def vert_edge_dict(me, sel=0, key=True):
 def vert_face_dict(me, sel=0):
     # -1 <= sel <= 2
     if sel == -1:
-        vert_faces = {v.index: [] for v in me.vertices}
+        vert_faces = dict((v.index, []) for v in me.vertices)
     elif sel:
-        vert_faces = {v.index: [] for v in me.vertices if \
-                      v.select and not v.hide}
+        vert_faces = dict((v.index, []) for v in me.vertices if \
+                      v.select and not v.hide)
     else:
-        vert_faces = {v.index: [] for v in me.vertices if not v.hide}
+        vert_faces = dict((v.index, []) for v in me.vertices if not v.hide)
 
     if sel == -1:
         for f in me.faces:
@@ -141,13 +143,13 @@ def vert_face_dict(me, sel=0):
 def edge_face_dict(me, sel=0, key=True):
     # sel==0:all, sel==1:edge.select, sel==2:face&edge.select
     if sel == -1:
-        edge_faces = {ed.key: [] for ed in me.edges}
+        edge_faces = dict((ed.key, []) for ed in me.edges)
     elif sel:
-        edge_faces = {ed.key: [] for ed in me.edges if \
-                        ed.select and not ed.hide}
+        edge_faces = dict((ed.key, []) for ed in me.edges if \
+                        ed.select and not ed.hide)
     else:
-        edge_faces = {ed.key: [] for ed in me.edges if \
-                        not ed.hide}
+        edge_faces = dict((ed.key, []) for ed in me.edges if \
+                        not ed.hide)
     if sel == -1:
         for f in me.faces:
             for edkey in f.edge_keys:
@@ -176,23 +178,23 @@ def edge_face_dict(me, sel=0, key=True):
 def key_edge_dict(me, sel=0):
     # sel==-1:all, sel==0:notHidden, sel==1or2:edge.select
     if sel == -1:
-        key_edges = {ed.key: ed.index for ed in me.edges}
+        key_edges = dict((ed.key, ed.index) for ed in me.edges)
     elif sel == 0:
-        key_edges = {ed.key: ed.index for ed in me.edges if not ed.hide}
+        key_edges = dict((ed.key, ed.index) for ed in me.edges if not ed.hide)
     elif sel:
-        key_edges = {ed.key: ed.index for ed in me.edges if \
-                     ed.select and not ed.hide}
+        key_edges = dict((ed.key, ed.index) for ed in me.edges if \
+                     ed.select and not ed.hide)
     return key_edges
 
 def vert_vert_dict(me, sel=0):
     # -1 <= sel <= 2
     if sel == -1:  # all vertices
-        vert_verts = {v.index: [] for v in me.vertices}
+        vert_verts = dict((v.index, []) for v in me.vertices)
     elif sel:
-        vert_verts = {v.index: [] for v in me.vertices if \
-                      v.select and not v.hide}
+        vert_verts = dict((v.index, []) for v in me.vertices if \
+                      v.select and not v.hide)
     else:
-        vert_verts = {v.index: [] for v in me.vertices if not v.hide}
+        vert_verts = dict((v.index, []) for v in me.vertices if not v.hide)
     if sel == -1:
         for ed in me.edges:
             v1 = ed.key[0]
@@ -216,12 +218,12 @@ def vert_vert_dict(me, sel=0):
 def vert_edge_dict(me, sel=0, key=True):
     # -1 <= sel <= 2
     if sel == -1:
-        vert_edges = {v.index: [] for v in me.vertices}
+        vert_edges = dict((v.index, []) for v in me.vertices)
     elif sel:
-        vert_edges = {v.index: [] for v in me.vertices if \
-                      v.select and not v.hide}
+        vert_edges = dict((v.index, []) for v in me.vertices if \
+                      v.select and not v.hide)
     else:
-        vert_edges = {v.index: [] for v in me.vertices if not v.hide}
+        vert_edges = dict((v.index, []) for v in me.vertices if not v.hide)
     if sel == -1:
         for ed in me.edges:
             edkey = ed.key
@@ -246,12 +248,12 @@ def vert_edge_dict(me, sel=0, key=True):
 def vert_face_dict(me, sel=0):
     # -1 <= sel <= 2
     if sel == -1:
-        vert_faces = {v.index: [] for v in me.vertices}
+        vert_faces = dict((v.index, []) for v in me.vertices)
     elif sel:
-        vert_faces = {v.index: [] for v in me.vertices if \
-                      v.select and not v.hide}
+        vert_faces = dict((v.index, []) for v in me.vertices if \
+                      v.select and not v.hide)
     else:
-        vert_faces = {v.index: [] for v in me.vertices if not v.hide}
+        vert_faces = dict((v.index, []) for v in me.vertices if not v.hide)
 
     if sel == -1:
         for f in me.faces:
@@ -275,13 +277,13 @@ def vert_face_dict(me, sel=0):
 def edge_face_dict(me, sel=0, key=True):
     # sel==0:all, sel==1:edge.select, sel==2:face&edge.select
     if sel == -1:
-        edge_faces = {ed.key: [] for ed in me.edges}
+        edge_faces = dict((ed.key, []) for ed in me.edges)
     elif sel:
-        edge_faces = {ed.key: [] for ed in me.edges if \
-                        ed.select and not ed.hide}
+        edge_faces = dict((ed.key, []) for ed in me.edges if \
+                        ed.select and not ed.hide)
     else:
-        edge_faces = {ed.key: [] for ed in me.edges if \
-                        not ed.hide}
+        edge_faces = dict((ed.key, []) for ed in me.edges if \
+                        not ed.hide)
     if sel == -1:
         for f in me.faces:
             for edkey in f.edge_keys:
@@ -310,12 +312,12 @@ def edge_face_dict(me, sel=0, key=True):
 def key_edge_dict_old(me, sel=0):
     # sel==-1:all, sel==0:notHidden, sel==1or2:edge.select
     if sel == -1:
-        key_edges = {ed.key: ed.index for ed in me.edges}
+        key_edges = dict((ed.key, ed.index) for ed in me.edges)
     elif sel == 0:
-        key_edges = {ed.key: ed.index for ed in me.edges if not ed.hide}
+        key_edges = dict((ed.key, ed.index) for ed in me.edges if not ed.hide)
     elif sel:
-        key_edges = {ed.key: ed.index for ed in me.edges if \
-                     ed.select and not ed.hide}
+        key_edges = dict((ed.key, ed.index) for ed in me.edges if \
+                     ed.select and not ed.hide)
     return key_edges
 
 
@@ -371,7 +373,7 @@ def keypath(edge_keys):
 def vert_verts_dict(me, select=None, hide=None):
     check = lambda item: (select is None or item.select is select) and \
                          (hide is None or item.hide is hide)
-    vert_verts = {v.index: [] for v in me.vertices if check(v)}
+    vert_verts = dict((v.index, []) for v in me.vertices if check(v))
     for edge in (e for e in me.edges if check(e)):  # edgeで接続判定
         i1, i2 = edge.key
         vert_verts[i1].append(i2)
@@ -381,7 +383,7 @@ def vert_verts_dict(me, select=None, hide=None):
 def key_edge_dict(me, select=None, hide=None):
     check = lambda item: (select is None or item.select is select) and \
                          (hide is None or item.hide is hide)
-    key_edge = {e.key: e.index for e in me.edges if check(e)}
+    key_edge = dict((e.key, e.index) for e in me.edges if check(e))
     return key_edge
 
 def path_vertices_list(me, select=None, hide=None):
@@ -390,9 +392,9 @@ def path_vertices_list(me, select=None, hide=None):
             super(Path, self).__init__(arg)
             self.cyclic = cyclic
     vert_verts = vert_verts_dict(me, select=select, hide=hide)
-    vert_end = {vi: len(vis) != 2 for vi, vis in vert_verts.items()}
+    vert_end = dict((vi, len(vis) != 2) for vi, vis in vert_verts.items())
     key_edge = key_edge_dict(me, select=select, hide=hide)
-    key_added = {k: False for k in key_edge.keys()}
+    key_added = dict((k, False) for k in key_edge.keys())
     paths = []
 
     # path has end points
@@ -407,7 +409,7 @@ def path_vertices_list(me, select=None, hide=None):
                     if vert_end[vi]:
                         break
                     vi = [i for i in vert_verts[vi] if i != path[-2]][0]
-                for i, j in zip(path, path[1:]):
+                for i, j in izip(path, path[1:]):
                     key = tuple(sorted((i, j)))
                     key_added[key] = True
 
@@ -439,7 +441,7 @@ def path_vertices_list(me, select=None, hide=None):
     return paths
 
 
-class Vert():
+class Vert(object):
     def __init__(self, vertex=None):
         if vertex:
             self.index = vertex.index
@@ -484,7 +486,7 @@ class Vert():
     '''
 
 
-class Edge():
+class Edge(object):
     def __init__(self, edge=None, vertices=None):
         if edge:
             self.index = edge.index
@@ -534,7 +536,7 @@ class Edge():
             return None
 
 
-class Face():
+class Face(object):
     def __init__(self, face=None, vertices=None, key_edge=None):
         if face:
             self.index = face.index
@@ -610,7 +612,7 @@ class Face():
     '''
 
 
-class PyMesh():
+class PyMesh(object):
     def __init__(self, me, select=(None, None, None), hide=(None, None, None)):
         key_edge = key_edge_dict(me, select=None, hide=None)
 
@@ -622,7 +624,7 @@ class PyMesh():
         vertices = [Vert(v) for v in me.vertices]
         #vertices = [Vert(v) for v in me.vertices if select_hide_check(v)]()
         edges = [Edge(e, vertices) for e in me.edges]
-        key_edge = {k: edges[ei] for k, ei in key_edge.items()}
+        key_edge = dict((k, edges[ei]) for k, ei in key_edge.items())
         faces = [Face(f, vertices, key_edge) for f in me.faces]
 
         for f in faces:
@@ -662,7 +664,7 @@ class PyMesh():
             vert.on_vertices = [v for v in vert.vertices if v.co == vert.co]
 
     def removed_same_coordinate(verts):
-        d = OrderedDict(zip((tuple(v.co) for v in verts), range(len(verts))))
+        d = OrderedDict(izip((tuple(v.co) for v in verts), xrange(len(verts))))
         return [verts[i] for i in d.values()]
 
     def find_edge(self, v1, v2):

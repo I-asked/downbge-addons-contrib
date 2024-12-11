@@ -18,6 +18,7 @@
 # Contributed to by
 # meta-androcto #
 
+from __future__ import absolute_import
 bl_info = {
 	"name": "EWOCprojects tools",
 	"author": "Gert De Roost - paleajed",

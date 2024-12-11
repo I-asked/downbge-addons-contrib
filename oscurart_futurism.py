@@ -16,6 +16,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import absolute_import
 bl_info = {
     "name": "Futurism",
     "author": "Oscurart",
@@ -54,7 +55,7 @@ def object_osc_futurism (self, context,STEP, HOLD):
 
     bpy.context.scene.objects.active = OBACT  # RECUPERO OBJETO ACTIVO
 
-    for OBJETO in range((FE+1)-FS):
+    for OBJETO in xrange((FE+1)-FS):
         if STEPINC == STEP:
             # CREO UN MESH A PARTIR DE OBJETO
             MESH=ACTOBJ.to_mesh(bpy.context.scene, True, 'PREVIEW')
@@ -110,7 +111,7 @@ class Oscurart_futurism (bpy.types.Operator):
     bl_idname = "object.duplicate_futurism"
     bl_label = "Duplicate Futurism"
     bl_description = "Duplicate object per frame"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     scale = bpy.props.IntProperty(name='Step',default=1, min=1, max=1000)
 
@@ -123,7 +124,7 @@ class Oscurart_futurism (bpy.types.Operator):
     def execute(self, context):
         object_osc_futurism(self, context, self.scale, self.hold)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # Registration

@@ -1,3 +1,5 @@
+from __future__ import division
+from __future__ import absolute_import
 from mathutils import *
 
 
@@ -7,7 +9,7 @@ def IsSamePoint(v31, v32, limitDistance):
     return False
 
     
-class Plane:
+class Plane(object):
     @staticmethod
     def XY():
         p1 = Vector((0, 0, 0))

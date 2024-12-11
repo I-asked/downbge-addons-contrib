@@ -43,11 +43,12 @@ Additional links:
 	e-mail: dolf {at} macouno {dot} com
 """
 '''
+from __future__ import absolute_import
 import bpy, mathutils, math
 from bpy.props import FloatVectorProperty, FloatProperty, BoolProperty, EnumProperty
 
 
-class Select_by_direction():
+class Select_by_direction(object):
 
 	# Initialise the class
 	def __init__(self, context, direction, divergence, extend, space):
@@ -186,7 +187,7 @@ class Select_init(bpy.types.Operator):
 	'''Select all items with normals facing a certain direction'''
 	bl_idname = 'mesh.select_by_direction'
 	bl_label = 'Select by direction'
-	bl_options = {'REGISTER', 'UNDO'}
+	bl_options = set(['REGISTER', 'UNDO'])
 
 	direction = FloatVectorProperty(name="Direction", description="Direction as a vector", default=(0.0, 0.0, 1.0), min=-100.0, max=100.0, soft_min=-10.0, soft_max=10.0, step=100, precision=2)
 
@@ -206,7 +207,7 @@ class Select_init(bpy.types.Operator):
 
 	def execute(self, context):
 		SELECT_DIRECTION = Select_by_direction(context, self.direction, self.divergence, self.extend, self.space)
-		return {'FINISHED'}
+		return set(['FINISHED'])
 
 
 

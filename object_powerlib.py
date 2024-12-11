@@ -16,6 +16,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import with_statement
+from __future__ import absolute_import
 bl_info = {
     "name": "Powerlib",
     "description": "Control panel for managing "
@@ -48,12 +50,12 @@ def SetProxyResolution(elem,target_resolution):
     ext = dupgroup_name[-3:]
     new_group = root + target_resolution
 
-    if ext in {'_hi', '_lo', '_me'}:
+    if ext in set(['_hi', '_lo', '_me']):
         try:
             obj.dupli_group = bpy.data.groups[new_group]
             #print("PowerLib: CHANGE " + str(elem) + " to " + new_group)
         except:
-            print ("Group %s not found" % new_group.upper())
+            print "Group %s not found" % new_group.upper()
 
 
 class PowerlibPanel(bpy.types.Panel):
@@ -121,7 +123,7 @@ class PowerlibPanel(bpy.types.Panel):
                         col.label(text="")
 
                     resolution = str(elem.dupli_group.name)[-3:]
-                    if resolution in {'_hi', '_lo', '_me'}:
+                    if resolution in set(['_hi', '_lo', '_me']):
                         res = resolution[-2:].upper()
 
                         subgroup = col.operator("powerlib.toggle_subgroup_res",
@@ -136,7 +138,7 @@ class PowerlibPanel(bpy.types.Panel):
             if total_groups == 0 :
                 box.label(" No subgroups found in this group",icon="LAYER_USED")
                 resolution = str(object.dupli_group.name)[-3:]
-                if resolution in {'_hi', '_lo', '_me'}:
+                if resolution in set(['_hi', '_lo', '_me']):
 
                     res = resolution[-2:].upper()
 
@@ -225,18 +227,18 @@ class ToggleSubgroupResolution(bpy.types.Operator):
             # link needed object
             filepath = bpy.data.groups[dupgroup_name].library.filepath
 
-            print(filepath)
+            print filepath
             with bpy.data.libraries.load(filepath,
             link=True) as (data_from, data_to):
                 data_to.groups.append(new_group)
 
         try:
             obj.dupli_group = bpy.data.groups[new_group]
-            print("PowerLib: CHANGE " + str(item_name) + " to " + new_group)
+            print "PowerLib: CHANGE " + str(item_name) + " to " + new_group
         except:
-            self.report({'WARNING'}, "Group %s not found" % new_group.upper())
+            self.report(set(['WARNING']), "Group %s not found" % new_group.upper())
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class ToggleAllSubgroups(bpy.types.Operator):
@@ -269,9 +271,9 @@ class ToggleAllSubgroups(bpy.types.Operator):
                 #print("Powerlib: ALL HIGH " + elem.name)
                 SetProxyResolution(elem,'_hi')
             else:
-                print("nothing")
+                print "nothing"
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class ToggleSubgroupDisplay(bpy.types.Operator):
@@ -288,10 +290,10 @@ class ToggleSubgroupDisplay(bpy.types.Operator):
         obj_name = self.item_name
         grp_name = self.group_name
 
-        print("Powerlib: " + obj_name + " is being set to " + display)
+        print "Powerlib: " + obj_name + " is being set to " + display
 
         bpy.data.groups[grp_name].objects[obj_name].dupli_type = display
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class DisplaySubgroupContent(bpy.types.Operator):
@@ -304,7 +306,7 @@ class DisplaySubgroupContent(bpy.types.Operator):
     def execute(self, context):
         scene = context.scene
         scene.ActiveSubgroup = self.item_name
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 def register():

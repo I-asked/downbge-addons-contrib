@@ -31,6 +31,7 @@ Assign a hotkey.
 Save as Default (Optional).
 """
 
+from __future__ import absolute_import
 bl_info = {
 	"name": "Quadder",
 	"author": "Gert De Roost",
@@ -52,7 +53,7 @@ class Quadder(bpy.types.Operator):
 	bl_idname = "mesh.quadder"
 	bl_label = "Quadder"
 	bl_description = "Fills selected border verts/edges area with quads"
-	bl_options = {'REGISTER', 'UNDO'}
+	bl_options = set(['REGISTER', 'UNDO'])
 
 	@classmethod
 	def poll(cls, context):
@@ -63,7 +64,7 @@ class Quadder(bpy.types.Operator):
 
 		self.do_quadder()
 
-		return {'FINISHED'}
+		return set(['FINISHED'])
 
 
 

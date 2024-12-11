@@ -20,6 +20,7 @@
 
 # Script copyright (C) Campbell Barton
 
+from __future__ import absolute_import
 bl_info = {
     "name": "Library Hide",
     "description": "Hide objects within library dupligroups",
@@ -76,7 +77,7 @@ def pick_object(context, event, pick_objects, ray_max=10000.0):
                 yield (None, obj, obj.matrix_world.copy())
 
             if obj.dupli_type != 'NONE':
-                print("DupliInst: %r" % obj)
+                print "DupliInst: %r" % obj
                 obj.dupli_list_create(scene)
                 # matrix = obj.matrix_world.copy()
                 for dob in obj.dupli_list:
@@ -137,7 +138,7 @@ def pick_object(context, event, pick_objects, ray_max=10000.0):
         #scene.update()
         return True
     else:
-        print("found none")
+        print "found none"
         return False
 
 
@@ -196,14 +197,14 @@ class ViewOperatorRayCast(bpy.types.Operator):
         context.area.header_text_set(info)
 
     def modal(self, context, event):
-        if event.type in {'MIDDLEMOUSE', 'WHEELUPMOUSE', 'WHEELDOWNMOUSE'}:
+        if event.type in set(['MIDDLEMOUSE', 'WHEELUPMOUSE', 'WHEELDOWNMOUSE']):
             # allow navigation
-            return {'PASS_THROUGH'}
+            return set(['PASS_THROUGH'])
         elif event.type == 'LEFTMOUSE':
             if event.value == 'RELEASE':
                 if pick_object(context, event, self.pick_objects):
                     self._update_header(context)
-                return {'RUNNING_MODAL'}
+                return set(['RUNNING_MODAL'])
         elif event.type == 'BACK_SPACE':
             if event.value == 'RELEASE':
                 if self.pick_objects:
@@ -211,23 +212,23 @@ class ViewOperatorRayCast(bpy.types.Operator):
                     pick_restore(pick_obj)
                     self._update_header(context)
 
-        elif event.type in {'RET', 'NUMPAD_ENTER'}:
+        elif event.type in set(['RET', 'NUMPAD_ENTER']):
             if event.value == 'RELEASE':
                 if self.pick_objects:  # avoid enter taking effect on startup
                     pick_finalize(context, self.pick_objects)
                     context.area.header_text_set()
-                    self.report({'INFO'}, "Finished")
-                    return {'FINISHED'}
+                    self.report(set(['INFO']), "Finished")
+                    return set(['FINISHED'])
                 
-        elif event.type in {'RIGHTMOUSE', 'ESC'}:
+        elif event.type in set(['RIGHTMOUSE', 'ESC']):
             if event.value == 'RELEASE':
                 for pick_obj in self.pick_objects:
                     pick_restore(pick_obj)
                 context.area.header_text_set()
-                self.report({'INFO'}, "Cancelled")
-                return {'CANCELLED'}
+                self.report(set(['INFO']), "Cancelled")
+                return set(['CANCELLED'])
 
-        return {'RUNNING_MODAL'}
+        return set(['RUNNING_MODAL'])
 
     def invoke(self, context, event):
         if context.space_data.type == 'VIEW_3D':
@@ -236,10 +237,10 @@ class ViewOperatorRayCast(bpy.types.Operator):
             self._update_header(context)
 
             context.window_manager.modal_handler_add(self)
-            return {'RUNNING_MODAL'}
+            return set(['RUNNING_MODAL'])
         else:
-            self.report({'WARNING'}, "Active space must be a View3d")
-            return {'CANCELLED'}
+            self.report(set(['WARNING']), "Active space must be a View3d")
+            return set(['CANCELLED'])
 
 
 def register():

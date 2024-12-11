@@ -34,6 +34,8 @@
 ## http://msdn.microsoft.com/en-us/library/dd942138.aspx
 
 
+from __future__ import division
+from __future__ import absolute_import
 from struct import (
         unpack,
         )
@@ -51,7 +53,7 @@ from operator import (
         )
 
 
-class DEBUG_CFB_SPEC:
+class DEBUG_CFB_SPEC(object):
     errors = []
     warnings = []
     enabled = True
@@ -78,7 +80,7 @@ class DEBUG_CFB_SPEC:
 ###############################################################################
 #234567890123456789012345678901234567890123456789012345678901234567890123456789
 #--------1---------2---------3---------4---------5---------6---------7---------
-class Cfb_RawIO_Reader:
+class Cfb_RawIO_Reader(object):
     SEPARATOR = '\\'
 
     __slots__ = (
@@ -140,7 +142,7 @@ class Cfb_RawIO_Reader:
         """ read a single quad word value """
         return unpack('<Q', self.__raw_io.read(Cfb_Size_Type.QWORD))[0]
 
-    CLSID_NULL = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+    CLSID_NULL = '\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
     #CLSID_NULL = (0x00000000, 0x0000, 0x0000, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, )
     def read_clsid(self):
         """
@@ -155,7 +157,7 @@ class Cfb_RawIO_Reader:
 ###############################################################################
 #234567890123456789012345678901234567890123456789012345678901234567890123456789
 #--------1---------2---------3---------4---------5---------6---------7---------
-class Cfb_Stream_Reader:
+class Cfb_Stream_Reader(object):
     """
     for internal use only
     do not create an instance directly
@@ -262,7 +264,7 @@ class Cfb_Stream_Reader:
         ## set __stream_position without -1
 ##        self.seek(self.__stream_position)
 
-        return b''.join(blocks)
+        return ''.join(blocks)
 
     def read_byte(self):
         """ read a single byte value """
@@ -303,7 +305,7 @@ class Cfb_Stream_Reader:
 
 
 ###############################################################################
-class Cfb_File_Header:
+class Cfb_File_Header(object):
     """ for internal use only """
 
     """
@@ -332,14 +334,14 @@ class Cfb_File_Header:
     (0x200) .
     """
 
-    HEADER_SIGNATURE = b'\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1'
+    HEADER_SIGNATURE = '\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1'
     HEADER_SIGNATURE_SIZE = len(HEADER_SIGNATURE)
 
     MINOR_VERSION = 0x003E
     MAX_MAJOR_VERSION = 0x0004
     BYTE_ORDER_LE = 0xFFFE
 
-    RESERVED = b'\x00\x00\x00\x00\x00\x00'
+    RESERVED = '\x00\x00\x00\x00\x00\x00'
     RESERVED_SIZE = len(RESERVED)
 
     NUMBER_OF_DIFAT_SECTOR_IN_HEADER = 109
@@ -471,7 +473,7 @@ class Cfb_File_Header:
         size = self.__sector_size
         number_entries = size // Cfb_Size_Type.DWORD
         sector_location = self.First_DIFAT_Sector_Location
-        for i in range(0, self.Number_Of_DIFAT_Sectors):
+        for i in xrange(0, self.Number_Of_DIFAT_Sectors):
             if sector_location >= Cfb_Sector_Type.MAXREGULAR:
                 break
             self.seek_to_sector(sector_location, size)
@@ -481,12 +483,12 @@ class Cfb_File_Header:
             sector_location = entries[number_entries - 1]
 
         # build __file_allocation_table
-        for i in range(0, self.Number_Of_FAT_Sectors):
+        for i in xrange(0, self.Number_Of_FAT_Sectors):
             self.read_ids(self.__sector_size, self.DIFAT[i], self.__file_allocation_table)
 
         # build __mini_file_allocation_table
         sector_location = self.First_Mini_FAT_Sector_Location
-        for i in range(0, self.__total_number_of_mini_sectors, self.__mini_sector_size):
+        for i in xrange(0, self.__total_number_of_mini_sectors, self.__mini_sector_size):
             self.read_ids(self.__sector_size, sector_location, self.__mini_file_allocation_table)
             sector_location = self.__file_allocation_table[sector_location]
 
@@ -494,7 +496,7 @@ class Cfb_File_Header:
         sector_location = self.First_Directory_Sector_Location
         while sector_location != Cfb_Sector_Type.ENDOFCHAIN:
             self.seek_to_sector(sector_location, self.__sector_size)
-            for i in range(0, self.__sector_size // 0x80):
+            for i in xrange(0, self.__sector_size // 0x80):
                 directory_entry = Cfb_File_Directory_Entry(self.__compound_raw_io)
                 directory_entry.read()
                 self.__directory_entry_list.append(directory_entry)
@@ -586,7 +588,7 @@ class Cfb_File_Header:
 
 
 ###############################################################################
-class Cfb_File_Directory_Entry:
+class Cfb_File_Directory_Entry(object):
     """ for internal use only """
 
     """
@@ -696,7 +698,7 @@ class Cfb_File_Directory_Entry:
 
 
 ###############################################################################
-class Cfb_Extras:
+class Cfb_Extras(object):
     """ for internal use only """
 
     @staticmethod
@@ -732,7 +734,7 @@ class Cfb_Extras:
 
 
 ###############################################################################
-class Cfb_Size_Type:
+class Cfb_Size_Type(object):
     """ for internal use only """
     BYTE = 1
     WORD = 2
@@ -755,7 +757,7 @@ class Cfb_Size_Type:
         return DEBUG_CFB_SPEC.unknown_value(value)
 
 
-class Cfb_Sector_Type:
+class Cfb_Sector_Type(object):
     """ for internal use only """
     MAXREGULAR = 0xFFFFFFFA
     DIFAT = 0xFFFFFFFC
@@ -780,7 +782,7 @@ class Cfb_Sector_Type:
         return DEBUG_CFB_SPEC.unknown_value(value)
 
 
-class Cfb_Stream_Type:
+class Cfb_Stream_Type(object):
     """ for internal use only """
     MAXREGULAR = 0xFFFFFFFA
     NOSTREAM = 0xFFFFFFFF
@@ -797,7 +799,7 @@ class Cfb_Stream_Type:
 
 
 ###############################################################################
-class Cfb_Object_Type:
+class Cfb_Object_Type(object):
     """ for internal use only """
     UNKNOWN = 0
     STORAGE = 1
@@ -818,7 +820,7 @@ class Cfb_Object_Type:
 
 
 ###############################################################################
-class Cfb_Color_Flag:
+class Cfb_Color_Flag(object):
     """ for internal use only """
     RED = 0
     BLACK = 1

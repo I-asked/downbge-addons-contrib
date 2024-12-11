@@ -45,6 +45,8 @@
 
 
 
+from __future__ import division
+from __future__ import absolute_import
 import bpy
 import bgl
 import math
@@ -109,15 +111,15 @@ class VIEW3D_OT_cursor_previous(bpy.types.Operator):
     """Previous cursor location"""
     bl_idname = "view3d.cursor_previous"
     bl_label = "Previous cursor location"
-    bl_options = {'REGISTER'}
+    bl_options = set(['REGISTER'])
 
     def modal(self, context, event):
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def execute(self, context):
         cc = context.scene.cursor_history
         cc.previousLocation()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 
@@ -125,15 +127,15 @@ class VIEW3D_OT_cursor_next(bpy.types.Operator):
     """Next cursor location"""
     bl_idname = "view3d.cursor_next"
     bl_label = "Next cursor location"
-    bl_options = {'REGISTER'}
+    bl_options = set(['REGISTER'])
 
     def modal(self, context, event):
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def execute(self, context):
         cc = context.scene.cursor_history
         cc.nextLocation()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 
@@ -141,16 +143,16 @@ class VIEW3D_OT_cursor_history_show(bpy.types.Operator):
     """Show cursor trace"""
     bl_idname = "view3d.cursor_history_show"
     bl_label = "Show cursor trace"
-    bl_options = {'REGISTER'}
+    bl_options = set(['REGISTER'])
 
     def modal(self, context, event):
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def execute(self, context):
         cc = context.scene.cursor_history
         cc.historyDraw = True
         BlenderFake.forceRedraw()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 
@@ -158,16 +160,16 @@ class VIEW3D_OT_cursor_history_hide(bpy.types.Operator):
     """Hide cursor trace"""
     bl_idname = "view3d.cursor_history_hide"
     bl_label = "Hide cursor trace"
-    bl_options = {'REGISTER'}
+    bl_options = set(['REGISTER'])
 
     def modal(self, context, event):
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def execute(self, context):
         cc = context.scene.cursor_history
         cc.historyDraw = False
         BlenderFake.forceRedraw()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 
@@ -175,7 +177,7 @@ class VIEW3D_PT_cursor_history(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_label = "Cursor History"
-    bl_options = {'DEFAULT_CLOSED'}
+    bl_options = set(['DEFAULT_CLOSED'])
 
     @classmethod
     def poll(self, context):
@@ -222,7 +224,7 @@ class VIEW3D_PT_cursor_history_init(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_label = "Register callback"
-    bl_options = {'DEFAULT_CLOSED'}
+    bl_options = set(['DEFAULT_CLOSED'])
 
     initDone = False
     _handle = None
@@ -243,17 +245,17 @@ class VIEW3D_PT_cursor_history_init(bpy.types.Panel):
         if VIEW3D_PT_cursor_history_init.initDone:
             return False
 
-        print ("Cursor History draw-callback registration...")
+        print "Cursor History draw-callback registration..."
         sce = context.scene
         if context.area.type == 'VIEW_3D':
             VIEW3D_PT_cursor_history_init.handle_add(cls, context)
             VIEW3D_PT_cursor_history_init.initDone = True
-            print ("Cursor History draw-callback registered")
+            print "Cursor History draw-callback registered"
             # Unregister to prevent double registration...
             # Started to fail after v2.57
             # bpy.types.unregister(VIEW3D_PT_cursor_history_init)
         else:
-            print("View3D not found, cannot run operator")
+            print "View3D not found, cannot run operator"
         return False
 
     def draw_header(self, context):
@@ -280,7 +282,7 @@ def cursor_history_draw(cls,context):
             return
         bgl.glBegin(bgl.GL_LINE_STRIP)
         ccc = 0
-        for iii in range(cc.historyWindow+1):
+        for iii in xrange(cc.historyWindow+1):
             ix_rel = iii - int(cc.historyWindow / 2)
             ix = cc.historyPosition[0] + ix_rel
             if(ix<0 or ix>=len(cc.historyLocation)):

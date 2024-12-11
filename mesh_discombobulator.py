@@ -16,6 +16,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
  
+from __future__ import division
+from __future__ import absolute_import
 bl_info = {
     "name": "Discombobulator",
     "description": "Its job is to easily add scifi details to a surface to create nice-looking space-ships or futuristic cities.",
@@ -360,7 +362,7 @@ def protusions_repeat(object1, mesh1, r_prot):
             if j<len(object1.data.polygons):
                 object1.data.polygons[j].select=True
             else:
-                print("Warning: hit end of polygons in object1")
+                print "Warning: hit end of polygons in object1"
  
 # add material to discombobulated mesh
 def setMatProt(discObj, origObj, sideProtMat, topProtMat):
@@ -397,7 +399,7 @@ def setMatDood(doodObj):
                 if i_dood_type[polygon.index] == name:
                     polygon.material_index = len(doodObj.material_slots)-1
         except:
-            print()
+            print
            
            
 def clean_doodads():
@@ -529,7 +531,7 @@ class chooseDoodad(bpy.types.Operator):
        
     def invoke(self, context, event):
         self.execute(context)
-        return {'FINISHED'}
+        return set(['FINISHED'])
  
 class unchooseDoodad(bpy.types.Operator):
     bl_idname = "object.discombobulate_unset_doodad"
@@ -542,14 +544,14 @@ class unchooseDoodad(bpy.types.Operator):
                
     def invoke(self, context, event):
         self.execute(context)
-        return {'FINISHED'}
+        return set(['FINISHED'])
  
 ################################## Interpolygon ####################################
  
 class discombobulator(bpy.types.Operator):
     bl_idname = "object.discombobulate"
     bl_label = "Discombobulate"
-    bl_options = {'REGISTER', 'UNDO'}  
+    bl_options = set(['REGISTER', 'UNDO'])  
    
     def execute(self, context):
         scn = context.scene
@@ -560,7 +562,7 @@ class discombobulator(bpy.types.Operator):
                 isLast=True
             discombobulate(scn.minHeight, scn.maxHeight, scn.minTaper, scn.maxTaper, scn.subpolygon1, scn.subpolygon2, scn.subpolygon3, scn.subpolygon4, scn.mindoodads, scn.maxdoodads, scn.repeatprot, scn.sideProtMat, scn.topProtMat, isLast)
             i+=1
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 class discombob_help(bpy.types.Operator):
 	bl_idname = 'help.discombobulator'
@@ -576,7 +578,7 @@ class discombob_help(bpy.types.Operator):
 
 	
 	def execute(self, context):
-		return {'FINISHED'}
+		return set(['FINISHED'])
 
 	def invoke(self, context, event):
 		return context.window_manager.invoke_popup(self, width = 300)
@@ -586,7 +588,7 @@ class VIEW3D_PT_tools_discombobulate(bpy.types.Panel):
     bl_region_type = 'TOOLS'
     bl_label = "Discombobulator"
     bl_context = "objectmode"
-    bl_options = {'DEFAULT_CLOSED'}
+    bl_options = set(['DEFAULT_CLOSED'])
     bl_category = "Create"
 	
     def draw(self, context):

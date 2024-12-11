@@ -110,6 +110,8 @@ v0.x -
 ######################################################################
 ######################################################################
 ######################################################################
+from __future__ import division
+from __future__ import absolute_import
 import bpy
 import time
 import random
@@ -118,6 +120,8 @@ from mathutils import Vector
 import struct
 import bisect
 import os.path
+from io import open
+from itertools import imap
 notZero = 0.0000000001
 #scn = bpy.context.scene
 winmgr = bpy.context.window_manager
@@ -158,7 +162,7 @@ def getLowHigh(aList):
 def weightedRandomChoice(aList):
     tL = []
     tweight = 0
-    for a in range(len(aList)):
+    for a in xrange(len(aList)):
         idex = a; weight = aList[a]
         if weight > 0.0:
             tweight += weight
@@ -169,9 +173,9 @@ def weightedRandomChoice(aList):
 
 def getStencil3D_26(x,y,z):
     nL = []
-    for xT in range(x-1, x+2):
-        for yT in range(y-1, y+2):
-            for zT in range(z-1, z+2):
+    for xT in xrange(x-1, x+2):
+        for yT in xrange(y-1, y+2):
+            for zT in xrange(z-1, z+2):
                 nL.append((xT, yT, zT))
     nL.remove((x,y,z))
     return nL
@@ -206,16 +210,16 @@ def writeArrayToVoxel(arr, filename):
     gridS = 64
     half = int(gridS/2)
     bitOn = 255
-    aGrid = [[[0 for z in range(gridS)] for y in range(gridS)] for x in range(gridS)]
+    aGrid = [[[0 for z in xrange(gridS)] for y in xrange(gridS)] for x in xrange(gridS)]
     for a in arr:
         try:
             aGrid[a[0]+half][a[1]+half][a[2]+half] = bitOn
         except:
-            print('Particle beyond voxel domain')
+            print 'Particle beyond voxel domain'
     file = open(filename, "wb")
-    for z in range(gridS):
-        for y in range(gridS):
-            for x in range(gridS):
+    for z in xrange(gridS):
+        for y in xrange(gridS):
+            for x in xrange(gridS):
                 file.write(struct.pack('B', aGrid[x][y][z]))
     file.flush()
     file.close()
@@ -332,7 +336,7 @@ def writeArrayToMesh(mname, arr, gridBU, rpt = None):
     mob.scale = (gridBU, gridBU, gridBU)
     if rpt: addReportProp(mob, rpt)
     addVert(mob, arr[0], -1)
-    for ai in range(1, len(arr)):
+    for ai in xrange(1, len(arr)):
         a = arr[ai]
         addVert(mob, a, ai-1)
     return mob        
@@ -351,7 +355,7 @@ def writeArrayToCurves(cname, arr, gridBU, bd = .05, rpt = None):
     cur.splines.new('BEZIER')
     cspline = cur.splines[0]
     div = 1 ###   SPACING FOR HANDLES (2 - 1/2 WAY, 1 - NEXT BEZIER)
-    for a in range(len(arr)):
+    for a in xrange(len(arr)):
         cspline.bezier_points.add(1)
         bp = cspline.bezier_points[len(cspline.bezier_points)-1]
         if a-1 < 0: hL = arr[a]
@@ -375,7 +379,7 @@ def addArrayToMesh(mob, arr):
     addVert(mob, arr[0], -1)
     mmesh = mob.data
     vcounti = len(mmesh.vertices)-1
-    for ai in range(1, len(arr)):
+    for ai in xrange(1, len(arr)):
         a = arr[ai]
         addVert(mob, a, len(mmesh.vertices)-1)
 
@@ -385,7 +389,7 @@ def addMaterial(ob, matname):
 
 def writeStokeToMesh(arr, jarr, MAINi, HORDERi, TIPSi, orig, gs, rpt=None):
     ###---MAIN BRANCH
-    print('   WRITING MAIN BRANCH')
+    print '   WRITING MAIN BRANCH'
     llmain = []
     for x in MAINi:
         llmain.append(jarr[x])
@@ -393,8 +397,8 @@ def writeStokeToMesh(arr, jarr, MAINi, HORDERi, TIPSi, orig, gs, rpt=None):
     mob.location = orig       
 
     ###---hORDER BRANCHES
-    for hOi in range(len(HORDERi)):
-        print('   WRITING ORDER', hOi)        
+    for hOi in xrange(len(HORDERi)):
+        print '   WRITING ORDER', hOi        
         hO = HORDERi[hOi]
         hob = newMesh('la1H'+str(hOi))
 
@@ -407,7 +411,7 @@ def writeStokeToMesh(arr, jarr, MAINi, HORDERi, TIPSi, orig, gs, rpt=None):
         hob.location = orig
 
     ###---TIPS
-    print('   WRITING TIP PATHS')    
+    print '   WRITING TIP PATHS'    
     tob = newMesh('la2TIPS')
     for y in  TIPSi:
         llt = []        
@@ -422,8 +426,8 @@ def writeStokeToMesh(arr, jarr, MAINi, HORDERi, TIPSi, orig, gs, rpt=None):
         addMaterial(mob, 'edgeMAT-h0')
         addMaterial(hob, 'edgeMAT-h1')
         addMaterial(tob, 'edgeMAT-h2')
-        print('   ADDED MATERIALS')
-    except: print('   MATERIALS NOT FOUND')
+        print '   ADDED MATERIALS'
+    except: print '   MATERIALS NOT FOUND'
     ###---ADD GENERATION REPORT TO ALL MESHES
     if rpt:
         addReportProp(mob, rpt)
@@ -437,7 +441,7 @@ def writeStokeToSingleMesh(arr, jarr, orig, gs, mct, rpt=None):
     Aob = newMesh('laALL')
     for pt in jarr:
         addVert(Aob, pt)
-    for cpi in range(len(sgarr)):
+    for cpi in xrange(len(sgarr)):
         ci = sgarr[cpi][0]
         pi = sgarr[cpi][1]
         addEdge(Aob, pi, ci)
@@ -463,26 +467,26 @@ def visualizeArray(cg, oob, gs, vm, vs, vc, vv, rst):
     if vm:  ###---WRITE ARRAY TO MULTI MESH
         
         aMi, aHi, aTi = classifyStroke(cg, oct, winmgr.HORDER)
-        print(':::WRITING TO MULTI-MESH')        
+        print ':::WRITING TO MULTI-MESH'        
         writeStokeToMesh(cg, cjarr, aMi, aHi, aTi, origin, gs, rst)
-        print(':::MULTI-MESH WRITTEN')
+        print ':::MULTI-MESH WRITTEN'
 
     if vs:  ###---WRITE TO SINGLE MESH
-        print(':::WRITING TO SINGLE MESH')         
+        print ':::WRITING TO SINGLE MESH'         
         writeStokeToSingleMesh(cg, cjarr, origin, gs, oct, rst)
-        print(':::SINGLE MESH WRITTEN')
+        print ':::SINGLE MESH WRITTEN'
         
     if vc:  ###---WRITE ARRAY TO CUBE OBJECTS
-        print(':::WRITING TO CUBES')
+        print ':::WRITING TO CUBES'
         writeArrayToCubes(cg, gs, origin)
-        print(':::CUBES WRITTEN')
+        print ':::CUBES WRITTEN'
 
     if vv:  ###---WRITE ARRAY TO VOXEL DATA FILE
-        print(':::WRITING TO VOXELS')
+        print ':::WRITING TO VOXELS'
         fname = "FSLGvoxels.raw"
         path = os.path.dirname(bpy.data.filepath)
         writeArrayToVoxel(cg, path + "\\" + fname)
-        print(':::VOXEL DATA WRITTEN TO - ', path + "\\" + fname)
+        print ':::VOXEL DATA WRITTEN TO - ', path + "\\" + fname
 
     ###---READ/WRITE ARRAY TO FILE (MIGHT NOT BE NECESSARY)
     #tfile = 'c:\\testarr.txt'
@@ -503,7 +507,7 @@ def buildCPGraph(arr, sti = 2):
 ###   sti - start index, 2 for Empty, len(me.vertices) for Mesh
     sgarr = []
     sgarr.append((1, 0)) #
-    for ai in range(sti, len(arr)):
+    for ai in xrange(sti, len(arr)):
         cs = arr[ai]
         cpts = arr[0:ai]
         cslap = getStencil3D_26(cs[0], cs[1], cs[2])
@@ -522,7 +526,7 @@ def buildCPGraph_WORKINPROGRESS(arr, sti = 2):
     sgarr = []
     sgarr.append((1, 0)) #
     ctix = 0
-    for ai in range(sti, len(arr)):		
+    for ai in xrange(sti, len(arr)):		
         cs = arr[ai]
         #cpts = arr[0:ai]
         cpts = arr[ctix:ai]
@@ -545,7 +549,7 @@ def findChargePath(oc, fc, ngraph, restrict = [], partial = True):
     pList = splitList(ngraph, 1)
     aRi = []
     cNODE = fc
-    for x in range(len(ngraph)):
+    for x in xrange(len(ngraph)):
         pNODE = pList[cList.index(cNODE)]
         aRi.append(cNODE)
         cNODE = pNODE
@@ -576,7 +580,7 @@ def findTips(arr):
 
 def findChannelRoots(path, ngraph, restrict = []):
     roots = []
-    for ai in range(len(ngraph)):
+    for ai in xrange(len(ngraph)):
         chi = ngraph[ai][0]
         par = ngraph[ai][1]
         if par in path and not chi in path and \
@@ -587,11 +591,11 @@ def findChannelRoots(path, ngraph, restrict = []):
 
 def findChannels(roots, tips, ngraph, restrict):
     cPATHS = []
-    for ri in range(len(roots)):
+    for ri in xrange(len(roots)):
         r = roots[ri]
         sL = 1
         sPATHi = []
-        for ti in range(len(tips)):
+        for ti in xrange(len(tips)):
             t = tips[ti]
             if t < r: continue
             tPATHi = findChargePath(r, t, ngraph, restrict, False)
@@ -602,8 +606,8 @@ def findChannels(roots, tips, ngraph, restrict):
                     sPATHi = tPATHi
                     tTEMP = t; tiTEMP = ti
         if len(sPATHi) > 0:
-            print('   found path/idex from', ri, 'of', 
-                  len(roots), 'possible | tips:', tTEMP, tiTEMP)
+            print '   found path/idex from', ri, 'of', 
+                  len(roots), 'possible | tips:', tTEMP, tiTEMP
             cPATHS.append(sPATHi)
             tips.remove(tTEMP)
     return cPATHS
@@ -611,12 +615,12 @@ def findChannels(roots, tips, ngraph, restrict):
 def findChannels_WORKINPROGRESS(roots, ttips, ngraph, restrict):
     cPATHS = []
     tips = list(ttips)
-    for ri in range(len(roots)):
+    for ri in xrange(len(roots)):
         r = roots[ri]
         sL = 1
         sPATHi = []
         tipREMOVE = [] ###---CHECKED TIP INDEXES, TO BE REMOVED FOR NEXT LOOP
-        for ti in range(len(tips)):
+        for ti in xrange(len(tips)):
             t = tips[ti]            
             #print('-CHECKING RT/IDEX:', r, ri, 'AGAINST TIP', t, ti)
             #if t < r: continue
@@ -631,8 +635,8 @@ def findChannels_WORKINPROGRESS(roots, ttips, ngraph, restrict):
             if tL > 0:
                 tipREMOVE.append(t)                    
         if len(sPATHi) > 0:
-            print('   found path from root idex', ri, 'of', 
-                   len(roots), 'possible roots | #oftips=', len(tips))
+            print '   found path from root idex', ri, 'of', 
+                   len(roots), 'possible roots | #oftips=', len(tips)
             cPATHS.append(sPATHi)
         for q in tipREMOVE:  tips.remove(q)
 
@@ -644,7 +648,7 @@ def countChildrenOnPath(aPath, ngraph, quick = True):
     ###   quick -STOP AND RETURN AFTER FIRST
     cCOUNT = 0
     pList = splitList(ngraph,1)
-    for ai in range(len(aPath)-1):
+    for ai in xrange(len(aPath)-1):
         ap = aPath[ai]
         pc = pList.count(ap)
         if quick and pc > 1: 
@@ -653,18 +657,18 @@ def countChildrenOnPath(aPath, ngraph, quick = True):
 
 ###---CLASSIFY CHANNELS INTO 'MAIN', 'hORDER/SECONDARY' and 'SIDE'
 def classifyStroke(sarr, mct, hORDER = 1):
-    print(':::CLASSIFYING STROKE')
+    print ':::CLASSIFYING STROKE'
     ###---BUILD CHILD/PARENT GRAPH (INDEXES OF sarr)  
     sgarr = buildCPGraph(sarr, mct)
 
     ###---FIND MAIN CHANNEL 
-    print('   finding MAIN')
+    print '   finding MAIN'
     oCharge = sgarr[0][1]
     fCharge = sgarr[len(sgarr)-1][0]
     aMAINi = findChargePath(oCharge, fCharge, sgarr)
     
     ###---FIND TIPS
-    print('   finding TIPS')
+    print '   finding TIPS'
     aTIPSi = findTips(sgarr)
 
     ###---FIND hORDER CHANNEL ROOTS
@@ -673,16 +677,16 @@ def classifyStroke(sarr, mct, hORDER = 1):
     hRESTRICT = list(aMAINi)    ### ADD TO THIS AFTER EACH TIME
     allHPATHSi = []             ### ALL hO PATHS: [[h0], [h1]...]
     curPATHSi = [aMAINi]        ### LIST OF PATHS FIND ROOTS ON
-    for h in range(hORDER):
+    for h in xrange(hORDER):
         allHPATHSi.append([])
-        for pi in range(len(curPATHSi)):     ###   LOOP THROUGH ALL PATHS IN THIS ORDER
+        for pi in xrange(len(curPATHSi)):     ###   LOOP THROUGH ALL PATHS IN THIS ORDER
             p = curPATHSi[pi]
             ###   GET ROOTS FOR THIS PATH
             aHROOTSi = findChannelRoots(p, sgarr, hRESTRICT)
-            print('   found', len(aHROOTSi), 'roots in ORDER', h, ':#paths:', len(curPATHSi))
+            print '   found', len(aHROOTSi), 'roots in ORDER', h, ':#paths:', len(curPATHSi)
             ### GET CHANNELS FOR THESE ROOTS
             if len(aHROOTSi) == 0:
-                print('NO ROOTS FOR FOUND FOR CHANNEL')
+                print 'NO ROOTS FOR FOUND FOR CHANNEL'
                 aHPATHSi = []
                 continue
             else:
@@ -737,31 +741,31 @@ def voxelByRays(ob, orig, gs):
     yct = int((bbyR - bbyL) / gs)
     zct = int((bbzR - bbzL) / gs)
     xs = int(xct/2); ys = int(yct/2); zs = int(zct/2)
-    print('  CASTING', xct, '/', yct, '/', zct, 'cells, total:', xct*yct*zct, 'in obj-', ob.name)    
+    print '  CASTING', xct, '/', yct, '/', zct, 'cells, total:', xct*yct*zct, 'in obj-', ob.name    
     ll = []
     rc = 100    ###---DISTANCE TO CAST FROM
     ###---RAYCAST TOP/BOTTOM
-    print('  RAYCASTING TOP/BOTTOM')
-    for x in range(xct):
-        for y in range(yct):
+    print '  RAYCASTING TOP/BOTTOM'
+    for x in xrange(xct):
+        for y in xrange(yct):
             xco = bbxL + (x*gs);  yco = bbyL + (y*gs)
             v1 = ((xco, yco,  rc));    v2 = ((xco, yco, -rc))            
             vz1 = ob.ray_cast(v1,v2);   vz2 = ob.ray_cast(v2,v1)            
             if vz1[2] != -1: ll.append((x-xs, y-ys, int(vz1[0][2] * (1/gs)) ))
             if vz2[2] != -1: ll.append((x-xs, y-ys, int(vz2[0][2] * (1/gs)) ))
     ###---RAYCAST FRONT/BACK
-    print('  RAYCASTING FRONT/BACK')    
-    for x in range(xct):
-        for z in range(zct):
+    print '  RAYCASTING FRONT/BACK'    
+    for x in xrange(xct):
+        for z in xrange(zct):
             xco = bbxL + (x*gs);  zco = bbzL + (z*gs)
             v1 = ((xco, rc,  zco));    v2 = ((xco, -rc, zco))            
             vy1 = ob.ray_cast(v1,v2);   vy2 = ob.ray_cast(v2,v1)            
             if vy1[2] != -1: ll.append((x-xs, int(vy1[0][1] * (1/gs)), z-zs))
             if vy2[2] != -1: ll.append((x-xs, int(vy2[0][1] * (1/gs)), z-zs))
     ###---RAYCAST LEFT/RIGHT
-    print('  RAYCASTING LEFT/RIGHT')
-    for y in range(yct):
-        for z in range(zct):
+    print '  RAYCASTING LEFT/RIGHT'
+    for y in xrange(yct):
+        for z in xrange(zct):
             yco = bbyL + (y*gs);  zco = bbzL + (z*gs)
             v1 = ((rc, yco,  zco));    v2 = ((-rc, yco, zco))            
             vx1 = ob.ray_cast(v1,v2);   vx2 = ob.ray_cast(v2,v1)            
@@ -775,7 +779,7 @@ def voxelByRays(ob, orig, gs):
         nlist += nl
 
     ###---DEDUPE
-    print('  ADDED NEIGHBORS, DEDUPING...')    
+    print '  ADDED NEIGHBORS, DEDUPING...'    
     rlist = deDupe(ll+nlist)
     qlist = []
     
@@ -824,7 +828,7 @@ def getGrowthProbability_KEEPFORREFERENCE(uN, aList):
     for o in oList:
         Uj = (o - Omin) / (Omax - Omin) ###===(FSLG - Eqn. 13)
         E += pow(Uj, uN)
-    for oi in range(len(oList)):
+    for oi in xrange(len(oList)):
         o = oList[oi]
         Ui = (o - Omin) / (Omax - Omin)
         Pd = (pow(Ui, uN)) / E ###===(FSLG - Eqn. 12)
@@ -846,12 +850,12 @@ def getGrowthProbability(uN, aList):
     if Omin == Omax: Omax += notZero; Omin -= notZero
     PdL = []
     E = notZero
-    minL = [Omin for q in range(len(oList))]
-    maxL = [Omax for q in range(len(oList))]
-    uNL =  [uN   for q in range(len(oList))]
-    E = sum(map(fslg_e13, oList, minL, maxL, uNL))
-    EL = [E for q in range(len(oList))]
-    mp = map(fslg_e12, oList, minL, maxL, uNL, EL)
+    minL = [Omin for q in xrange(len(oList))]
+    maxL = [Omax for q in xrange(len(oList))]
+    uNL =  [uN   for q in xrange(len(oList))]
+    E = sum(imap(fslg_e13, oList, minL, maxL, uNL))
+    EL = [E for q in xrange(len(oList))]
+    mp = imap(fslg_e12, oList, minL, maxL, uNL, EL)
     for m in mp: PdL.append(m)
     return PdL 
 
@@ -861,7 +865,7 @@ def updatePointCharges(p, cList, eList = []):
     ###   OUT: LIST OF NEW CHARGE AT CANDIDATE SITES
     r1 = 1/2        ###===(FSLG - Eqn. 10)
     nOiL = []    
-    for oi in range(len(cList)):
+    for oi in xrange(len(cList)):
         o = cList[oi][1]
         c = cList[oi][0]
         iOe = 0
@@ -945,16 +949,16 @@ def setupObjects():
 def checkSettings():
     check = True
     if winmgr.OOB == "": 
-        print('ERROR: NO ORIGIN OBJECT SELECTED')
+        print 'ERROR: NO ORIGIN OBJECT SELECTED'
         check = False
     if winmgr.GROUNDBOOL and winmgr.GOB == "":
-        print('ERROR: NO GROUND OBJECT SELECTED')
+        print 'ERROR: NO GROUND OBJECT SELECTED'
         check = False
     if winmgr.CLOUDBOOL and winmgr.COB == "":
-        print('ERROR: NO CLOUD OBJECT SELECTED')        
+        print 'ERROR: NO CLOUD OBJECT SELECTED'        
         check = False
     if winmgr.IBOOL and winmgr.IOB == "":
-        print('ERROR: NO INSULATOR OBJECT SELECTED')        
+        print 'ERROR: NO INSULATOR OBJECT SELECTED'        
         check = False
     #should make a popup here
     return check
@@ -965,7 +969,7 @@ def checkSettings():
 ######################################################################
 def FSLG():
 ###======FAST SIMULATION OF LAPLACIAN GROWTH======###
-    print('\n<<<<<<------GO GO GADGET: FAST SIMULATION OF LAPLACIAN GROWTH!')
+    print '\n<<<<<<------GO GO GADGET: FAST SIMULATION OF LAPLACIAN GROWTH!'
     tc1 = time.clock()
     TSTEPS = winmgr.TSTEPS
 
@@ -979,10 +983,10 @@ def FSLG():
     ###====== 1) INSERT INTIAL CHARGE(S) POINT (USES VERTS IF MESH)
     cgrid = [(0, 0, 0)]
     if obORIGIN.type == 'MESH':
-        print("<<<<<<------ORIGIN OBJECT IS MESH, 'VOXELIZING' INTIAL CHARGES FROM VERTS")
+        print "<<<<<<------ORIGIN OBJECT IS MESH, 'VOXELIZING' INTIAL CHARGES FROM VERTS"
         cgrid = voxelByVertex(obORIGIN, winmgr.GSCALE)
         if winmgr.VMMESH:
-            print("<<<<<<------CANNOT CLASSIFY STROKE FROM VERT ORIGINS YET, NO MULTI-MESH OUTPUT")
+            print "<<<<<<------CANNOT CLASSIFY STROKE FROM VERT ORIGINS YET, NO MULTI-MESH OUTPUT"
             winmgr.VMMESH = False; winmgr.VSMESH = True
 
     ###---GROUND CHARGE CELL / INSULATOR LISTS (eChargeList/icList)
@@ -990,16 +994,16 @@ def FSLG():
     if winmgr.GROUNDBOOL:
         eChargeList = fakeGroundChargePlane(winmgr.GROUNDZ, winmgr.GROUNDC)
     if winmgr.CLOUDBOOL:
-        print("<<<<<<------'VOXELIZING' CLOUD OBJECT (COULD TAKE SOME TIME)")
+        print "<<<<<<------'VOXELIZING' CLOUD OBJECT (COULD TAKE SOME TIME)"
         obCLOUD = bpy.context.scene.objects[winmgr.COB]
         eChargeListQ = voxelByRays(obCLOUD, winmgr.ORIGIN, winmgr.GSCALE)
         eChargeList = addCharges(eChargeListQ, winmgr.CLOUDC)
-        print('<<<<<<------CLOUD OBJECT CELL COUNT = ', len(eChargeList) )        
+        print '<<<<<<------CLOUD OBJECT CELL COUNT = ', len(eChargeList)        
     if winmgr.IBOOL:
-        print("<<<<<<------'VOXELIZING' INSULATOR OBJECT (COULD TAKE SOME TIME)")
+        print "<<<<<<------'VOXELIZING' INSULATOR OBJECT (COULD TAKE SOME TIME)"
         obINSULATOR = bpy.context.scene.objects[winmgr.IOB]
         icList = voxelByRays(obINSULATOR, winmgr.ORIGIN, winmgr.GSCALE)
-        print('<<<<<<------INSULATOR OBJECT CELL COUNT = ', len(icList) )
+        print '<<<<<<------INSULATOR OBJECT CELL COUNT = ', len(icList)
         #writeArrayToCubes(icList, winmgr.GSCALE, winmgr.ORIGIN)
         #return 'THEEND'
         
@@ -1051,31 +1055,31 @@ def FSLG():
         istr12 = ' | GROUNDZ: ' + str(winmgr.GROUNDZ) + ' | '
         istr2 = 'CANDS: ' + str(len(cSites)) + ' | '
         istr3 = 'GSITE: ' + str(gsite)
-        print(istr1 + istr12 + istr2 + istr3)        
+        print istr1 + istr12 + istr2 + istr3        
         ts += 1
         
         ###---EARLY TERMINATION FOR GROUND/CLOUD STRIKE
         if winmgr.GROUNDBOOL:
             if gsite[2] == winmgr.GROUNDZ:
                 ts = TSTEPS+1
-                print('<<<<<<------EARLY TERMINATION DUE TO GROUNDSTRIKE')
+                print '<<<<<<------EARLY TERMINATION DUE TO GROUNDSTRIKE'
                 continue
         if winmgr.CLOUDBOOL:
             #if gsite in cloudList:
             if gsite in splitListCo(eChargeList):
                 ts = TSTEPS+1
-                print('<<<<<<------EARLY TERMINATION DUE TO CLOUDSTRIKE')
+                print '<<<<<<------EARLY TERMINATION DUE TO CLOUDSTRIKE'
                 continue            
 
     tc2 = time.clock()
     tcRUN = tc2 - tc1
-    print('<<<<<<------LAPLACIAN GROWTH LOOP COMPLETED: ' + str(len(cgrid)) + ' / ' + str(tcRUN)[0:5] + ' SECONDS')
-    print('<<<<<<------VISUALIZING DATA')
+    print '<<<<<<------LAPLACIAN GROWTH LOOP COMPLETED: ' + str(len(cgrid)) + ' / ' + str(tcRUN)[0:5] + ' SECONDS'
+    print '<<<<<<------VISUALIZING DATA'
 
     reportSTRING = getReportString(tcRUN)    
     ###---VISUALIZE ARRAY
     visualizeArray(cgrid, obORIGIN, winmgr.GSCALE, winmgr.VMMESH, winmgr.VSMESH, winmgr.VCUBE, winmgr.VVOX, reportSTRING)
-    print('<<<<<<------COMPLETE')
+    print '<<<<<<------COMPLETE'
 
 ######################################################################
 ################################ GUI #################################
@@ -1162,7 +1166,7 @@ class runFSLGLoopOperator(bpy.types.Operator):
         if checkSettings():
             FSLG()
         else: pass
-        return {'FINISHED'}
+        return set(['FINISHED'])
     
 class setupObjectsOperator(bpy.types.Operator):
     '''create origin/ground/cloud/insulator objects'''
@@ -1171,7 +1175,7 @@ class setupObjectsOperator(bpy.types.Operator):
 
     def execute(self, context):
         setupObjects()        
-        return {'FINISHED'}    
+        return set(['FINISHED'])    
 
 class OBJECT_PT_fslg(bpy.types.Panel):
     bl_label = "Laplacian Lightning - v0.2.6"
@@ -1179,7 +1183,7 @@ class OBJECT_PT_fslg(bpy.types.Panel):
     bl_region_type = "TOOLS"
     bl_context = "objectmode"
     bl_category = "Create"
-    bl_options = {'DEFAULT_CLOSED'}
+    bl_options = set(['DEFAULT_CLOSED'])
 
     def draw(self, context):
         scn = context.scene
@@ -1244,14 +1248,14 @@ if __name__ == "__main__":
 ##### FXN BENCHMARKS ######
 ###########################
 def BENCH():
-    print('\n\n\n--->BEGIN BENCHMARK')
+    print '\n\n\n--->BEGIN BENCHMARK'
     bt0 = time.clock()
     ###---MAKE A BIG LIST
     tsize = 25
     tlist = []
-    for x in range(tsize):
-        for y in range(tsize):
-            for z in range(tsize):
+    for x in xrange(tsize):
+        for y in xrange(tsize):
+            for z in xrange(tsize):
                 tlist.append((x,y,z))
                 tlist.append((x,y,z))
 
@@ -1260,14 +1264,14 @@ def BENCH():
 
     #ll = deDupe(tlist)
     #ll = f5(tlist)
-    print('LENS - ', len(tlist), len(ll) )
+    print 'LENS - ', len(tlist), len(ll)
 
     bt2 = time.clock()
     btRUNb = bt2 - bt1
     btRUNa = bt1 - bt0
-    print('--->SETUP TIME    : ', btRUNa)
-    print('--->BENCHMARK TIME: ', btRUNb)
-    print('--->GRIDSIZE: ', tsize, ' - ', tsize*tsize*tsize)
+    print '--->SETUP TIME    : ', btRUNa
+    print '--->BENCHMARK TIME: ', btRUNb
+    print '--->GRIDSIZE: ', tsize, ' - ', tsize*tsize*tsize
     
 #BENCH()
 

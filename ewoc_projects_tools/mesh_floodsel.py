@@ -39,6 +39,7 @@ Save as Default (Optional).
 """
 
 
+from __future__ import absolute_import
 bl_info = {
 	"name": "FloodSel",
 	"author": "Gert De Roost",
@@ -80,7 +81,7 @@ class FloodSel(bpy.types.Operator):
 	bl_idname = "mesh.floodsel"
 	bl_label = "FloodSel"
 	bl_description = "Flood-(de)select areas"
-	bl_options = {'REGISTER', 'UNDO'}
+	bl_options = set(['REGISTER', 'UNDO'])
 
 
 	SelectMode = bpy.props.BoolProperty(
@@ -123,7 +124,7 @@ class FloodSel(bpy.types.Operator):
 
 		context.window_manager.modal_handler_add(self)
 
-		return {'RUNNING_MODAL'}
+		return set(['RUNNING_MODAL'])
 
 
 	def modal(self, context, event):
@@ -131,12 +132,12 @@ class FloodSel(bpy.types.Operator):
 		global started
 
 		if event.type in ['MIDDLEMOUSE']:
-			return {'PASS_THROUGH'}
+			return set(['PASS_THROUGH'])
 		elif event.type in ['WHEELDOWNMOUSE', 'WHEELUPMOUSE']:
-			return {'PASS_THROUGH'}
+			return set(['PASS_THROUGH'])
 		elif event.type in ['LEFTMOUSE']:
 			if not(self.region):
-				return {'PASS_THROUGH'}
+				return set(['PASS_THROUGH'])
 
 			if not(self.Preselection):
 				for elem in self.doneset:
@@ -146,11 +147,11 @@ class FloodSel(bpy.types.Operator):
 				self.bm.free()
 				bpy.ops.object.editmode_toggle()
 				bpy.ops.object.editmode_toggle()
-				return {'FINISHED'}
+				return set(['FINISHED'])
 			else:
 				self.doneset = set([])
-			return {'RUNNING_MODAL'}
-		elif event.type in {'RET', 'RIGHTMOUSE'}:
+			return set(['RUNNING_MODAL'])
+		elif event.type in set(['RET', 'RIGHTMOUSE']):
 			started = False
 			del bpy.types.Scene.PreSelOff
 			# Consolidate changes if ENTER pressed.
@@ -159,7 +160,7 @@ class FloodSel(bpy.types.Operator):
 			self.bm.free()
 			bpy.ops.object.editmode_toggle()
 			bpy.ops.object.editmode_toggle()
-			return {'FINISHED'}
+			return set(['FINISHED'])
 		elif event.type in ['MOUSEMOVE']:
 
 			mxa = event.mouse_x
@@ -186,7 +187,7 @@ class FloodSel(bpy.types.Operator):
 					for elem in self.doneset:
 						elem.select = self.state
 					self.doneset = set([])
-				return {'PASS_THROUGH'}
+				return set(['PASS_THROUGH'])
 
 			for elem in self.doneset:
 				elem.select = self.state
@@ -208,7 +209,7 @@ class FloodSel(bpy.types.Operator):
 			self.bm = bmesh.from_edit_mesh(self.mesh)
 			if hit[2] == -1:
 				self.doneset = set([])
-				return {'RUNNING_MODAL'}
+				return set(['RUNNING_MODAL'])
 			face = self.bm.faces[hit[2]]
 
 			self.doneset = set([])
@@ -279,9 +280,9 @@ class FloodSel(bpy.types.Operator):
 				for elem in self.doneset:
 					elem.select = not(self.state)
 
-			return {'RUNNING_MODAL'}
+			return set(['RUNNING_MODAL'])
 
-		return {'RUNNING_MODAL'}
+		return set(['RUNNING_MODAL'])
 
 
 	def initialize(self, context):
@@ -354,14 +355,14 @@ def panel_func(self, context):
 	self.layout.label(text="FloodSel:")
 	self.layout.operator("mesh.floodsel", text="Flood SelArea")
 	if started:
-		print ("op")
+		print "op"
 		self.layout.prop(mainop, "SelectMode")
 		self.layout.prop(mainop, "Multiple")
 		self.layout.prop(mainop, "Preselection")
 		self.layout.prop(mainop, "Diagonal")
 
 def register():
-	print ("registered")
+	print "registered"
 	bpy.utils.register_module(__name__)
 	bpy.types.VIEW3D_PT_tools_meshedit.append(panel_func)
 

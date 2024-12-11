@@ -27,10 +27,11 @@
 """
 
 
+from __future__ import absolute_import
 import bpy
 
 
-class CursorAccess:
+class CursorAccess(object):
 
     @classmethod
     def findSpace(cls):

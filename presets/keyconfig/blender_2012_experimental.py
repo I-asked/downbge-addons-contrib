@@ -6,6 +6,7 @@
 # - N-panel etc. appear to have hard-coded 'I' as "insert key" key.  Make that
 #   user-configurable.
 
+from __future__ import absolute_import
 import bpy
 import bmesh
 
@@ -61,7 +62,7 @@ class SetManipulator(bpy.types.Operator):
             context.space_data.use_manipulator_rotate = False
             context.space_data.use_manipulator_scale = True
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 bpy.utils.register_class(SetManipulator)
 
 
@@ -74,10 +75,10 @@ class ContextualTranslate(bpy.types.Operator):
 
     def execute(self, context):
         if context.space_data.show_manipulator:
-            context.space_data.transform_manipulators = {'TRANSLATE'}
+            context.space_data.transform_manipulators = set(['TRANSLATE'])
         else:
             bpy.ops.transform.translate('INVOKE_DEFAULT')
-        return {'FINISHED'}
+        return set(['FINISHED'])
 bpy.utils.register_class(ContextualTranslate)
 
 
@@ -90,10 +91,10 @@ class ContextualRotate(bpy.types.Operator):
 
     def execute(self, context):
         if context.space_data.show_manipulator:
-            context.space_data.transform_manipulators = {'ROTATE'}
+            context.space_data.transform_manipulators = set(['ROTATE'])
         else:
             bpy.ops.transform.rotate('INVOKE_DEFAULT')
-        return {'FINISHED'}
+        return set(['FINISHED'])
 bpy.utils.register_class(ContextualRotate)
 
 
@@ -106,10 +107,10 @@ class ContextualScale(bpy.types.Operator):
 
     def execute(self, context):
         if context.space_data.show_manipulator:
-            context.space_data.transform_manipulators = {'SCALE'}
+            context.space_data.transform_manipulators = set(['SCALE'])
         else:
             bpy.ops.transform.resize('INVOKE_DEFAULT')
-        return {'FINISHED'}
+        return set(['FINISHED'])
 bpy.utils.register_class(ContextualScale)
 
 
@@ -130,7 +131,7 @@ class TweakSelect3dview(bpy.types.Operator):
     """
     bl_idname = "view3d.tweak_select"
     bl_label = "Tweak Select 3d View"
-    bl_options = {'UNDO'}
+    bl_options = set(['UNDO'])
     
     @classmethod
     def poll(cls, context):
@@ -148,7 +149,7 @@ class ObjectDeleteNoConfirm(bpy.types.Operator):
     """Delete selected objects without the confirmation popup"""
     bl_idname = "object.delete_no_confirm"
     bl_label = "Delete Objects No Confirm"
-    bl_options = {'UNDO'}
+    bl_options = set(['UNDO'])
     
     @classmethod
     def poll(cls, context):
@@ -157,7 +158,7 @@ class ObjectDeleteNoConfirm(bpy.types.Operator):
     def execute(self, context):
         bpy.ops.object.delete()
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 bpy.utils.register_class(ObjectDeleteNoConfirm)
 
 
@@ -196,7 +197,7 @@ class ShiftSubsurfLevel(bpy.types.Operator):
                     m = obj.modifiers.new(name="Subsurf", type='SUBSURF')
                     m.levels = 0
                 else:
-                    return {'FINISHED'}
+                    return set(['FINISHED'])
 
             # Adjust it's subsurf level
             if m:
@@ -210,7 +211,7 @@ class ShiftSubsurfLevel(bpy.types.Operator):
                         m.levels += self.delta
                     elif m.levels != 0:
                         m.levels = 0
-        return {'FINISHED'}
+        return set(['FINISHED'])
 bpy.utils.register_class(ShiftSubsurfLevel)
 
 
@@ -242,11 +243,11 @@ class SetEditMeshSelectMode(bpy.types.Operator):
             select_mode[mode] = [True, False][select_mode[mode]]
         else:
             select_mode[mode] = True
-            for i in range(0,3):
+            for i in xrange(0,3):
                 if i != mode:
                     select_mode[i] = False
             
-        return {'FINISHED'}
+        return set(['FINISHED'])
 bpy.utils.register_class(SetEditMeshSelectMode)
 
 
@@ -257,7 +258,7 @@ class MeshCreateEdgeFaceContextual(bpy.types.Operator):
     """
     bl_idname = "mesh.create_edge_face_contextual"
     bl_label = "Create Edge/Face Contextual"
-    bl_options = {'UNDO'}
+    bl_options = set(['UNDO'])
     
     @classmethod
     def poll(cls, context):
@@ -293,7 +294,7 @@ class MeshCreateEdgeFaceContextual(bpy.types.Operator):
         else:
             bpy.ops.mesh.vert_connect()
         
-        return {'FINISHED'}
+        return set(['FINISHED'])
 bpy.utils.register_class(MeshCreateEdgeFaceContextual)
 
 
@@ -304,7 +305,7 @@ class MeshDeleteContextual(bpy.types.Operator):
     """
     bl_idname = "mesh.delete_contextual"
     bl_label = "Mesh Delete Contextual"
-    bl_options = {'UNDO'}
+    bl_options = set(['UNDO'])
     
     @classmethod
     def poll(cls, context):
@@ -322,7 +323,7 @@ class MeshDeleteContextual(bpy.types.Operator):
         else:
             bpy.ops.mesh.delete(type='VERT')
             
-        return {'FINISHED'}
+        return set(['FINISHED'])
 bpy.utils.register_class(MeshDeleteContextual)
 
 
@@ -333,7 +334,7 @@ class MeshDissolveContextual(bpy.types.Operator):
     """
     bl_idname = "mesh.dissolve_contextual"
     bl_label = "Mesh Dissolve Contextual"
-    bl_options = {'UNDO'}
+    bl_options = set(['UNDO'])
     
     use_verts = bpy.props.BoolProperty(name="Use Verts", default=False)
     
@@ -353,7 +354,7 @@ class MeshDissolveContextual(bpy.types.Operator):
         else:
             bpy.ops.mesh.dissolve_verts()
             
-        return {'FINISHED'}
+        return set(['FINISHED'])
 bpy.utils.register_class(MeshDissolveContextual)
 
 
@@ -363,7 +364,7 @@ class MeshMergeContextual(bpy.types.Operator):
     """
     bl_idname = "mesh.merge_contextual"
     bl_label = "Mesh Merge Contextual"
-    bl_options = {'UNDO'}
+    bl_options = set(['UNDO'])
     
     @classmethod
     def poll(cls, context):
@@ -375,7 +376,7 @@ class MeshMergeContextual(bpy.types.Operator):
             bpy.ops.mesh.merge()
         else:
             bpy.ops.mesh.edge_collapse()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 bpy.utils.register_class(MeshMergeContextual)
 
 

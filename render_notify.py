@@ -18,6 +18,7 @@
 # ***** END GPL LICENCE BLOCK *****
 
 
+from __future__ import absolute_import
 bl_info = {
     "name": "Render Notify",
     "author": "Campbell Barton",

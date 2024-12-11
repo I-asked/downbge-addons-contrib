@@ -18,6 +18,7 @@
 
 # By CoDEmanX
 
+from __future__ import absolute_import
 import bpy
 
 class DATA_PT_info_panel(bpy.types.Panel):
@@ -27,7 +28,7 @@ class DATA_PT_info_panel(bpy.types.Panel):
     bl_space_type = "PROPERTIES"
     bl_region_type = "WINDOW"
     bl_context = "data"
-    bl_options = {'DEFAULT_CLOSED'}
+    bl_options = set(['DEFAULT_CLOSED'])
 
     @classmethod
     def poll(self, context):

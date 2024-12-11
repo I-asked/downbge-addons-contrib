@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import bpy
 from mathutils import Matrix
 
@@ -16,7 +17,7 @@ def DefQuickParent(inf,out):
         a = Matrix(target.matrix_world)
         a.invert()
         i = Matrix(ob.matrix)
-        for frame in range(inf,out): 
+        for frame in xrange(inf,out): 
             bpy.context.scene.frame_set(frame=frame)
             ob.matrix = target.matrix_world * a * i     
             bpy.ops.anim.keyframe_insert(type="LocRotScale")   
@@ -29,7 +30,7 @@ def DefQuickParent(inf,out):
         a = Matrix(target.matrix_world)
         a.invert()
         i = Matrix(ob.matrix_world)
-        for frame in range(inf,out): 
+        for frame in xrange(inf,out): 
             bpy.context.scene.frame_set(frame=frame)
             ob.matrix_world = target.matrix_world * a * i     
             bpy.ops.anim.keyframe_insert(type="LocRotScale")   
@@ -37,10 +38,10 @@ def DefQuickParent(inf,out):
 class QuickParent (bpy.types.Operator):
     bl_idname = "anim.quick_parent_osc"
     bl_label = "Quick Parent"
-    bl_options = {"REGISTER", "UNDO"}      
+    bl_options = set(["REGISTER", "UNDO"])      
     
     def execute(self,context):
         DefQuickParent(bpy.context.scene.quick_animation_in,bpy.context.scene.quick_animation_out)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 

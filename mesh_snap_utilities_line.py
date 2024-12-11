@@ -19,6 +19,8 @@
 # Email:    germano.costa@ig.com.br
 # Twitter:  wii_mano @mano_wii
 
+from __future__ import division
+from __future__ import absolute_import
 bl_info = {
     "name": "Snap_Utilities_Line",
     "author": "Germano Cavalcante",
@@ -281,7 +283,7 @@ def snap_utilities(self,
                                 v_dist = dist
                                 self.location = v_co
                     except:
-                        print('Fail')
+                        print 'Fail'
             if constrain:
                 is_increment = False
                 self.preloc = self.location
@@ -422,16 +424,13 @@ def draw_line(self, obj, Bmesh, bm_geom, location):
 
     return [obj.matrix_world*a.co for a in self.list_verts]
     
-class CharMap:
-    ascii = {
+class CharMap(object):
+    ascii = set([
         ".", ",", "-", "+", "1", "2", "3",
         "4", "5", "6", "7", "8", "9", "0",
-        " ", "/", "*", "'", "\""
-        #"="
-        }
-    type = {
-        'BACK_SPACE', 'DEL'
-        }
+        " ", "/", "*", "'", "\""])
+    type = set([
+        'BACK_SPACE', 'DEL'])
 
     def __init__(self, length_entered = ""):
         self.length_entered = length_entered
@@ -450,7 +449,7 @@ class SnapUtilitiesLine(bpy.types.Operator):
     """ Draw edges. Connect them to split faces."""
     bl_idname = "mesh.snap_utilities_line"
     bl_label = "Line Tool"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     constrain_keys = {
         'X': Vector((1,0,0)),
@@ -487,7 +486,7 @@ class SnapUtilitiesLine(bpy.types.Operator):
         if evkey in self.keys_rotate:
             bpy.ops.view3d.rotate('INVOKE_DEFAULT')
         elif evkey in self.keys_move:
-            if event.shift and self.vector_constrain and self.vector_constrain[2] in {'RIGHT_SHIFT', 'LEFT_SHIFT', 'shift'}:
+            if event.shift and self.vector_constrain and self.vector_constrain[2] in set(['RIGHT_SHIFT', 'LEFT_SHIFT', 'shift']):
                 self.vector_constrain = None
             bpy.ops.view3d.move('INVOKE_DEFAULT')
         else:
@@ -507,7 +506,7 @@ class SnapUtilitiesLine(bpy.types.Operator):
 
         if self.vector_constrain:
             vc = self.vector_constrain
-            if hasattr(self, 'preloc') and self.type in {'VERT', 'FACE'}:
+            if hasattr(self, 'preloc') and self.type in set(['VERT', 'FACE']):
                 bgl.glColor4f(1.0,1.0,1.0,0.5)
                 bgl.glDepthRange(0,0)
                 bgl.glPointSize(5)
@@ -578,7 +577,7 @@ class SnapUtilitiesLine(bpy.types.Operator):
             self.obj = bpy.context.active_object
             self.obj_matrix = self.obj.matrix_world.copy()
             self.bm = bmesh.from_edit_mesh(self.obj.data)
-            return {'RUNNING_MODAL'}
+            return set(['RUNNING_MODAL'])
 
         if event.type == 'MOUSEMOVE' or self.bool_update:
             if self.rv3d.view_matrix != self.rotMat:
@@ -717,7 +716,7 @@ class SnapUtilitiesLine(bpy.types.Operator):
                 self.keyf8 = self.keyf8 == False
 
         elif event.value == 'RELEASE':
-            if event.type in {'RET', 'NUMPAD_ENTER'}:
+            if event.type in set(['RET', 'NUMPAD_ENTER']):
                 if self.length_entered != "" and self.list_verts_co != []:
                     try:
                         text_value = bpy.utils.units.to_value(self.unit_system, 'LENGTH', self.length_entered)
@@ -729,9 +728,9 @@ class SnapUtilitiesLine(bpy.types.Operator):
                         self.vector_constrain = None
 
                     except:# ValueError:
-                        self.report({'INFO'}, "Operation not supported yet")
+                        self.report(set(['INFO']), "Operation not supported yet")
 
-            elif event.type in {'RIGHTMOUSE', 'ESC'}:
+            elif event.type in set(['RIGHTMOUSE', 'ESC']):
                 if self.list_verts_co == [] or event.type == 'ESC':                
                     bpy.types.SpaceView3D.draw_handler_remove(self._handle, 'WINDOW')
                     context.tool_settings.mesh_select_mode = self.select_mode
@@ -739,7 +738,7 @@ class SnapUtilitiesLine(bpy.types.Operator):
                     context.user_preferences.view.use_rotate_around_active = self.use_rotate_around_active
                     if not self.is_editmode:
                         bpy.ops.object.editmode_toggle()
-                    return {'FINISHED'}
+                    return set(['FINISHED'])
                 else:
                     self.vector_constrain = None
                     self.list_verts = []
@@ -757,7 +756,7 @@ class SnapUtilitiesLine(bpy.types.Operator):
         context.area.header_text_set("hit: %.3f %.3f %.3f %s" % (self.location[0], self.location[1], self.location[2], a))
 
         self.modal_navigation(context, event)
-        return {'RUNNING_MODAL'}
+        return set(['RUNNING_MODAL'])
 
     def invoke(self, context, event):        
         if context.space_data.type == 'VIEW_3D':
@@ -832,10 +831,10 @@ class SnapUtilitiesLine(bpy.types.Operator):
 
             self._handle = bpy.types.SpaceView3D.draw_handler_add(self.draw_callback_px, (context,), 'WINDOW', 'POST_VIEW')
             context.window_manager.modal_handler_add(self)
-            return {'RUNNING_MODAL'}
+            return set(['RUNNING_MODAL'])
         else:
-            self.report({'WARNING'}, "Active space must be a View3d")
-            return {'CANCELLED'}
+            self.report(set(['WARNING']), "Active space must be a View3d")
+            return set(['CANCELLED'])
 
 class PanelSnapUtilities(bpy.types.Panel) :
     bl_space_type = "VIEW_3D"
@@ -987,7 +986,7 @@ class SnapAddonPreferences(bpy.types.AddonPreferences):
         col.prop(self, "create_new_obj")
 
 def register():
-    print('Addon', __name__, 'registered')
+    print 'Addon', __name__, 'registered'
     bpy.utils.register_class(SnapAddonPreferences)
     bpy.utils.register_class(SnapUtilitiesLine)
     update_panel(None, bpy.context)

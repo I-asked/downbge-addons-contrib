@@ -1,9 +1,11 @@
+from __future__ import division
+from __future__ import absolute_import
 from . import Math
 
 import bpy
 
 
-class BezierPoint:
+class BezierPoint(object):
     @staticmethod
     def FromBlenderBezierPoint(blenderBezierPoint):
         return BezierPoint(blenderBezierPoint.handle_left, blenderBezierPoint.co, blenderBezierPoint.handle_right)
@@ -27,7 +29,7 @@ class BezierPoint:
         self.handle_right = tmp
 
 
-class BezierSegment:
+class BezierSegment(object):
     @staticmethod
     def FromBlenderBezierPoints(blenderBezierPoint1, blenderBezierPoint2):
         bp1 = BezierPoint.FromBlenderBezierPoint(blenderBezierPoint1)
@@ -88,7 +90,7 @@ class BezierSegment:
     def CalcLength(self, nrSamples = 2):
         nrSamplesFloat = float(nrSamples)
         rvLength = 0.0
-        for iSample in range(nrSamples):
+        for iSample in xrange(nrSamples):
             par1 = float(iSample) / nrSamplesFloat
             par2 = float(iSample + 1) / nrSamplesFloat
             
@@ -126,7 +128,7 @@ class BezierSegment:
         return [bezPoint1, bezPointNew, bezPoint2]
             
 
-class BezierSpline:
+class BezierSpline(object):
     @staticmethod
     def FromSegments(listSegments):
         rvSpline = BezierSpline(None)
@@ -139,11 +141,11 @@ class BezierSpline:
     def __init__(self, blenderBezierSpline):
         if not blenderBezierSpline is None:
             if blenderBezierSpline.type != 'BEZIER': 
-                print("## ERROR:", "blenderBezierSpline.type != 'BEZIER'")
+                print "## ERROR:", "blenderBezierSpline.type != 'BEZIER'"
                 raise Exception("blenderBezierSpline.type != 'BEZIER'")
             if len(blenderBezierSpline.bezier_points) < 1:
                 if not blenderBezierSpline.use_cyclic_u:
-                    print("## ERROR:", "len(blenderBezierSpline.bezier_points) < 1")
+                    print "## ERROR:", "len(blenderBezierSpline.bezier_points) < 1"
                     raise Exception("len(blenderBezierSpline.bezier_points) < 1")
         
         self.bezierSpline = blenderBezierSpline
@@ -187,7 +189,7 @@ class BezierSpline:
         if self.bezierSpline is None: return rvSegments
         
         nrBezierPoints = len(self.bezierSpline.bezier_points)
-        for iBezierPoint in range(nrBezierPoints - 1):
+        for iBezierPoint in xrange(nrBezierPoints - 1):
             bezierPoint1 = self.bezierSpline.bezier_points[iBezierPoint]
             bezierPoint2 = self.bezierSpline.bezier_points[iBezierPoint + 1]
             rvSegments.append(BezierSegment.FromBlenderBezierPoints(bezierPoint1, bezierPoint2))
@@ -223,13 +225,13 @@ class BezierSpline:
 
             self.segments = newSegments
         else:
-            print("### WARNING: UpdateSegments(): not diffNrSegments > 0")
+            print "### WARNING: UpdateSegments(): not diffNrSegments > 0"
             
     
     def Reversed(self):
         revSegments = []
         
-        for iSeg in reversed(range(self.nrSegments)): revSegments.append(self.segments[iSeg].Reversed())
+        for iSeg in reversed(xrange(self.nrSegments)): revSegments.append(self.segments[iSeg].Reversed())
         
         rvSpline = BezierSpline.FromSegments(revSegments)
         rvSpline.resolution = self.resolution
@@ -241,7 +243,7 @@ class BezierSpline:
     def Reverse(self):
         revSegments = []
         
-        for iSeg in reversed(range(self.nrSegments)): 
+        for iSeg in reversed(xrange(self.nrSegments)): 
             self.segments[iSeg].Reverse()
             revSegments.append(self.segments[iSeg])
         
@@ -250,7 +252,7 @@ class BezierSpline:
         
     def CalcDivideResolution(self, segment, parameter):
         if not segment in self.segments:
-            print("### WARNING: InsertPoint(): not segment in self.segments")
+            print "### WARNING: InsertPoint(): not segment in self.segments"
             return None
             
         iSeg = self.segments.index(segment)
@@ -259,12 +261,12 @@ class BezierSpline:
         
         res1 = int(splinePar * self.resolution)
         if res1 < 2:
-            print("### WARNING: CalcDivideResolution(): res1 < 2 -- res1: %d" % res1, "-- setting it to 2")
+            print "### WARNING: CalcDivideResolution(): res1 < 2 -- res1: %d" % res1, "-- setting it to 2"
             res1 = 2
             
         res2 = int((1.0 - splinePar) * self.resolution)
         if res2 < 2:
-            print("### WARNING: CalcDivideResolution(): res2 < 2 -- res2: %d" % res2, "-- setting it to 2")
+            print "### WARNING: CalcDivideResolution(): res2 < 2 -- res2: %d" % res2, "-- setting it to 2"
             res2 = 2
         
         return [res1, res2]
@@ -301,7 +303,7 @@ class BezierSpline:
         
     def InsertPoint(self, segment, parameter):
         if not segment in self.segments:
-            print("### WARNING: InsertPoint(): not segment in self.segments")
+            print "### WARNING: InsertPoint(): not segment in self.segments"
             return
         iSeg = self.segments.index(segment)
         nrSegments = len(self.segments)
@@ -329,7 +331,7 @@ class BezierSpline:
         
     def Split(self, segment, parameter):
         if not segment in self.segments:
-            print("### WARNING: InsertPoint(): not segment in self.segments")
+            print "### WARNING: InsertPoint(): not segment in self.segments"
             return None
         iSeg = self.segments.index(segment)
         nrSegments = len(self.segments)
@@ -341,13 +343,13 @@ class BezierSpline:
         
                 
         newSpline1Segments = []
-        for iSeg1 in range(iSeg): newSpline1Segments.append(self.segments[iSeg1])
+        for iSeg1 in xrange(iSeg): newSpline1Segments.append(self.segments[iSeg1])
         if len(newSpline1Segments) > 0: newSpline1Segments[-1].bezierPoint2.handle_right = bezPoint1.handle_right
         newSpline1Segments.append(BezierSegment(bezPoint1, bezPointNew))
         
         newSpline2Segments = []
         newSpline2Segments.append(BezierSegment(bezPointNew, bezPoint2))
-        for iSeg2 in range(iSeg + 1, nrSegments): newSpline2Segments.append(self.segments[iSeg2])
+        for iSeg2 in xrange(iSeg + 1, nrSegments): newSpline2Segments.append(self.segments[iSeg2])
         if len(newSpline2Segments) > 1: newSpline2Segments[1].bezierPoint1.handle_left = newSpline2Segments[0].bezierPoint2.handle_left
         
         
@@ -366,7 +368,7 @@ class BezierSpline:
             self.JoinInsertSegment(spline2)
             return
             
-        print("### ERROR: Join(): unknown mode:", mode)        
+        print "### ERROR: Join(): unknown mode:", mode        
 
 
     def JoinAtMidpoint(self, spline2):
@@ -443,7 +445,7 @@ class BezierSpline:
         return True
         
         
-class Curve:
+class Curve(object):
     def __init__(self, blenderCurve):
         self.curve = blenderCurve
         self.curveData = blenderCurve.data
@@ -471,12 +473,12 @@ class Curve:
         rvSplines = []
         for spline in self.curveData.splines:
             if spline.type != 'BEZIER':
-                print("## WARNING: only bezier splines are supported, atm; other types are ignored")
+                print "## WARNING: only bezier splines are supported, atm; other types are ignored"
                 continue
             
             try: newSpline = BezierSpline(spline)
             except: 
-                print("## EXCEPTION: newSpline = BezierSpline(spline)")
+                print "## EXCEPTION: newSpline = BezierSpline(spline)"
                 continue
             
             rvSplines.append(newSpline)
@@ -551,10 +553,10 @@ class Curve:
         nrSplines = len(self.splines)
         
         if startEnd:
-            for iCurrentSpline in range(nrSplines):
+            for iCurrentSpline in xrange(nrSplines):
                 currentSpline = self.splines[iCurrentSpline]
                 
-                for iNextSpline in range(iCurrentSpline + 1, nrSplines):
+                for iNextSpline in xrange(iCurrentSpline + 1, nrSplines):
                     nextSpline = self.splines[iNextSpline]
                     
                     currEndPoint = currentSpline.segments[-1].bezierPoint2.co
@@ -567,10 +569,10 @@ class Curve:
                     
             return None
         else:
-            for iCurrentSpline in range(nrSplines):
+            for iCurrentSpline in xrange(nrSplines):
                 currentSpline = self.splines[iCurrentSpline]
                 
-                for iNextSpline in range(iCurrentSpline + 1, nrSplines):
+                for iNextSpline in xrange(iCurrentSpline + 1, nrSplines):
                     nextSpline = self.splines[iNextSpline]
                     
                     currEndPoint = currentSpline.segments[-1].bezierPoint2.co

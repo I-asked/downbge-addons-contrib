@@ -16,6 +16,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import absolute_import
 bl_info = {
     "name": "Class Viewer",
     "author": "Mackraken", "batFinger"
@@ -80,7 +81,7 @@ class TEXT_OT_Jumptoline(bpy.types.Operator):
         if self.line!=-1:
             bpy.ops.text.jump(line=self.line)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 

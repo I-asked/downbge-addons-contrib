@@ -19,6 +19,7 @@ Shift+Z Rendered Preview (now in Blender 2.70)
 Alt+Shift+Z Only Render
 """
 
+from __future__ import absolute_import
 import bpy
 
 
@@ -36,7 +37,7 @@ class AMTH_VIEW3D_OT_show_only_render(bpy.types.Operator):
             space.show_only_render = False
         else:
             space.show_only_render = True
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 
 def register():

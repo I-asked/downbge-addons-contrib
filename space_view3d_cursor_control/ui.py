@@ -37,6 +37,7 @@
 
 
 
+from __future__ import absolute_import
 import bpy
 import bgl
 import math
@@ -53,7 +54,7 @@ class VIEW3D_PT_cursor(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_label = "Cursor Target"
-    bl_options = {'DEFAULT_CLOSED'}
+    bl_options = set(['DEFAULT_CLOSED'])
 
     @classmethod
     def poll(self, context):
@@ -133,7 +134,7 @@ class VIEW3D_PT_ccDelta(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_label = "Cursor Delta"
-    bl_options = {'DEFAULT_CLOSED'}
+    bl_options = set(['DEFAULT_CLOSED'])
 
     @classmethod
     def poll(self, context):

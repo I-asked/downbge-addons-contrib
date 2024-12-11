@@ -16,6 +16,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import absolute_import
 bl_info = {
     "name": "Face info / select by type",
     "author": "CoDEmanX",
@@ -41,7 +42,7 @@ class DATA_OT_facetype_select(bpy.types.Operator):
     """Select all faces of a certain type"""
     bl_idname = "data.facetype_select"
     bl_label = "Select by face type"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     face_type = EnumProperty(name="Select faces:",
                              items = (("3","Triangles","Faces made up of 3 vertices"),
@@ -65,7 +66,7 @@ class DATA_OT_facetype_select(bpy.types.Operator):
         else:
             bpy.ops.mesh.select_face_by_sides(number=4, type='GREATER')
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class DATA_PT_info_panel(bpy.types.Panel):
@@ -74,7 +75,7 @@ class DATA_PT_info_panel(bpy.types.Panel):
     bl_space_type = "PROPERTIES"
     bl_region_type = "WINDOW"
     bl_context = "data"
-    bl_options = {'DEFAULT_CLOSED'}
+    bl_options = set(['DEFAULT_CLOSED'])
 
     @classmethod
     def poll(self, context):

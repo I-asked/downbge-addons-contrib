@@ -20,6 +20,8 @@
 
 """Creating offset polygons inside faces."""
 
+from __future__ import division
+from __future__ import absolute_import
 __author__ = "howard.trickey@gmail.com"
 
 import math
@@ -343,9 +345,9 @@ class Offset(object):
 
     def PrintNest(self, indent_level=0):
         indent = " " * indent_level * 4
-        print(indent + "Offset  timesofar=", self.timesofar, "endtime=",
-            self.endtime)
-        print(indent + " polyarea=", self.polyarea.poly, self.polyarea.holes)
+        print indent + "Offset  timesofar=", self.timesofar, "endtime=",
+            self.endtime
+        print indent + " polyarea=", self.polyarea.poly, self.polyarea.holes
         for o in self.inneroffsets:
             o.PrintNest(indent_level + 1)
 
@@ -495,7 +497,7 @@ class Offset(object):
                                 # print("add", hf, "to", pa2.poly)
                                 pa2.holes.append(hf)
                             else:
-                                print("whoops, hole in neither poly!")
+                                print "whoops, hole in neither poly!"
                     self.inneroffsets = [Offset(pa, newt, self.vspeed), \
                         Offset(pa2, newt, self.vspeed)]
                 else:
@@ -540,7 +542,7 @@ class Offset(object):
 
         newface = []
         points = self.polyarea.points
-        for i in range(0, len(f)):
+        for i in xrange(0, len(f)):
             s = f[i]
             vcoords = s.EndPoint(t, points, self.vspeed)
             v = points.AddPoint(vcoords)
@@ -669,7 +671,7 @@ class Offset(object):
             # Case where joining two faces into one.
             # The new face is splicing d's face between
             # f and g in other face (or the reverse of all of that).
-            newface0 = [othface[i] for i in range(0, f + 1)]
+            newface0 = [othface[i] for i in xrange(0, f + 1)]
             newface0.append(newface[d])
             i = b
             while i != d:
@@ -677,7 +679,7 @@ class Offset(object):
                 i = (i + 1) % nnf
             newface0.append(newface[d])
             if g != 0:
-                newface0.extend([othface[i] for i in range(g, nonf)])
+                newface0.extend([othface[i] for i in xrange(g, nonf)])
             # print("newface0=", newface0)
             newfaces[findex] = None
             newfaces[othfindex] = None

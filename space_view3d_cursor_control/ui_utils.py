@@ -28,7 +28,7 @@
 
 
 
-class GUI:
+class GUI(object):
 
     @classmethod
     def drawIconButton(cls, enabled, layout, iconName, operator, frame=True):

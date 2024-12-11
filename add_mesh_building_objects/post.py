@@ -36,9 +36,11 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import division
+from __future__ import absolute_import
 from mathutils import Vector
 
-class Posts:
+class Posts(object):
     def __init__(self,G,rise,run,d,w,wT,nP,hR,tR, rEnable, lEnable):
         self.G = G #General
         self.rise = rise #Stair rise
@@ -66,7 +68,7 @@ class Posts:
         return self.x1+a*((c.cross(b).dot(cr_ab))/mag_cr_ab)
 
     def Create(self):
-        for i in range(0,self.nP+2,1):
+        for i in xrange(0,self.nP+2,1):
             coords = []
             #intersections with rail
             coords.append(self.Intersect(i,0.0))
@@ -76,7 +78,7 @@ class Posts:
                                   int(coords[0][0]/self.run)*self.rise]))
             coords.append(coords[2]+Vector([self.d,0,0]))
             #inner face
-            for j in range(4):
+            for j in xrange(4):
                 coords.append(coords[j]+Vector([0,self.w,0]))
             if self.rEnable:
                 self.G.Make_mesh(coords, self.G.faces, 'posts')

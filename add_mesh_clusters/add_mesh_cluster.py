@@ -16,6 +16,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import division
+from __future__ import absolute_import
 import bpy
 import io
 import math
@@ -903,9 +905,9 @@ def create_hexagonal_abcabc_lattice(ctype, size, skin, lattice):
         number_z = int(size/(2*g))+1+4
 
 
-    for k in range(-number_z,number_z+1):
-        for j in range(-number_y,number_y+1):
-            for i in range(-number_x,number_x+1):
+    for k in xrange(-number_z,number_z+1):
+        for j in xrange(-number_y,number_y+1):
+            for i in xrange(-number_x,number_x+1):
                 atom = Vector((float(i)*e,float(j)*f,float(k)*g)) 
 
                 if y_displ == 1:
@@ -949,7 +951,7 @@ def create_hexagonal_abcabc_lattice(ctype, size, skin, lattice):
         else:
            z_displ = 0
 
-    print("Atom positions calculated")
+    print "Atom positions calculated"
 
     return (atom_number_total, atom_number_drawn)
 
@@ -985,9 +987,9 @@ def create_hexagonal_abab_lattice(ctype, size, skin, lattice):
         number_z = int(size/(2*g))+1+4
 
 
-    for k in range(-number_z,number_z+1):
-        for j in range(-number_y,number_y+1):
-            for i in range(-number_x,number_x+1):
+    for k in xrange(-number_z,number_z+1):
+        for j in xrange(-number_y,number_y+1):
+            for i in xrange(-number_x,number_x+1):
 
                 atom = Vector((float(i)*e,float(j)*f,float(k)*g))
           
@@ -1025,7 +1027,7 @@ def create_hexagonal_abab_lattice(ctype, size, skin, lattice):
         else:
             z_displ = "even"
 
-    print("Atom positions calculated")
+    print "Atom positions calculated"
 
     return (atom_number_total, atom_number_drawn)
 
@@ -1046,9 +1048,9 @@ def create_square_lattice(ctype, size, skin, lattice):
         number_i = int(size/(2.0*lattice))       
 
 
-    for k in range(-number_k,number_k+1):
-        for j in range(-number_j,number_j+1):
-            for i in range(-number_i,number_i+1):
+    for k in xrange(-number_k,number_k+1):
+        for j in xrange(-number_j,number_j+1):
+            for i in xrange(-number_i,number_i+1):
 
                 atom = Vector((float(i),float(j),float(k))) * lattice 
 
@@ -1072,7 +1074,7 @@ def create_square_lattice(ctype, size, skin, lattice):
                 if message[0] == True and message[1] == False:
                     atom_number_total += 1 
 
-    print("Atom positions calculated")
+    print "Atom positions calculated"
 
     return (atom_number_total, atom_number_drawn)
 
@@ -1106,20 +1108,20 @@ def create_icosahedron(size, lattice):
 
     natot = int(1 + (10*size*size+15*size+11)*size/3)
 
-    x = list(range(natot+1))
-    y = list(range(natot+1))
-    z = list(range(natot+1))
+    x = range(natot+1)
+    y = range(natot+1)
+    z = range(natot+1)
 
-    xs = list(range(12+1))
-    ys = list(range(12+1))
-    zs = list(range(12+1))
+    xs = range(12+1)
+    ys = range(12+1)
+    zs = range(12+1)
 
-    xa = [[[ [] for i in range(12+1)] for j in range(12+1)] for k in range(20+1)]
-    ya = [[[ [] for i in range(12+1)] for j in range(12+1)] for k in range(20+1)]
-    za = [[[ [] for i in range(12+1)] for j in range(12+1)] for k in range(20+1)]
+    xa = [[[ [] for i in xrange(12+1)] for j in xrange(12+1)] for k in xrange(20+1)]
+    ya = [[[ [] for i in xrange(12+1)] for j in xrange(12+1)] for k in xrange(20+1)]
+    za = [[[ [] for i in xrange(12+1)] for j in xrange(12+1)] for k in xrange(20+1)]
 
-    naret  = [[ [] for i in range(12+1)] for j in range(12+1)]
-    nfacet = [[[ [] for i in range(12+1)] for j in range(12+1)] for k in range(12+1)]
+    naret  = [[ [] for i in xrange(12+1)] for j in xrange(12+1)]
+    nfacet = [[[ [] for i in xrange(12+1)] for j in xrange(12+1)] for k in xrange(12+1)]
 
     rac2 = sqrt(2.0)
     rac5 = sqrt(5.0)
@@ -1134,12 +1136,12 @@ def create_icosahedron(size, lattice):
     y[1] = 0.0
     z[1] = 0.0
 
-    for i in range(2, 5+1):
+    for i in xrange(2, 5+1):
         z[i]   = 0.0
         y[i+4] = 0.0
         x[i+8] = 0.0
     
-    for i in range(2, 3+1):
+    for i in xrange(2, 3+1):
         x[i]    =  tdef
         x[i+2]  = -tdef
         x[i+4]  =  1.0
@@ -1147,7 +1149,7 @@ def create_icosahedron(size, lattice):
         y[i+8]  =  tdef
         y[i+10] = -tdef
 
-    for i in range(2, 4+1, 2):
+    for i in xrange(2, 4+1, 2):
         y[i]   =  1.0
         y[i+1] = -1.0
         z[i+4] =  tdef
@@ -1157,21 +1159,21 @@ def create_icosahedron(size, lattice):
 
     xdef = rac2 / sqrt(tdef * tdef + 1)
 
-    for i in range(2, 13+1):
+    for i in xrange(2, 13+1):
         x[i] = x[i] * xdef / 2.0
         y[i] = y[i] * xdef / 2.0
         z[i] = z[i] * xdef / 2.0
 
     if size > 1:
 
-        for n in range (2, size+1):
+        for n in xrange (2, size+1):
             ifacet = 0
             iaret  = 0
             inatf  = 0
-            for i in range(1, 12+1):
-                for j in range(1, 12+1):
+            for i in xrange(1, 12+1):
+                for j in xrange(1, 12+1):
                     naret[i][j] = 0
-                    for k in range (1, 12+1): 
+                    for k in xrange (1, 12+1): 
                         nfacet[i][j][k] = 0
 
             nl1 = 6
@@ -1181,7 +1183,7 @@ def create_icosahedron(size, lattice):
             k2  = 0
             k3  = 0
             k12 = 0
-            for i in range(1, 12+1):
+            for i in xrange(1, 12+1):
                 nat += 1
                 xs[i] = n * x[i+1]
                 ys[i] = n * y[i+1]
@@ -1191,8 +1193,8 @@ def create_icosahedron(size, lattice):
                 z[nat] = zs[i]
                 k1 += 1
 
-            for i in range(1, 12+1):
-                for j in range(2, 12+1):
+            for i in xrange(1, 12+1):
+                for j in xrange(2, 12+1):
                     if j <= i:
                         continue
                     
@@ -1209,7 +1211,7 @@ def create_icosahedron(size, lattice):
                     if diffij >= epsi:
                         continue
                     
-                    for k in range(3, 12+1):
+                    for k in xrange(3, 12+1):
                         if k <= j:
                             continue
                         
@@ -1244,7 +1246,7 @@ def create_icosahedron(size, lattice):
                         if naret[i][j] == 0:
                             iaret += 1
                             naret[i][j] = iaret
-                            for l in range(1,n-1+1):
+                            for l in xrange(1,n-1+1):
                                 nat += 1
                                 xa[i][j][l] = xs[i]+l*(xs[j]-xs[i]) / n
                                 ya[i][j][l] = ys[i]+l*(ys[j]-ys[i]) / n
@@ -1256,7 +1258,7 @@ def create_icosahedron(size, lattice):
                         if naret[i][k] == 0:
                             iaret += 1
                             naret[i][k] = iaret
-                            for l in range(1, n-1+1):
+                            for l in xrange(1, n-1+1):
                                 nat += 1
                                 xa[i][k][l] = xs[i]+l*(xs[k]-xs[i]) / n
                                 ya[i][k][l] = ys[i]+l*(ys[k]-ys[i]) / n
@@ -1268,7 +1270,7 @@ def create_icosahedron(size, lattice):
                         if naret[j][k] == 0:
                             iaret += 1
                             naret[j][k] = iaret
-                            for l in range(1, n-1+1):
+                            for l in xrange(1, n-1+1):
                                 nat += 1
                                 xa[j][k][l] = xs[j]+l*(xs[k]-xs[j]) / n
                                 ya[j][k][l] = ys[j]+l*(ys[k]-ys[j]) / n
@@ -1277,8 +1279,8 @@ def create_icosahedron(size, lattice):
                                 y[nat] = ya[j][k][l]
                                 z[nat] = za[j][k][l]
 
-                        for l in range(2, n-1+1):
-                            for ll in range(1, l-1+1):
+                        for l in xrange(2, n-1+1):
+                            for ll in xrange(1, l-1+1):
                                 xf = xa[i][j][l]+ll*(xa[i][k][l]-xa[i][j][l]) / l
                                 yf = ya[i][j][l]+ll*(ya[i][k][l]-ya[i][j][l]) / l
                                 zf = za[i][j][l]+ll*(za[i][k][l]-za[i][j][l]) / l
@@ -1292,7 +1294,7 @@ def create_icosahedron(size, lattice):
     atom_number_total = 0
     atom_number_drawn = 0
 
-    for i in range (1,natot+1):
+    for i in xrange (1,natot+1):
 
         atom = Vector((x[i],y[i],z[i])) * lattice 
 

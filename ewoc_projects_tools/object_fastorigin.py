@@ -44,6 +44,8 @@ Save as Default (Optional).
 """
 
 
+from __future__ import division
+from __future__ import absolute_import
 bl_info = {
 	"name": "FastOrigin",
 	"author": "Gert De Roost",
@@ -71,7 +73,7 @@ class FastOrigin(bpy.types.Operator):
 	bl_idname = "object.fastorigin"
 	bl_label = "Fast Origin"
 	bl_description = "Set object origin with snapping"
-	bl_options = {'REGISTER', 'UNDO'}
+	bl_options = set(['REGISTER', 'UNDO'])
 
 	@classmethod
 	def poll(cls, context):
@@ -91,15 +93,15 @@ class FastOrigin(bpy.types.Operator):
 
 		self._handle = bpy.types.SpaceView3D.draw_handler_add(self.redraw, (), 'WINDOW', 'POST_PIXEL')
 
-		return {'RUNNING_MODAL'}
+		return set(['RUNNING_MODAL'])
 
 
 	def modal(self, context, event):
 
-		if event.type in {'LEFTMOUSE', 'MIDDLEMOUSE', 'RIGHTMOUSE', 'WHEELDOWNMOUSE', 'WHEELUPMOUSE', 'G', 'X', 'Y', 'Z', 'MOUSEMOVE'}:
-			return {'PASS_THROUGH'}
+		if event.type in set(['LEFTMOUSE', 'MIDDLEMOUSE', 'RIGHTMOUSE', 'WHEELDOWNMOUSE', 'WHEELUPMOUSE', 'G', 'X', 'Y', 'Z', 'MOUSEMOVE']):
+			return set(['PASS_THROUGH'])
 
-		elif event.type in {'RET', 'NUMPAD_ENTER'}:
+		elif event.type in set(['RET', 'NUMPAD_ENTER']):
 			del bpy.types.Scene.PreSelOff
 			# Consolidate changes.
 			for v in self.vsellist:
@@ -120,7 +122,7 @@ class FastOrigin(bpy.types.Operator):
 			if self.mode == 'EDIT':
 				bpy.ops.object.editmode_toggle()
 			bpy.types.SpaceView3D.draw_handler_remove(self._handle, 'WINDOW')
-			return {'FINISHED'}
+			return set(['FINISHED'])
 
 		elif event.type == 'ESC':
 			del bpy.types.Scene.PreSelOff
@@ -141,9 +143,9 @@ class FastOrigin(bpy.types.Operator):
 			if self.mode == 'EDIT':
 				bpy.ops.object.editmode_toggle()
 			bpy.types.SpaceView3D.draw_handler_remove(self._handle, 'WINDOW')
-			return {'CANCELLED'}
+			return set(['CANCELLED'])
 
-		return {'RUNNING_MODAL'}
+		return set(['RUNNING_MODAL'])
 
 
 	def init_fastorigin(self, context):

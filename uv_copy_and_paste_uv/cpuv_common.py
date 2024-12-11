@@ -18,10 +18,12 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import absolute_import
 import bpy
 import bmesh
 from collections import namedtuple
 from . import cpuv_properties
+from itertools import izip
 
 __author__ = "Nutti <nutti.metro@gmail.com>"
 __status__ = "production"
@@ -33,10 +35,10 @@ SelectedFaceInfo = namedtuple('SelectedFaceInfo', 'normal indices center')
 
 def debug_print(*s):
     if cpuv_properties.DEBUG:
-        print(s)
+        print s
 
 
-class View3DModeMemory():
+class View3DModeMemory(object):
     __mode_orig = None
 
     def __init__(self, context):
@@ -93,7 +95,7 @@ def prep_copy(context, self):
     obj = context.active_object
     # check if active object has more than one UV map
     if len(obj.data.uv_textures.keys()) == 0:
-        self.report({'WARNING'}, "Object must have more than one UV map.")
+        self.report(set(['WARNING']), "Object must have more than one UV map.")
         return (1, None)
 
     return (0, obj)
@@ -117,13 +119,13 @@ def prep_paste(context, self, src_obj, src_sel_face_info):
     """
     # check if copy operation was executed
     if src_sel_face_info is None or src_obj is None:
-        self.report({'WARNING'}, "Do copy operation at first.")
+        self.report(set(['WARNING']), "Do copy operation at first.")
         return (1, None)
     # get active (source) object to be pasted to
     obj = context.active_object
     # check if active object has more than one UV map
     if len(obj.data.uv_textures.keys()) == 0:
-        self.report({'WARNING'}, "Object must have more than one UV map.")
+        self.report(set(['WARNING']), "Object must have more than one UV map.")
         return (2, None)
 
     return (0, obj)
@@ -205,11 +207,11 @@ def copy_opt(self, uv_map, src_obj, src_sel_face_info):
 
     # confirm that there was no problem in copy operation
     if len(src_sel_face_info) == 0:
-        self.report({'WARNING'}, "No faces are selected.")
+        self.report(set(['WARNING']), "No faces are selected.")
         return (1, None)
     else:
         self.report(
-            {'INFO'}, "%d face(s) are selected." % len(src_sel_face_info))
+            set(['INFO']), "%d face(s) are selected." % len(src_sel_face_info))
 
     # get UV map name
     if uv_map == "":
@@ -237,18 +239,18 @@ def paste_opt(context, self, uv_map, src_obj, src_sel_face_info,
 
     # confirm that there was no problem between copy and paste operation
     if len(dest_sel_face_info) == 0:
-        self.report({'WARNING'}, "No faces are selected.")
+        self.report(set(['WARNING']), "No faces are selected.")
         return 1
     if len(dest_sel_face_info) != len(src_sel_face_info):
         self.report(
-            {'WARNING'},
+            set(['WARNING']),
             "Number of selected faces is different from copied faces." +
             "(src:%d, dest:%d)" %
             (len(src_sel_face_info), len(dest_sel_face_info)))
         return 2
-    for sinfo, dinfo in zip(src_sel_face_info, dest_sel_face_info):
+    for sinfo, dinfo in izip(src_sel_face_info, dest_sel_face_info):
         if len(sinfo.indices) != len(dinfo.indices):
-            self.report({'WARNING'}, "Some faces are different size.")
+            self.report(set(['WARNING']), "Some faces are different size.")
             return 3
 
     # get UV map name
@@ -260,19 +262,19 @@ def paste_opt(context, self, uv_map, src_obj, src_sel_face_info,
     # update UV data
     src_uv = src_obj.data.uv_layers[src_uv_map]
     dest_uv = dest_obj.data.uv_layers[dest_uv_map]
-    for sinfo, dinfo in zip(src_sel_face_info, dest_sel_face_info):
+    for sinfo, dinfo in izip(src_sel_face_info, dest_sel_face_info):
         dest_indices = dinfo.indices
         src_indices = sinfo.indices
         # flip/rotate UVs
         dest_indices = flip_rotate_uvs(
             list(dest_indices), self.flip_copied_uv, self.rotate_copied_uv)
         # update
-        for si, di in zip(src_indices, dest_indices):
+        for si, di in izip(src_indices, dest_indices):
             dest_data = dest_uv.data[di]
             src_data = src_uv.data[si]
             dest_data.uv = src_data.uv
 
-    self.report({'INFO'}, "%d faces are copied." % len(dest_sel_face_info))
+    self.report(set(['INFO']), "%d faces are copied." % len(dest_sel_face_info))
     return 0
 
 
@@ -281,7 +283,7 @@ def flip_rotate_uvs(indices, flip, num_rotate):
     if flip is True:
         indices.reverse()
     # rotate UVs
-    for n in range(num_rotate):
+    for n in xrange(num_rotate):
         idx = indices.pop()
         indices.insert(0, idx)
     return indices

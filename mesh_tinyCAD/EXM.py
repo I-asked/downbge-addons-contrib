@@ -18,6 +18,7 @@ Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 END GPL LICENCE BLOCK
 '''
 
+from __future__ import absolute_import
 import math
 import itertools
 
@@ -66,7 +67,7 @@ def add_or_remove_new_edge(self, idx):
     p_idx = self.edge_prime_idx
 
     if idx == p_idx:
-        print(idx, 'is edge prime, not adding')
+        print idx, 'is edge prime, not adding'
         return
 
     if (idx in self.selected_edges):
@@ -186,7 +187,7 @@ class ExtendEdgesMulti(bpy.types.Operator):
 
             del self.selected_edges
             del self.xvectors
-            return {'FINISHED'}
+            return set(['FINISHED'])
 
         if (event.type, event.value) == ("RIGHTMOUSE", "RELEASE"):
             set_mesh_data(self)
@@ -194,7 +195,7 @@ class ExtendEdgesMulti(bpy.types.Operator):
         if context.area:
             context.area.tag_redraw()
 
-        return {'PASS_THROUGH'}
+        return set(['PASS_THROUGH'])
 
     def invoke(self, context, event):
         if context.area.type == "VIEW_3D":
@@ -208,8 +209,8 @@ class ExtendEdgesMulti(bpy.types.Operator):
             # enforce singular edge selection first then assign to edge_prime
             m = [e.index for e in self.bm.edges if e.select]
             if not len(m) is 1:
-                self.report({"WARNING"}, "Please select 1 edge only")
-                return {'CANCELLED'}
+                self.report(set(["WARNING"]), "Please select 1 edge only")
+                return set(['CANCELLED'])
 
             # switch off axial manipulator, set important variables.
             self.edge_prime_idx = m[0]
@@ -222,7 +223,7 @@ class ExtendEdgesMulti(bpy.types.Operator):
             self.handle = draw_handler_add(*handler_config)
 
             context.window_manager.modal_handler_add(self)
-            return {'RUNNING_MODAL'}
+            return set(['RUNNING_MODAL'])
         else:
-            self.report({"WARNING"}, "Please run operator from within 3d view")
-            return {'CANCELLED'}
+            self.report(set(["WARNING"]), "Please run operator from within 3d view")
+            return set(['CANCELLED'])

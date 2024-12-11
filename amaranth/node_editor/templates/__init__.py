@@ -23,6 +23,7 @@ Vignette: Adjust the size and position of the vignette with the Ellipse
 Mask's X/Y and width, height values.
 """
 
+from __future__ import absolute_import
 import bpy
 from amaranth.node_editor.templates.vectorblur import AMTH_NODE_OT_AddTemplateVectorBlur
 from amaranth.node_editor.templates.vignette import AMTH_NODE_OT_AddTemplateVignette

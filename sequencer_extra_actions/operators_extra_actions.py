@@ -22,6 +22,9 @@ align strip to the left (shift-s + -lenght)
 
 '''
 
+from __future__ import with_statement
+from __future__ import division
+from __future__ import absolute_import
 import bpy
 
 import random
@@ -163,7 +166,7 @@ class Sequencer_Extra_TrimTimeline(bpy.types.Operator):
     bl_label = 'Trim to Timeline Content'
     bl_idname = 'timeextra.trimtimeline'
     bl_description = 'Automatically set start and end frames'
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     @classmethod
     def poll(self, context):
@@ -195,7 +198,7 @@ class Sequencer_Extra_TrimTimeline(bpy.types.Operator):
             scn.frame_start = frame_start
         if frame_end != -300000:
             scn.frame_end = frame_end
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # TRIM TIMELINE TO SELECTION
@@ -203,7 +206,7 @@ class Sequencer_Extra_TrimTimelineToSelection(bpy.types.Operator):
     bl_label = 'Trim to Selection'
     bl_idname = 'timeextra.trimtimelinetoselection'
     bl_description = 'Set start and end frames to selection'
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     @classmethod
     def poll(self, context):
@@ -235,7 +238,7 @@ class Sequencer_Extra_TrimTimelineToSelection(bpy.types.Operator):
             scn.frame_start = frame_start
         if frame_end != -300000:
             scn.frame_end = frame_end
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # SLIDE STRIP
@@ -250,8 +253,8 @@ class Sequencer_Extra_SlideStrip(bpy.types.Operator):
         ('TOEND', 'Current Frame to Strip End', ''),
         ('INPUT', 'Input...', '')),
         default='INPUT',
-        options={'HIDDEN'})
-    bl_options = {'REGISTER', 'UNDO'}
+        options=set(['HIDDEN']))
+    bl_options = set(['REGISTER', 'UNDO'])
     
     slide_offset = IntProperty(
         name='Offset',
@@ -293,10 +296,10 @@ class Sequencer_Extra_SlideStrip(bpy.types.Operator):
         strip.frame_final_start -= sx
         strip.frame_final_end -= sx
 
-        self.report({'INFO'}, 'Strip slid %d frame(s)' % (sx))
+        self.report(set(['INFO']), 'Strip slid %d frame(s)' % (sx))
         scn.default_slide_offset = sx
         bpy.ops.sequencer.reload()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def invoke(self, context, event):
         scn = context.scene
@@ -313,7 +316,7 @@ class Sequencer_Extra_SlideGrab(bpy.types.Operator):
     bl_label = 'Slide Grab'
     bl_idname = 'sequencerextra.slidegrab'
     bl_description = 'Alter in and out points but not duration of a strip'
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     @classmethod
     def poll(self, context):
@@ -350,11 +353,11 @@ class Sequencer_Extra_SlideGrab(bpy.types.Operator):
             self.x = event.mouse_x
             self.execute(context)
         elif event.type == 'LEFTMOUSE':
-            return {'FINISHED'}
+            return set(['FINISHED'])
         elif event.type in ('RIGHTMOUSE', 'ESC'):
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
 
-        return {'RUNNING_MODAL'}
+        return set(['RUNNING_MODAL'])
 
     def invoke(self, context, event):
         scn = context.scene
@@ -362,7 +365,7 @@ class Sequencer_Extra_SlideGrab(bpy.types.Operator):
         self.prev_x = event.mouse_x
         self.execute(context)
         context.window_manager.modal_handler_add(self)
-        return {'RUNNING_MODAL'}
+        return set(['RUNNING_MODAL'])
 
 
 # FILE NAME TO STRIP NAME
@@ -370,7 +373,7 @@ class Sequencer_Extra_FileNameToStripName(bpy.types.Operator):
     bl_label = 'File Name to Selected Strips Name'
     bl_idname = 'sequencerextra.striprename'
     bl_description = 'Set strip name to input file name'
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     @classmethod
     def poll(self, context):
@@ -396,10 +399,10 @@ class Sequencer_Extra_FileNameToStripName(bpy.types.Operator):
                     selection = True
                     i.name = bpy.path.display_name_from_filepath(i.filepath)
         if selection == False:
-            self.report({'ERROR_INVALID_INPUT'},
+            self.report(set(['ERROR_INVALID_INPUT']),
             'No image or movie strip selected')
-            return {'CANCELLED'}
-        return {'FINISHED'}
+            return set(['CANCELLED'])
+        return set(['FINISHED'])
 
 
 # NAVIGATE UP
@@ -427,7 +430,7 @@ class Sequencer_Extra_NavigateUp(bpy.types.Operator):
                 context.scene.sequence_editor.active_strip = None
 
         bpy.ops.sequencer.meta_toggle()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # RIPPLE DELETE
@@ -435,7 +438,7 @@ class Sequencer_Extra_RippleDelete(bpy.types.Operator):
     bl_label = 'Ripple Delete'
     bl_idname = 'sequencerextra.rippledelete'
     bl_description = 'Delete a strip and shift back following ones'
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     @classmethod
     def poll(self, context):
@@ -472,9 +475,9 @@ class Sequencer_Extra_RippleDelete(bpy.types.Operator):
                         pass
 
             if next_edit == 300000:
-                return {'FINISHED'}
+                return set(['FINISHED'])
             ripple_length = next_edit - cut_frame
-            for i in range(len(striplist)):
+            for i in xrange(len(striplist)):
                 str = striplist[i]
                 try:
                     if str.frame_final_start > cut_frame:
@@ -482,7 +485,7 @@ class Sequencer_Extra_RippleDelete(bpy.types.Operator):
                 except AttributeError:
                         pass
             bpy.ops.sequencer.reload()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # RIPPLE CUT
@@ -490,7 +493,7 @@ class Sequencer_Extra_RippleCut(bpy.types.Operator):
     bl_label = 'Ripple Cut'
     bl_idname = 'sequencerextra.ripplecut'
     bl_description = 'Move a strip to buffer and shift back following ones'
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     @classmethod
     def poll(self, context):
@@ -516,7 +519,7 @@ class Sequencer_Extra_RippleCut(bpy.types.Operator):
         scn.frame_current = temp_cf
 
         bpy.ops.sequencerextra.rippledelete()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # INSERT
@@ -528,7 +531,7 @@ class Sequencer_Extra_Insert(bpy.types.Operator):
     singlechannel = BoolProperty(
     name='Single Channel',
     default=False)
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     @classmethod
     def poll(self, context):
@@ -566,11 +569,11 @@ class Sequencer_Extra_Insert(bpy.types.Operator):
             bpy.ops.sequencerextra.selectcurrentframe('EXEC_DEFAULT',
             mode='AFTER')
         except:
-            self.report({'ERROR_INVALID_INPUT'}, 'Execution Error, '\
+            self.report(set(['ERROR_INVALID_INPUT']), 'Execution Error, '\
             'check your Blender version')
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
 
-        for i in range(len(striplist)):
+        for i in xrange(len(striplist)):
             str = striplist[i]
             try:
                 if str.select == True:
@@ -587,7 +590,7 @@ class Sequencer_Extra_Insert(bpy.types.Operator):
         scn.frame_current += strip.frame_final_duration
         bpy.ops.sequencer.reload()
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # PLACE FROM FILE BROWSER
@@ -598,7 +601,7 @@ class Sequencer_Extra_PlaceFromFileBrowser(bpy.types.Operator):
     insert = BoolProperty(
     name='Insert',
     default=False)
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     def execute(self, context):
         scn = context.scene
@@ -609,12 +612,12 @@ class Sequencer_Extra_PlaceFromFileBrowser(bpy.types.Operator):
         try:
             params
         except UnboundLocalError:
-            self.report({'ERROR_INVALID_INPUT'}, 'No visible File Browser')
-            return {'CANCELLED'}
+            self.report(set(['ERROR_INVALID_INPUT']), 'No visible File Browser')
+            return set(['CANCELLED'])
 
         if params.filename == '':
-            self.report({'ERROR_INVALID_INPUT'}, 'No file selected')
-            return {'CANCELLED'}
+            self.report(set(['ERROR_INVALID_INPUT']), 'No file selected')
+            return set(['CANCELLED'])
 
         path = os.path.join(params.directory, params.filename)
         frame = context.scene.frame_current
@@ -637,11 +640,11 @@ class Sequencer_Extra_PlaceFromFileBrowser(bpy.types.Operator):
                 bpy.ops.sequencer.sound_strip_add(filepath=path,
                 frame_start=frame, relative_path=False)
             else:
-                self.report({'ERROR_INVALID_INPUT'}, 'Invalid file format')
-                return {'CANCELLED'}
+                self.report(set(['ERROR_INVALID_INPUT']), 'Invalid file format')
+                return set(['CANCELLED'])
         except:
-            self.report({'ERROR_INVALID_INPUT'}, 'Error loading file')
-            return {'CANCELLED'}
+            self.report(set(['ERROR_INVALID_INPUT']), 'Error loading file')
+            return set(['CANCELLED'])
 
         if self.insert == True:
             try:
@@ -653,15 +656,15 @@ class Sequencer_Extra_PlaceFromFileBrowser(bpy.types.Operator):
                 if striplist[0]:
                     striplist[0].frame_start = frame
             except:
-                self.report({'ERROR_INVALID_INPUT'}, 'Execution Error, '\
+                self.report(set(['ERROR_INVALID_INPUT']), 'Execution Error, '\
                 'check your Blender version')
-                return {'CANCELLED'}
+                return set(['CANCELLED'])
         else:
             strip = functions.act_strip(context)
             scn.frame_current += strip.frame_final_duration
             bpy.ops.sequencer.reload()
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # SELECT BY TYPE
@@ -682,7 +685,7 @@ class Sequencer_Extra_SelectAllByType(bpy.types.Operator):
             ('COLOR', 'Color', '')),
             default='ACTIVE',
             )
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     @classmethod
     def poll(self, context):
@@ -702,9 +705,9 @@ class Sequencer_Extra_SelectAllByType(bpy.types.Operator):
         active_strip = functions.act_strip(context)
         if strip_type == 'ACTIVE':
             if active_strip == None:
-                self.report({'ERROR_INVALID_INPUT'},
+                self.report(set(['ERROR_INVALID_INPUT']),
                 'No active strip')
-                return {'CANCELLED'}
+                return set(['CANCELLED'])
             strip_type = active_strip.type
 
         striplist = []
@@ -715,14 +718,14 @@ class Sequencer_Extra_SelectAllByType(bpy.types.Operator):
                     striplist.append(i)
             except AttributeError:
                     pass
-        for i in range(len(striplist)):
+        for i in xrange(len(striplist)):
             str = striplist[i]
             try:
                 str.select = True
             except AttributeError:
                     pass
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # CURRENT-FRAME-AWARE SELECT
@@ -738,7 +741,7 @@ class Sequencer_Extra_SelectCurrentFrame(bpy.types.Operator):
             ('ON', 'On Current Frame', '')),
             default='BEFORE',
             )
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     @classmethod
     def poll(self, context):
@@ -783,7 +786,7 @@ class Sequencer_Extra_SelectCurrentFrame(bpy.types.Operator):
                 except AttributeError:
                         pass
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # SELECT STRIPS ON SAME CHANNEL
@@ -791,7 +794,7 @@ class Sequencer_Extra_SelectSameChannel(bpy.types.Operator):
     bl_label = 'Select Strips on the Same Channel'
     bl_idname = 'sequencerextra.selectsamechannel'
     bl_description = 'Select strips on the same channel as active one'
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     @classmethod
     def poll(self, context):
@@ -811,7 +814,7 @@ class Sequencer_Extra_SelectSameChannel(bpy.types.Operator):
         bpy.ops.sequencer.select_active_side(side="LEFT")
         bpy.ops.sequencer.select_active_side(side="RIGHT")
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # OPEN IMAGE WITH EXTERNAL EDITOR
@@ -839,11 +842,11 @@ class Sequencer_Extra_EditExternally(bpy.types.Operator):
         try:
             bpy.ops.image.external_edit(filepath=path)
         except:
-            self.report({'ERROR_INVALID_INPUT'},
+            self.report(set(['ERROR_INVALID_INPUT']),
             'Please specify an Image Editor in Preferences > File')
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # OPEN IMAGE WITH EDITOR
@@ -878,8 +881,8 @@ class Sequencer_Extra_Edit(bpy.types.Operator):
                 try:
                     data = bpy.data.movieclips.load(filepath=path)
                 except:
-                    self.report({'ERROR_INVALID_INPUT'}, 'Error loading file')
-                    return {'CANCELLED'}
+                    self.report(set(['ERROR_INVALID_INPUT']), 'Error loading file')
+                    return set(['CANCELLED'])
 
         elif strip.type == 'IMAGE':
             base_dir = bpy.path.abspath(strip.directory)
@@ -896,8 +899,8 @@ class Sequencer_Extra_Edit(bpy.types.Operator):
                 try:
                     data = bpy.data.images.load(filepath=path)
                 except:
-                    self.report({'ERROR_INVALID_INPUT'}, 'Error loading file')
-                    return {'CANCELLED'}
+                    self.report(set(['ERROR_INVALID_INPUT']), 'Error loading file')
+                    return set(['CANCELLED'])
 
         if strip.type == 'MOVIE':
             for a in context.window.screen.areas:
@@ -908,7 +911,7 @@ class Sequencer_Extra_Edit(bpy.types.Operator):
                 if a.type == 'IMAGE_EDITOR':
                     a.spaces[0].image = data
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # COPY STRIP PROPERTIES
@@ -916,7 +919,7 @@ class Sequencer_Extra_CopyProperties(bpy.types.Operator):
     bl_label = 'Copy Properties'
     bl_idname = 'sequencerextra.copyproperties'
     bl_description = 'Copy properties of active strip to selected strips'
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     prop = EnumProperty(
     name='Property',
@@ -1074,7 +1077,7 @@ class Sequencer_Extra_CopyProperties(bpy.types.Operator):
                     pass
 
         bpy.ops.sequencer.reload()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # FADE IN AND OUT
@@ -1090,7 +1093,7 @@ class Sequencer_Extra_FadeInOut(bpy.types.Operator):
             ('INOUT', 'Fade In and Out...', '')),
             default='IN',
             )
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
     
     fade_duration = IntProperty(
         name='Duration',
@@ -1180,7 +1183,7 @@ class Sequencer_Extra_FadeInOut(bpy.types.Operator):
 
         scn.default_fade_duration = self.fade_duration
         scn.default_fade_amount = self.fade_amount
-        return{'FINISHED'}
+        returnset(['FINISHED'])
 
     def invoke(self, context, event):
         scn = context.scene
@@ -1195,7 +1198,7 @@ class Sequencer_Extra_ExtendToFill(bpy.types.Operator):
     bl_idname = 'sequencerextra.extendtofill'
     bl_label = 'Extend to Fill'
     bl_description = 'Extend active strip forward to fill adjacent space'
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     @classmethod
     def poll(cls, context):
@@ -1225,13 +1228,13 @@ class Sequencer_Extra_ExtendToFill(bpy.types.Operator):
             enf = scn.frame_end
 
         if enf == 300000 or enf == stf:
-            self.report({'ERROR_INVALID_INPUT'}, 'Unable to extend')
-            return {'CANCELLED'}
+            self.report(set(['ERROR_INVALID_INPUT']), 'Unable to extend')
+            return set(['CANCELLED'])
         else:
             strip.frame_final_end = enf
 
         bpy.ops.sequencer.reload()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # DISTRIBUTE
@@ -1239,7 +1242,7 @@ class Sequencer_Extra_Distribute(bpy.types.Operator):
     bl_idname = 'sequencerextra.distribute'
     bl_label = 'Distribute...'
     bl_description = 'Evenly distribute selected strips'
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     @classmethod
     def poll(self, context):
@@ -1279,7 +1282,7 @@ class Sequencer_Extra_Distribute(bpy.types.Operator):
 
         scn.default_distribute_offset = self.distribute_offset
         scn.default_distribute_reverse = self.distribute_reverse
-        return{'FINISHED'}
+        returnset(['FINISHED'])
 
     def invoke(self, context, event):
         scn = context.scene
@@ -1294,7 +1297,7 @@ class Sequencer_Extra_FrameSkip(bpy.types.Operator):
     bl_label = 'Skip One Second'
     bl_idname = 'screenextra.frame_skip'
     bl_description = 'Skip through the Timeline by one-second increments'
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
     back = BoolProperty(
         name='Back',
         default=False)
@@ -1304,7 +1307,7 @@ class Sequencer_Extra_FrameSkip(bpy.types.Operator):
         if self.back == True:
             one_second *= -1
         bpy.ops.screen.frame_offset(delta=one_second)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # JOG/SHUTTLE
@@ -1331,11 +1334,11 @@ class Sequencer_Extra_JogShuttle(bpy.types.Operator):
             self.x = event.mouse_x
             self.execute(context)
         elif event.type == 'LEFTMOUSE':
-            return {'FINISHED'}
+            return set(['FINISHED'])
         elif event.type in ('RIGHTMOUSE', 'ESC'):
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
 
-        return {'RUNNING_MODAL'}
+        return set(['RUNNING_MODAL'])
 
     def invoke(self, context, event):
         scn = context.scene
@@ -1344,7 +1347,7 @@ class Sequencer_Extra_JogShuttle(bpy.types.Operator):
         self.init_current_frame = scn.frame_current
         self.execute(context)
         context.window_manager.modal_handler_add(self)
-        return {'RUNNING_MODAL'}
+        return set(['RUNNING_MODAL'])
 
 
 # OPEN IN MOVIE CLIP EDITOR FROM FILE BROWSER
@@ -1352,7 +1355,7 @@ class Clip_Extra_OpenFromFileBrowser(bpy.types.Operator):
     bl_label = 'Open from File Browser'
     bl_idname = 'clipextra.openfromfilebrowser'
     bl_description = 'Load a Movie or Image Sequence from File Browser'
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     def execute(self, context):
         for a in context.window.screen.areas:
@@ -1362,12 +1365,12 @@ class Clip_Extra_OpenFromFileBrowser(bpy.types.Operator):
         try:
             params
         except:
-            self.report({'ERROR_INVALID_INPUT'}, 'No visible File Browser')
-            return {'CANCELLED'}
+            self.report(set(['ERROR_INVALID_INPUT']), 'No visible File Browser')
+            return set(['CANCELLED'])
 
         if params.filename == '':
-            self.report({'ERROR_INVALID_INPUT'}, 'No file selected')
-            return {'CANCELLED'}
+            self.report(set(['ERROR_INVALID_INPUT']), 'No file selected')
+            return set(['CANCELLED'])
 
         strip = functions.act_strip(context)
         path = params.directory + params.filename
@@ -1384,17 +1387,17 @@ class Clip_Extra_OpenFromFileBrowser(bpy.types.Operator):
                 try:
                     data = bpy.data.movieclips.load(filepath=path)
                 except:
-                    self.report({'ERROR_INVALID_INPUT'}, 'Error loading file')
-                    return {'CANCELLED'}
+                    self.report(set(['ERROR_INVALID_INPUT']), 'Error loading file')
+                    return set(['CANCELLED'])
         else:
-            self.report({'ERROR_INVALID_INPUT'}, 'Invalid file format')
-            return {'CANCELLED'}
+            self.report(set(['ERROR_INVALID_INPUT']), 'Invalid file format')
+            return set(['CANCELLED'])
 
         for a in context.window.screen.areas:
             if a.type == 'CLIP_EDITOR':
                 a.spaces[0].clip = data
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # OPEN IN MOVIE CLIP EDITOR FROM SEQUENCER
@@ -1402,7 +1405,7 @@ class Clip_Extra_OpenActiveStrip(bpy.types.Operator):
     bl_label = 'Open Active Strip'
     bl_idname = 'clipextra.openactivestrip'
     bl_description = 'Load a Movie or Image Sequence from Sequence Editor'
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     @classmethod
     def poll(cls, context):
@@ -1424,8 +1427,8 @@ class Clip_Extra_OpenActiveStrip(bpy.types.Operator):
             filename = strip.elements[0].filename
             path = base_dir + '/' + filename
         else:
-            self.report({'ERROR_INVALID_INPUT'}, 'Invalid file format')
-            return {'CANCELLED'}
+            self.report(set(['ERROR_INVALID_INPUT']), 'Invalid file format')
+            return set(['CANCELLED'])
 
         for i in bpy.data.movieclips:
             if i.filepath == path:
@@ -1435,14 +1438,14 @@ class Clip_Extra_OpenActiveStrip(bpy.types.Operator):
             try:
                 data = bpy.data.movieclips.load(filepath=path)
             except:
-                self.report({'ERROR_INVALID_INPUT'}, 'Error loading file')
-                return {'CANCELLED'}
+                self.report(set(['ERROR_INVALID_INPUT']), 'Error loading file')
+                return set(['CANCELLED'])
 
         for a in context.window.screen.areas:
             if a.type == 'CLIP_EDITOR':
                 a.spaces[0].clip = data
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # PLACE FROM FILE BROWSER WITH PROXY
@@ -1477,7 +1480,7 @@ class Sequencer_Extra_PlaceFromFileBrowserProxy(bpy.types.Operator):
         description='default proxy path',
         default="")
 
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     def invoke(self, context, event):
         scn = context.scene
@@ -1501,12 +1504,12 @@ class Sequencer_Extra_PlaceFromFileBrowserProxy(bpy.types.Operator):
         try:
             params
         except UnboundLocalError:
-            self.report({'ERROR_INVALID_INPUT'}, 'No visible File Browser')
-            return {'CANCELLED'}
+            self.report(set(['ERROR_INVALID_INPUT']), 'No visible File Browser')
+            return set(['CANCELLED'])
 
         if params.filename == '':
-            self.report({'ERROR_INVALID_INPUT'}, 'No file selected (proxy)')
-            return {'CANCELLED'}
+            self.report(set(['ERROR_INVALID_INPUT']), 'No file selected (proxy)')
+            return set(['CANCELLED'])
         path = os.path.join(params.directory, params.filename)
         frame = context.scene.frame_current
         strip_type = functions.detect_strip_type(params.filename)
@@ -1546,12 +1549,12 @@ class Sequencer_Extra_PlaceFromFileBrowserProxy(bpy.types.Operator):
                 bpy.ops.sequencer.sound_strip_add(filepath=path,
                 frame_start=frame, relative_path=False)
             else:
-                self.report({'ERROR_INVALID_INPUT'}, 'Invalid file format')
-                return {'CANCELLED'}
+                self.report(set(['ERROR_INVALID_INPUT']), 'Invalid file format')
+                return set(['CANCELLED'])
 
         except:
-            self.report({'ERROR_INVALID_INPUT'}, 'Error loading file (proxy)')
-            return {'CANCELLED'}
+            self.report(set(['ERROR_INVALID_INPUT']), 'Error loading file (proxy)')
+            return set(['CANCELLED'])
 
         scn.default_proxy_suffix = self.proxy_suffix
         scn.default_proxy_extension = self.proxy_extension
@@ -1565,15 +1568,15 @@ class Sequencer_Extra_PlaceFromFileBrowserProxy(bpy.types.Operator):
             try:
                 bpy.ops.sequencerextra.insert()
             except:
-                self.report({'ERROR_INVALID_INPUT'}, 'Execution Error, '\
+                self.report(set(['ERROR_INVALID_INPUT']), 'Execution Error, '\
                 'check your Blender version')
-                return {'CANCELLED'}
+                return set(['CANCELLED'])
         else:
             strip = functions.act_strip(context)
             scn.frame_current += strip.frame_final_duration
             bpy.ops.sequencer.reload()
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # OPEN IMAGE WITH EDITOR AND create movie clip strip
@@ -1626,8 +1629,8 @@ class Sequencer_Extra_CreateMovieclip(bpy.types.Operator):
                     #print(newstrip.frame_start, strip.frame_start, tin, tout)
                     functions.triminout(newstrip, tin, tout)
                 except:
-                    self.report({'ERROR_INVALID_INPUT'}, 'Error loading file')
-                    return {'CANCELLED'}
+                    self.report(set(['ERROR_INVALID_INPUT']), 'Error loading file')
+                    return set(['CANCELLED'])
 
             else:
                 try:
@@ -1650,8 +1653,8 @@ class Sequencer_Extra_CreateMovieclip(bpy.types.Operator):
                     #print(newstrip.frame_start, strip.frame_start, tin, tout)
                     functions.triminout(clip, tin, tout)
                 except:
-                    self.report({'ERROR_INVALID_INPUT'}, 'Error loading file')
-                    return {'CANCELLED'}
+                    self.report(set(['ERROR_INVALID_INPUT']), 'Error loading file')
+                    return set(['CANCELLED'])
 
         elif strip.type == 'IMAGE':
             #print("image")
@@ -1687,8 +1690,8 @@ class Sequencer_Extra_CreateMovieclip(bpy.types.Operator):
                     #print(newstrip.frame_start, strip.frame_start, tin, tout)
                     functions.triminout(clip, tin, tout)
                 except:
-                    self.report({'ERROR_INVALID_INPUT'}, 'Error loading file')
-                    return {'CANCELLED'}
+                    self.report(set(['ERROR_INVALID_INPUT']), 'Error loading file')
+                    return set(['CANCELLED'])
 
             else:
                 try:
@@ -1711,8 +1714,8 @@ class Sequencer_Extra_CreateMovieclip(bpy.types.Operator):
                     #print(newstrip.frame_start, strip.frame_start, tin, tout)
                     functions.triminout(clip, tin, tout)
                 except:
-                    self.report({'ERROR_INVALID_INPUT'}, 'Error loading file')
-                    return {'CANCELLED'}
+                    self.report(set(['ERROR_INVALID_INPUT']), 'Error loading file')
+                    return set(['CANCELLED'])
 
         # show the new clip in a movie clip editor, if available.
         if strip.type == 'MOVIE' or 'IMAGE':
@@ -1720,7 +1723,7 @@ class Sequencer_Extra_CreateMovieclip(bpy.types.Operator):
                 if a.type == 'CLIP_EDITOR':
                     a.spaces[0].clip = data
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
         
         
 # RECURSIVE LOADER
@@ -1728,7 +1731,7 @@ class Sequencer_Extra_CreateMovieclip(bpy.types.Operator):
 class Sequencer_Extra_RecursiveLoader(bpy.types.Operator):
     bl_idname = "sequencerextra.recursiveload"
     bl_label = "recursive load"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
     
     recursive = BoolProperty(
         name='recursive',
@@ -1832,9 +1835,9 @@ class Sequencer_Extra_RecursiveLoader(bpy.types.Operator):
                     else:
                         bpy.ops.sequencerextra.placefromfilebrowser()
                 except:
-                    print("Error loading file (recursive loader error): ", i[1])
+                    print "Error loading file (recursive loader error): ", i[1]
                     functions.add_marker(context, i[1])
-                    self.report({'ERROR_INVALID_INPUT'}, 'Error loading file ')
+                    self.report(set(['ERROR_INVALID_INPUT']), 'Error loading file ')
                     pass
 
 
@@ -1880,7 +1883,7 @@ class Sequencer_Extra_RecursiveLoader(bpy.types.Operator):
             self.recursive_proxies = scn.default_recursive_proxies
             self.ext = scn.default_ext
             
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # READ EXIF DATA
@@ -1889,7 +1892,7 @@ class Sequencer_Extra_ReadExifData(bpy.types.Operator):
     bl_label = 'Read EXIF Data'
     bl_idname = 'sequencerextra.read_exif'
     bl_description = 'Load exifdata from strip to metadata property in scene'
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     @classmethod
     def poll(self, context):
@@ -1904,9 +1907,9 @@ class Sequencer_Extra_ReadExifData(bpy.types.Operator):
         try:
             exiftool.ExifTool().start()
         except:
-            self.report({'ERROR_INVALID_INPUT'},
+            self.report(set(['ERROR_INVALID_INPUT']),
             'exiftool not found in PATH')
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
 
         def getexifdata(strip):
             def getlist(lista):
@@ -1926,8 +1929,8 @@ class Sequencer_Extra_ReadExifData(bpy.types.Operator):
                 with exiftool.ExifTool() as et:
                     try:
                         metadata = et.get_metadata_batch(lista)
-                    except UnicodeDecodeError as Err:
-                        print(Err)
+                    except UnicodeDecodeError, Err:
+                        print Err
                 return metadata
             if strip.type == "IMAGE":
                 path = bpy.path.abspath(strip.directory)
@@ -1945,4 +1948,4 @@ class Sequencer_Extra_ReadExifData(bpy.types.Operator):
         text = bpy.context.active_object
         strip = context.scene.sequence_editor.active_strip
         sce['metadata'] = getexifdata(strip)
-        return {'FINISHED'}
+        return set(['FINISHED'])

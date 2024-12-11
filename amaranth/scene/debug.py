@@ -46,6 +46,7 @@ Under the "Scene Debug" panel in Scene properties.
 #     self.__class__.attr? use type(self).attr or self.attr instead.
 #     avoid duplicate code/patterns through helper functions.
 
+from __future__ import absolute_import
 import os
 import bpy
 from amaranth import utils
@@ -129,7 +130,7 @@ class AMTH_SCENE_OT_cycles_shader_list_nodes(bpy.types.Operator):
         self.__class__.materials = []
         shaders_roughness = ("BSDF_GLOSSY", "BSDF_DIFFUSE", "BSDF_GLASS")
 
-        print("\n=== Cycles Shader Type: %s === \n" % node_type)
+        print "\n=== Cycles Shader Type: %s === \n" % node_type
 
         for ma in bpy.data.materials:
             if ma.node_tree:
@@ -151,7 +152,7 @@ class AMTH_SCENE_OT_cycles_shader_list_nodes(bpy.types.Operator):
                                     roughness = False
                             else:
                                 connected = False
-                                print(print_unconnected)
+                                print print_unconnected
 
                             if ma.name not in self.__class__.materials:
                                 self.__class__.materials.append(
@@ -178,7 +179,7 @@ class AMTH_SCENE_OT_cycles_shader_list_nodes(bpy.types.Operator):
                                                 roughness = False
                                         else:
                                             connected = False
-                                            print(print_unconnected)
+                                            print print_unconnected
 
                                         if ma.name not in self.__class__.materials:
                                             self.__class__.materials.append(
@@ -198,26 +199,26 @@ class AMTH_SCENE_OT_cycles_shader_list_nodes(bpy.types.Operator):
                         list(set(self.__class__.materials)))
 
         if len(self.__class__.materials) == 0:
-            self.report({"INFO"},
+            self.report(set(["INFO"]),
                         "No materials with nodes type %s found" % node_type)
         else:
-            print("* A total of %d %s using %s was found \n" % (
+            print "* A total of %d %s using %s was found \n" % (
                 len(self.__class__.materials),
                 "material" if len(
                     self.__class__.materials) == 1 else "materials",
-                node_type))
+                node_type)
 
             count = 0
 
             for mat in self.__class__.materials:
-                print('%02d. %s' %
-                      (count + 1, self.__class__.materials[count]))
+                print '%02d. %s' %
+                      (count + 1, self.__class__.materials[count])
                 count += 1
-            print("\n")
+            print "\n"
 
         self.__class__.materials = sorted(list(set(self.__class__.materials)))
 
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 
 class AMTH_SCENE_OT_cycles_shader_list_nodes_clear(bpy.types.Operator):
@@ -232,8 +233,8 @@ class AMTH_SCENE_OT_cycles_shader_list_nodes_clear(bpy.types.Operator):
 
     def execute(self, context):
         AMTH_SCENE_OT_cycles_shader_list_nodes.materials[:] = []
-        print("* Cleared Cycles Materials List")
-        return {"FINISHED"}
+        print "* Cleared Cycles Materials List"
+        return set(["FINISHED"])
 
 
 class AMTH_SCENE_OT_amaranth_object_select(bpy.types.Operator):
@@ -251,7 +252,7 @@ class AMTH_SCENE_OT_amaranth_object_select(bpy.types.Operator):
             object.select = True
             context.scene.objects.active = object
 
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 
 class AMTH_SCENE_OT_list_missing_node_links(bpy.types.Operator):
@@ -377,8 +378,7 @@ class AMTH_SCENE_OT_list_missing_node_links(bpy.types.Operator):
         image_nodes_unlinked = sorted(list(set(image_nodes_unlinked)))
         libraries = sorted(list(set(libraries)))
 
-        print(
-            "\n\n== %s missing image %s, %s missing node %s and %s image %s unlinked ==" %
+        print "\n\n== %s missing image %s, %s missing node %s and %s image %s unlinked ==" %
             ("No" if self.__class__.count_images == 0 else str(
                 self.__class__.count_images),
                 "node" if self.__class__.count_images == 1 else "nodes",
@@ -387,52 +387,51 @@ class AMTH_SCENE_OT_list_missing_node_links(bpy.types.Operator):
                 "group" if self.__class__.count_groups == 1 else "groups",
                 "no" if self.__class__.count_image_node_unlinked == 0 else str(
                     self.__class__.count_image_node_unlinked),
-                "node" if self.__class__.count_groups == 1 else "nodes"))
+                "node" if self.__class__.count_groups == 1 else "nodes")
 
         # List Missing Node Groups
         if missing_groups:
-            print("\n* Missing Node Group Links\n")
+            print "\n* Missing Node Group Links\n"
             for mig in missing_groups:
-                print(mig)
+                print mig
 
         # List Missing Image Nodes
         if missing_images:
-            print("\n* Missing Image Nodes Link\n")
+            print "\n* Missing Image Nodes Link\n"
 
             for mii in missing_images:
-                print(mii)
+                print mii
 
         # List Image Nodes with its outputs unlinked
         if image_nodes_unlinked:
-            print("\n* Image Nodes Unlinked\n")
+            print "\n* Image Nodes Unlinked\n"
 
             for nou in image_nodes_unlinked:
-                print(nou)
+                print nou
 
         if missing_groups or \
            missing_images or \
            image_nodes_unlinked:
             if libraries:
-                print(
-                    "\nThat's bad, run check on %s:" %
-                    ("this library" if len(libraries) == 1 else "these libraries"))
+                print "\nThat's bad, run check on %s:" %
+                    ("this library" if len(libraries) == 1 else "these libraries")
                 for li in libraries:
-                    print(li)
+                    print li
         else:
-            self.report({"INFO"}, "Yay! No missing node links")
+            self.report(set(["INFO"]), "Yay! No missing node links")
 
-        print("\n")
+        print "\n"
 
         if missing_groups and missing_images:
             self.report(
-                {"WARNING"},
+                set(["WARNING"]),
                 "%d missing image %s and %d missing node %s found" %
                 (self.__class__.count_images,
                  "node" if self.__class__.count_images == 1 else "nodes",
                  self.__class__.count_groups,
                  "group" if self.__class__.count_groups == 1 else "groups"))
 
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 
 class AMTH_SCENE_OT_list_missing_material_slots(bpy.types.Operator):
@@ -461,35 +460,34 @@ class AMTH_SCENE_OT_list_missing_material_slots(bpy.types.Operator):
         self.__class__.libraries = sorted(list(set(self.__class__.libraries)))
 
         if len(self.__class__.objects) == 0:
-            self.report({"INFO"},
+            self.report(set(["INFO"]),
                         "No objects with empty material slots found")
         else:
-            print(
-                "\n* A total of %d %s with empty material slots was found \n" %
+            print "\n* A total of %d %s with empty material slots was found \n" %
                 (len(
                     self.__class__.objects), "object" if len(
-                    self.__class__.objects) == 1 else "objects"))
+                    self.__class__.objects) == 1 else "objects")
 
             count = 0
             count_lib = 0
 
             for obs in self.__class__.objects:
-                print('%02d. %s' % (
-                    count + 1, self.__class__.objects[count]))
+                print '%02d. %s' % (
+                    count + 1, self.__class__.objects[count])
                 count += 1
 
             if self.__class__.libraries:
-                print("\n\n* Check %s:\n" %
+                print "\n\n* Check %s:\n" %
                      ("this library" if len(self.__class__.libraries) == 1
-                      else "these libraries"))
+                      else "these libraries")
 
                 for libs in self.__class__.libraries:
-                    print('%02d. %s' % (
-                        count_lib + 1, self.__class__.libraries[count_lib]))
+                    print '%02d. %s' % (
+                        count_lib + 1, self.__class__.libraries[count_lib])
                     count_lib += 1
-            print("\n")
+            print "\n"
 
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 
 class AMTH_SCENE_OT_list_missing_material_slots_clear(bpy.types.Operator):
@@ -500,8 +498,8 @@ class AMTH_SCENE_OT_list_missing_material_slots_clear(bpy.types.Operator):
 
     def execute(self, context):
         AMTH_SCENE_OT_list_missing_material_slots.objects[:] = []
-        print("* Cleared Empty Material Slots List")
-        return {"FINISHED"}
+        print "* Cleared Empty Material Slots List"
+        return set(["FINISHED"])
 
 
 class AMTH_SCENE_OT_list_users_for_x_type(bpy.types.Operator):
@@ -515,7 +513,7 @@ class AMTH_SCENE_OT_list_users_for_x_type(bpy.types.Operator):
         if datablock_type == 'IMAGE_DATA':
             where = []
             for im in bpy.data.images:
-                if im.name not in {'Render Result', 'Viewer Node'}:
+                if im.name not in set(['Render Result', 'Viewer Node']):
                     where.append(im)
 
         elif datablock_type == 'MATERIAL':
@@ -546,7 +544,7 @@ class AMTH_SCENE_OT_list_users_for_x_type(bpy.types.Operator):
         if datablock_type == 'IMAGE_DATA':
             where = []
             for im in bpy.data.images:
-                if im.name not in {'Render Result', 'Viewer Node'}:
+                if im.name not in set(['Render Result', 'Viewer Node']):
                     where.append(im)
 
         elif datablock_type == 'MATERIAL':
@@ -562,7 +560,7 @@ class AMTH_SCENE_OT_list_users_for_x_type(bpy.types.Operator):
             where = list(set(where))
 
         bpy.context.scene.amth_list_users_for_x_name = where[int(self.list_type_select)].name
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class AMTH_SCENE_OT_list_users_for_x(bpy.types.Operator):
@@ -609,12 +607,12 @@ class AMTH_SCENE_OT_list_users_for_x(bpy.types.Operator):
                         materials = []
 
                         for nd in ma.node_tree.nodes:
-                            if nd and nd.type in {'TEX_IMAGE','TEX_ENVIRONMENT'}:
+                            if nd and nd.type in set(['TEX_IMAGE','TEX_ENVIRONMENT']):
                                 materials.append(nd)
                             if nd and nd.type == 'GROUP':
                                 if nd.node_tree and nd.node_tree.nodes:
                                     for ng in nd.node_tree.nodes:
-                                        if ng.type in {'TEX_IMAGE','TEX_ENVIRONMENT'}:
+                                        if ng.type in set(['TEX_IMAGE','TEX_ENVIRONMENT']):
                                             materials.append(ng)
 
                             for no in materials:
@@ -646,7 +644,7 @@ class AMTH_SCENE_OT_list_users_for_x(bpy.types.Operator):
                     if la and la.node_tree and la.node_tree.nodes:
                         for no in la.node_tree.nodes:
                             if no and \
-                               no.type in {'TEX_IMAGE','TEX_ENVIRONMENT'} and \
+                               no.type in set(['TEX_IMAGE','TEX_ENVIRONMENT']) and \
                                no.image and no.image.name == x:
                                     if la.name not in self.__class__.users['LAMP']:
                                         self.__class__.users['LAMP'].append(la.name)
@@ -658,7 +656,7 @@ class AMTH_SCENE_OT_list_users_for_x(bpy.types.Operator):
                     if wo and wo.node_tree and wo.node_tree.nodes:
                         for no in wo.node_tree.nodes:
                             if no and \
-                               no.type in {'TEX_IMAGE','TEX_ENVIRONMENT'} and \
+                               no.type in set(['TEX_IMAGE','TEX_ENVIRONMENT']) and \
                                no.image and no.image.name == x:
                                 if wo.name not in self.__class__.users['WORLD']:
                                     self.__class__.users['WORLD'].append(wo.name)
@@ -675,7 +673,7 @@ class AMTH_SCENE_OT_list_users_for_x(bpy.types.Operator):
             # Check Modifiers in Objects
             for ob in d.objects:
                 for mo in ob.modifiers:
-                    if mo.type in {'UV_PROJECT'}:
+                    if mo.type in set(['UV_PROJECT']):
                         image = mo.image
 
                         if mo and image and image.name == x:
@@ -760,7 +758,7 @@ class AMTH_SCENE_OT_list_users_for_x(bpy.types.Operator):
                 if utils.cycles_exists():
                     if ma and ma.node_tree and ma.node_tree.nodes:
                         for no in ma.node_tree.nodes:
-                            if no and no.type in {'ATTRIBUTE'}:
+                            if no and no.type in set(['ATTRIBUTE']):
                                 if no.attribute_name == x:
                                     objects = []
 
@@ -787,32 +785,32 @@ class AMTH_SCENE_OT_list_users_for_x(bpy.types.Operator):
         for t in self.__class__.users:
             if self.__class__.users[t]:
                 empty = False
-                print('\n== {0} {1} use {2} "{3}" ==\n'.format(
+                print '\n== {0} {1} use {2} "{3}" ==\n'.format(
                         len(self.__class__.users[t]),
                         t,
                         dtype,
-                        x))
+                        x)
                 for p in self.__class__.users[t]:
-                    print(' {0}'.format(p))
+                    print ' {0}'.format(p)
 
         if self.__class__.libraries:
-            print("\n* Check %s:\n" %
+            print "\n* Check %s:\n" %
                  ("this library" if len(self.__class__.libraries) == 1
-                  else "these libraries"))
+                  else "these libraries")
 
             for libs in self.__class__.libraries:
-                print('%02d. %s' % (
-                    count_lib + 1, self.__class__.libraries[count_lib]))
+                print '%02d. %s' % (
+                    count_lib + 1, self.__class__.libraries[count_lib])
                 count_lib += 1
-            print("\n")
+            print "\n"
 
         if empty:
-            print('\n== No users for {0} ==\n'.format(x))
+            print '\n== No users for {0} ==\n'.format(x)
 
         #print('Type: {0}'.format(context.scene.amth_datablock_types))
         #print('X: {0}'.format(x))
 
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 
 class AMTH_SCENE_OT_list_users_for_x_clear(bpy.types.Operator):
@@ -823,8 +821,8 @@ class AMTH_SCENE_OT_list_users_for_x_clear(bpy.types.Operator):
 
     def execute(self, context):
         AMTH_SCENE_OT_list_users_for_x.users = {}
-        print("* Cleared Users List for Datablock")
-        return {"FINISHED"}
+        print "* Cleared Users List for Datablock"
+        return set(["FINISHED"])
 
 
 class AMTH_SCENE_OT_blender_instance_open(bpy.types.Operator):
@@ -842,11 +840,11 @@ class AMTH_SCENE_OT_blender_instance_open(bpy.types.Operator):
             try:
                 subprocess.Popen([bpy.app.binary_path, filepath])
             except:
-                print("Error on the new Blender instance")
+                print "Error on the new Blender instance"
                 import traceback
                 traceback.print_exc()
 
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 
 class AMTH_SCENE_PT_scene_debug(bpy.types.Panel):
@@ -1356,7 +1354,7 @@ class AMTH_LightersCorner(bpy.types.Panel):
             box.label(text="No Lamps", icon="LAMP_DATA")
 
 
-classes = {
+classes = set([
     AMTH_SCENE_PT_scene_debug,
     AMTH_SCENE_OT_blender_instance_open,
     AMTH_SCENE_OT_amaranth_object_select,
@@ -1368,8 +1366,7 @@ classes = {
     AMTH_SCENE_OT_list_users_for_x,
     AMTH_SCENE_OT_list_users_for_x_type,
     AMTH_SCENE_OT_list_users_for_x_clear,
-    AMTH_LightersCorner
-}
+    AMTH_LightersCorner])
 
 def register():
     init()

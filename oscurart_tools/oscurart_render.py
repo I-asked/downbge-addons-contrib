@@ -1,7 +1,11 @@
+from __future__ import with_statement
+from __future__ import division
+from __future__ import absolute_import
 import bpy
 import math
 import os
 import stat
+from io import open
 
 
 ##-------------------------------- RENDER ALL SCENES ----------------------------
@@ -14,8 +18,8 @@ def defRenderAll (frametype, scenes):
     FC = bpy.context.scene.frame_current
     FS = bpy.context.scene.frame_start
     FE = bpy.context.scene.frame_end
-    print("---------------------")
-    types = {'MESH','META','CURVE'}
+    print "---------------------"
+    types = set(['MESH','META','CURVE'])
 
     for ob in bpy.data.objects:
         if ob.type in types:
@@ -43,22 +47,22 @@ def defRenderAll (frametype, scenes):
                 if object.type in types:
                     if len(object.data.materials):
                         object.data.materials.clear()
-                        for newslot in range(lenslots):
+                        for newslot in xrange(lenslots):
                             object.data.materials.append(bpy.data.materials[material])            
         filename = os.path.basename(bpy.data.filepath.rpartition(".")[0])  
-        uselayers = {layer : layer.use for layer in scene.render.layers} 
+        uselayers = dict((layer, layer.use) for layer in scene.render.layers) 
         for layer, usado in uselayers.items():
             if usado:
                 for i in scene.render.layers: i.use = False  
                 layer.use = 1  
-                print("SCENE: %s" % scene.name)
-                print("LAYER: %s" % layer.name)
-                print("OVERRIDE: %s" % str(proptolist))   
+                print "SCENE: %s" % scene.name
+                print "LAYER: %s" % layer.name
+                print "OVERRIDE: %s" % str(proptolist)   
                 scene.render.filepath = os.path.join(os.path.dirname(renpath), filename, scene.name, layer.name,"%s_%s_%s" % (filename,scene.name,layer.name))
                 bpy.context.window.screen.scene = scene  
                 bpy.ops.render.render(animation=True, write_still=True, layer=layer.name, scene= scene.name)   
-                print("DONE")
-                print("---------------------") 
+                print "DONE"
+                print "---------------------" 
         for layer, usado in uselayers.items():
             layer.use = usado
         scene.render.filepath = renpath
@@ -83,7 +87,7 @@ class renderAll (bpy.types.Operator):
 
     def execute(self,context):
         defRenderAll(self.frametype,[scene for scene in bpy.data.scenes])
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 ##--------------------------------RENDER SELECTED SCENES----------------------------
@@ -99,7 +103,7 @@ class renderSelected (bpy.types.Operator):
 
     def execute(self,context):
         defRenderAll(self.frametype,[ sc for sc in bpy.data.scenes if sc.use_render_scene])
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 ##--------------------------------RENDER CURRENT SCENE----------------------------
 
@@ -114,7 +118,7 @@ class renderCurrent (bpy.types.Operator):
 
         defRenderAll(self.frametype,[bpy.context.scene])
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 ##--------------------------RENDER CROP----------------------
@@ -129,7 +133,7 @@ def OscRenderCropFunc():
     FILEPATH = bpy.context.scene.render.filepath
     bpy.context.scene.render.use_border = True
     bpy.context.scene.render.use_crop_to_border = True
-    for PART in range(PARTS):
+    for PART in xrange(PARTS):
         bpy.context.scene.render.border_min_y = PART*CHUNKYSIZE
         bpy.context.scene.render.border_max_y = (PART*CHUNKYSIZE)+CHUNKYSIZE
         bpy.context.scene.render.filepath = "%s_part%s" % (os.path.join(FILEPATH,SCENENAME,bpy.context.scene.name,SCENENAME),PART)
@@ -142,19 +146,19 @@ class renderCrop (bpy.types.Operator):
     bl_label="Render Crop: Render!"
     def execute(self,context):
         OscRenderCropFunc()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 ##---------------------------BATCH MAKER------------------
 def defoscBatchMaker(TYPE,BIN):
     
     
     if os.sys.platform.startswith("w"):
-        print("PLATFORM: WINDOWS")
+        print "PLATFORM: WINDOWS"
         SYSBAR = os.sep
         EXTSYS = ".bat"
         QUOTES = '"'
     else:
-        print("PLATFORM:LINUX")
+        print "PLATFORM:LINUX"
         SYSBAR = os.sep
         EXTSYS = ".sh"
         QUOTES = ''
@@ -169,7 +173,7 @@ def defoscBatchMaker(TYPE,BIN):
             try:
                 os.chmod(SHFILE, stat.S_IRWXU)
             except:
-                print("** Oscurart Batch maker can not modify the permissions.")    
+                print "** Oscurart Batch maker can not modify the permissions."    
         if not BIN:
             FILE.writelines("%s%s%s -b %s -x 1 -o %s -P %s%s.py  -s %s -e %s -a" %
                 (QUOTES,BINDIR,QUOTES,bpy.data.filepath,bpy.context.scene.render.filepath,bpy.data.filepath.rpartition(SYSBAR)[0]+
@@ -186,11 +190,11 @@ def defoscBatchMaker(TYPE,BIN):
                 try:
                     os.chmod(RLATFILE, stat.S_IRWXU)  
                 except:
-                    print("** Oscurart Batch maker can not modify the permissions.")                             
+                    print "** Oscurart Batch maker can not modify the permissions."                             
             file.writelines("import bpy \nbpy.ops.render.render_all_scenes_osc()\nbpy.ops.wm.quit_blender()")
 
     else:
-        print("The All Python files Skips: Already exist!")   
+        print "The All Python files Skips: Already exist!"   
          
     RSLATFILE = "%s%sosRSlat.py" % (bpy.data.filepath.rpartition(SYSBAR)[0] , SYSBAR)    
     if not os.path.isfile(RSLATFILE):  
@@ -199,15 +203,15 @@ def defoscBatchMaker(TYPE,BIN):
                 try:
                     os.chmod(RSLATFILE, stat.S_IRWXU)   
                 except:
-                    print("** Oscurart Batch maker can not modify the permissions.")                            
+                    print "** Oscurart Batch maker can not modify the permissions."                            
             file.writelines("import bpy \nbpy.ops.render.render_selected_scenes_osc()\nbpy.ops.wm.quit_blender()")
     else:
-        print("The Selected Python files Skips: Already exist!")          
+        print "The Selected Python files Skips: Already exist!"          
 
 class oscBatchMaker (bpy.types.Operator):
     bl_idname = "file.create_batch_maker_osc"
     bl_label = "Make render batch"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     type = bpy.props.EnumProperty(
             name="Render Mode",
@@ -221,7 +225,7 @@ class oscBatchMaker (bpy.types.Operator):
     
     def execute(self,context):
         defoscBatchMaker(self.type,self.bin)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 ## --------------------------------------PYTHON BATCH--------------------------------------------------------
 def defoscPythonBatchMaker(BATCHTYPE,SIZE):
@@ -229,12 +233,12 @@ def defoscPythonBatchMaker(BATCHTYPE,SIZE):
     
     # REVISO SISTEMA
     if os.sys.platform.startswith("w"):
-        print("PLATFORM: WINDOWS")
+        print "PLATFORM: WINDOWS"
         SYSBAR = "\\"
         EXTSYS = ".bat"
         QUOTES = '"'
     else:
-        print("PLATFORM:LINUX")
+        print "PLATFORM:LINUX"
         SYSBAR = "/"
         EXTSYS = ".sh"    
         QUOTES = ''
@@ -279,13 +283,13 @@ def defoscPythonBatchMaker(BATCHTYPE,SIZE):
             os.chmod(CALLFILE, stat.S_IRWXU)  
             os.chmod(SHFILE, stat.S_IRWXU) 
         except:
-            print("** Oscurart Batch maker can not modify the permissions.")      
+            print "** Oscurart Batch maker can not modify the permissions."      
 
     
 class oscPythonBatchMaker (bpy.types.Operator):
     bl_idname = "file.create_batch_python"
     bl_label = "Make Batch Python"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     size = bpy.props.IntProperty(name="Size in Bytes", default=10, min=0)
     
@@ -299,7 +303,7 @@ class oscPythonBatchMaker (bpy.types.Operator):
 
     def execute(self,context):
         defoscPythonBatchMaker(self.type, self.size)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 # ---------------------------------- BROKEN FRAMES --------------------- 
@@ -321,13 +325,13 @@ class SumaFile(bpy.types.Operator):
         for root, folder, files in os.walk(absdir):  
             for f in files:
                 if os.path.getsize(os.path.join(root,f)) <  10:    
-                    print(f)      
+                    print f      
                     i = bpy.context.scene.broken_files.add()
                     i.filename = f
                     i.fullpath = os.path.join(root,f)
                     i.value = os.path.getsize(os.path.join(root,f))   
                     i.checkbox = True   
-        return {'FINISHED'}  
+        return set(['FINISHED'])  
 
 class ClearFile(bpy.types.Operator):
     bl_idname = "object.clear_broken_file"
@@ -335,7 +339,7 @@ class ClearFile(bpy.types.Operator):
 
     def execute(self, context):
         bpy.context.scene.broken_files.clear()
-        return {'FINISHED'} 
+        return set(['FINISHED']) 
 
 class DeleteFiles(bpy.types.Operator):
     bl_idname = "object.delete_broken_file"
@@ -346,7 +350,7 @@ class DeleteFiles(bpy.types.Operator):
             if file.checkbox:
                 os.remove(file.fullpath)
         bpy.context.scene.broken_files.clear()    
-        return {'FINISHED'}     
+        return set(['FINISHED'])     
 
 
 bpy.types.Scene.broken_files = bpy.props.CollectionProperty(type=VarColArchivos)
@@ -385,7 +389,7 @@ def defCopyRenderSettings(mode):
     sceneslist = bpy.data.scenes[:]
     sceneslist.remove(sc)    
 
-    excludes = {'name','objects', 'object_bases', 'has_multiple_engines', 'display_settings', 'broken_files', 'rna_type', 'frame_subframe', 'view_settings', 'tool_settings', 'render', 'user_clear', 'animation_data_create', 'collada_export', 'keying_sets', 'icon_props', 'image_settings', 'library', 'bake', 'active_layer', 'frame_current_final', 'sequence_editor_clear', 'rigidbody_world', 'unit_settings', 'orientations', '__slots__', 'ray_cast', 'sequencer_colorspace_settings', 'ffmpeg', 'is_movie_format', 'frame_path', 'frame_set', 'network_render', 'animation_data_clear', 'is_nla_tweakmode', 'keying_sets_all', 'sequence_editor', '__doc__', 'ovlist', 'file_extension', 'users', 'node_tree', 'is_updated_data', 'bl_rna', 'is_library_indirect', 'cycles_curves', 'timeline_markers', 'statistics', 'use_shading_nodes', 'use_game_engine', 'sequence_editor_create', 'is_updated', '__module__', 'update_tag', 'update', 'animation_data', 'cycles', 'copy', 'game_settings', 'layers','__weakref__','string','double','overrides','use_render_scene','engine','use_nodes','world'}
+    excludes = set(['name','objects', 'object_bases', 'has_multiple_engines', 'display_settings', 'broken_files', 'rna_type', 'frame_subframe', 'view_settings', 'tool_settings', 'render', 'user_clear', 'animation_data_create', 'collada_export', 'keying_sets', 'icon_props', 'image_settings', 'library', 'bake', 'active_layer', 'frame_current_final', 'sequence_editor_clear', 'rigidbody_world', 'unit_settings', 'orientations', '__slots__', 'ray_cast', 'sequencer_colorspace_settings', 'ffmpeg', 'is_movie_format', 'frame_path', 'frame_set', 'network_render', 'animation_data_clear', 'is_nla_tweakmode', 'keying_sets_all', 'sequence_editor', '__doc__', 'ovlist', 'file_extension', 'users', 'node_tree', 'is_updated_data', 'bl_rna', 'is_library_indirect', 'cycles_curves', 'timeline_markers', 'statistics', 'use_shading_nodes', 'use_game_engine', 'sequence_editor_create', 'is_updated', '__module__', 'update_tag', 'update', 'animation_data', 'cycles', 'copy', 'game_settings', 'layers','__weakref__','string','double','overrides','use_render_scene','engine','use_nodes','world'])
        
     
     if mode == "render":    
@@ -397,21 +401,21 @@ def defCopyRenderSettings(mode):
                 try:
                     scenerenderdict[prop] = getattr(bpy.context.scene.render,prop) 
                 except:
-                    print("%s does not exist." % (prop))     
+                    print "%s does not exist." % (prop)     
 
         for prop in dir(bpy.context.scene):
             if prop not in excludes:
                 try:
                     scenedict[prop] = getattr(bpy.context.scene,prop) 
                 except:
-                    print("%s does not exist." % (prop))  
+                    print "%s does not exist." % (prop)  
                 
         for prop in dir(bpy.context.scene.render.image_settings):
             if prop not in excludes:
                 try:
                     sceneimagesettingdict[prop] = getattr(bpy.context.scene.render.image_settings,prop) 
                 except:
-                    print("%s does not exist." % (prop))   
+                    print "%s does not exist." % (prop)   
                                                
         """    
         scenerenderdict = {prop : getattr(bpy.context.scene.render,prop) for prop in dir(bpy.context.scene.render)}        
@@ -425,7 +429,7 @@ def defCopyRenderSettings(mode):
                 try:
                     setattr(escena.render, prop,value)
                 except:
-                    print("%s was not copied!" % (prop))
+                    print "%s was not copied!" % (prop)
                     pass
      
         # scene        
@@ -434,7 +438,7 @@ def defCopyRenderSettings(mode):
                 try:
                     setattr(escena, prop,value)
                 except:
-                    print("%s was not copied!" % (prop))
+                    print "%s was not copied!" % (prop)
                     pass
         # imageSettings             
         for escena in sceneslist:
@@ -442,7 +446,7 @@ def defCopyRenderSettings(mode):
                 try:
                     setattr(escena.render.image_settings, prop,value)
                 except:
-                    print("%s was not copied!" % (prop))                             
+                    print "%s was not copied!" % (prop)                             
                     pass      
                     
     if mode == "cycles":  
@@ -452,7 +456,7 @@ def defCopyRenderSettings(mode):
                 try:
                     scenecyclesdict[prop] = getattr(bpy.context.scene.cycles,prop) 
                 except:
-                    print("%s does not exist." % (prop))        
+                    print "%s does not exist." % (prop)        
         
         """
         scenecyclesdict = {prop : getattr(bpy.context.scene.cycles,prop) for prop in dir(bpy.context.scene.cycles)}  
@@ -463,7 +467,7 @@ def defCopyRenderSettings(mode):
                 try:
                     setattr(escena.cycles, prop,value)
                 except:
-                    print("%s was not copied!" % (prop))                             
+                    print "%s was not copied!" % (prop)                             
                     pass
               
    
@@ -479,7 +483,7 @@ class copyRenderSettings (bpy.types.Operator):
         
         defCopyRenderSettings(self.mode)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 

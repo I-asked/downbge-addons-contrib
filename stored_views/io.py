@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import gzip
 import os
 import pickle
@@ -13,7 +14,7 @@ from . import bl_info
 from . operators import DataStore
 
 # TODO: reinstate filters?
-class IO_Utils():
+class IO_Utils(object):
     @staticmethod
     def get_preset_path():
         # locate stored_views preset folder
@@ -43,7 +44,7 @@ class IO_Utils():
         f_structs = [f_sv.view_list, f_sv.pov_list, f_sv.layers_list, f_sv.display_list]
 #        is_filtered = [io_filters.views, io_filters.point_of_views, io_filters.layers, io_filters.displays]
 
-        for i in range(len(f_structs)):
+        for i in xrange(len(f_structs)):
 #            if is_filtered[i] == False:
 #                continue
             for j in f_structs[i]:
@@ -156,13 +157,13 @@ class IO_Utils():
                         for v_subkey, v_subval in subval.items():
                             if type(v_subval) == type([]):  # array like of pov,...
                                 v_array_like = getattr(v_subprop, v_subkey)
-                                for i in range(len(v_array_like)):
+                                for i in xrange(len(v_array_like)):
                                     v_array_like[i] = v_subval[i]
                             else:
                                 setattr(v_subprop, v_subkey, v_subval)  # others
                     elif type(subval) == type([]):
                         array_like = getattr(sv_item, subprop)
-                        for i in range(len(array_like)):
+                        for i in xrange(len(array_like)):
                             array_like[i] = subval[i]
                     else:
                         setattr(sv_item, subprop, subval)
@@ -176,7 +177,7 @@ class VIEW3D_stored_views_import(bpy.types.Operator, ImportHelper):
     bl_description = "Import a .blsv preset file to the current Stored Views"
 
     filename_ext = ".blsv"
-    filter_glob = StringProperty(default="*.blsv", options={'HIDDEN'})
+    filter_glob = StringProperty(default="*.blsv", options=set(['HIDDEN']))
     replace = BoolProperty(name="Replace",
                                      default=True,
                                      description="Replace current stored views, otherwise append")
@@ -191,10 +192,10 @@ class VIEW3D_stored_views_import(bpy.types.Operator, ImportHelper):
             shutil.copyfile(self.filepath,
                             os.path.join(IO_Utils.get_preset_path()[0], filename))
         except:
-            self.report({'WARNING'}, "Stored Views: preset applied, but installing failed (preset already exists?)")
-            return{'CANCELLED'}
+            self.report(set(['WARNING']), "Stored Views: preset applied, but installing failed (preset already exists?)")
+            returnset(['CANCELLED'])
 
-        return{'FINISHED'}
+        returnset(['FINISHED'])
 
 
 class VIEW3D_stored_views_import_from_scene(bpy.types.Operator):
@@ -214,11 +215,11 @@ class VIEW3D_stored_views_import_from_scene(bpy.types.Operator):
         # filepath should always be given
         if not self.scene_name:
             self.report("ERROR", "Could not find scene")
-            return{'CANCELLED'}
+            returnset(['CANCELLED'])
 
         IO_Utils.stored_views_apply_from_scene(self.scene_name, replace=self.replace)
 
-        return{'FINISHED'}
+        returnset(['FINISHED'])
 
 
 class VIEW3D_stored_views_export(bpy.types.Operator, ExportHelper):
@@ -228,11 +229,11 @@ class VIEW3D_stored_views_export(bpy.types.Operator, ExportHelper):
 
     filename_ext = ".blsv"
     filepath = StringProperty(default=os.path.join(IO_Utils.get_preset_path()[0], "untitled"))
-    filter_glob = StringProperty(default="*.blsv", options={'HIDDEN'})
+    filter_glob = StringProperty(default="*.blsv", options=set(['HIDDEN']))
     preset_name = StringProperty(name="Preset name",
                                  default="",
                                  description="Name of the stored views preset")
 
     def execute(self, context):
         IO_Utils.stored_views_export_to_blsv(self.filepath, self.preset_name)
-        return{'FINISHED'}
+        returnset(['FINISHED'])

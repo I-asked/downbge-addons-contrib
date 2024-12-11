@@ -16,6 +16,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import absolute_import
 bl_info = {
     "name": "Oscurart Chain Maker",
     "author": "Oscurart",
@@ -81,10 +82,10 @@ def makeChain (self, context, mult, curverig):
                 creahuesonoventa(hueso)
             if VAR_SWITCH == 1:
                 VAR_SWITCH = 0
-                print(VAR_SWITCH)
+                print VAR_SWITCH
             else :
                 VAR_SWITCH = 1
-                print(VAR_SWITCH)
+                print VAR_SWITCH
         # SI NO TILDAMOS CURVERIG
         if curverig == True:
             # VARIABLES
@@ -106,18 +107,18 @@ def makeChain (self, context, mult, curverig):
                 ACTARM.data.bones[0].head_local[2],
                 1
             ))
-            print("huesos: "+ str(len(ACTARM.data.bones)))
+            print "huesos: "+ str(len(ACTARM.data.bones))
             for hueso in ACTARM.data.bones:
                 LISTA_POINTC.append((hueso.tail_local[0],hueso.tail_local[1],hueso.tail_local[2],1))
             # CREO EL SPLINE
             spline=crv.splines.new("NURBS")
             lencoord= len(LISTA_POINTC)
-            print("lencoord--> :"+str(lencoord))
-            rango=range(lencoord)
+            print "lencoord--> :"+str(lencoord)
+            rango=xrange(lencoord)
             spline.points.add(lencoord-1)
             for punto in rango:
                 spline.points[punto].co = LISTA_POINTC[punto]
-                print(LISTA_POINTC[punto])
+                print LISTA_POINTC[punto]
             # SETEO ENDPOINT
             bpy.data.objects['Cable'].data.splines[0].use_endpoint_u= True
             # SELECCIONO LA CURVA
@@ -150,7 +151,7 @@ def makeChain (self, context, mult, curverig):
             # VUELVO A OBJECT MODE
             bpy.ops.object.mode_set(mode='OBJECT')
     else:
-        self.report({'WARNING'}, "Active Object must be an Armature")
+        self.report(set(['WARNING']), "Active Object must be an Armature")
 
 
 #---------------
@@ -159,7 +160,7 @@ from bpy.props import *
 class MESH_OT_chain_maker(bpy.types.Operator):
     bl_idname="mesh.primitive_oscurart_chain_add"
     bl_label="Oscurart Chain"
-    bl_options={'REGISTER','UNDO'}
+    bl_options=set(['REGISTER','UNDO'])
 
     curverig= BoolProperty(name="Curve Rig", default=False)
     multiplier= FloatProperty (name="Scale", default=1 , min=0.01, max=100.0)
@@ -170,7 +171,7 @@ class MESH_OT_chain_maker(bpy.types.Operator):
 
     def execute(self, context):
         makeChain(self, context, self.multiplier,self.curverig)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 def menu_oscChain(self, context):
     self.layout.operator("mesh.primitive_oscurart_chain_add",

@@ -22,6 +22,7 @@ figure out how to do that nicely), good news is that in Blender 2.69+ you
 can now copy/paste curves.
 """
 
+from __future__ import absolute_import
 import bpy
 from bl_operators.presets import AddPresetBase
 

@@ -16,6 +16,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import absolute_import
+from io import open
 bl_info = {
     "name": "LipSync Importer & Blinker",
     "author": "Yousef Harfoush - bat3a ;)",
@@ -51,7 +53,7 @@ def blinker():
         modifier = scn.blinkMod
 
     #creating keys with blinkNm count
-    for y in range(scn.blinkNm):
+    for y in xrange(scn.blinkNm):
         frame = y * scn.blinkSp + int(random()*modifier)
         createShapekey('blink', frame)
 
@@ -233,18 +235,18 @@ class btn_lipsyncer(bpy.types.Operator):
             if obj.type=="MESH":
                 if obj.data.shape_keys!=None:
                     if scn.fpath!='': lipsyncer()
-                    else: print ("select a Moho file")
-                else: print("No shape keys")
+                    else: print "select a Moho file"
+                else: print "No shape keys"
 
             elif obj.type=="ARMATURE":
                 if 1:#XXX add prop test
                     if scn.fpath!='': lipsyncerBone()
-                    else: print ("select a Moho file")
-                else: print("Create Pose properties")
+                    else: print "select a Moho file"
+                else: print "Create Pose properties"
 
-            else: print ("Object is not a mesh ot bone")
-        else: print ("Select object")
-        return {'FINISHED'}
+            else: print "Object is not a mesh ot bone"
+        else: print "Select object"
+        return set(['FINISHED'])
 
 # blinker operation start
 class btn_blinker(bpy.types.Operator):
@@ -265,10 +267,10 @@ class btn_blinker(bpy.types.Operator):
                         if key.name=='blink':
                             blinker()
                             #return
-                else: print("No shape keys")
-            else: print ("Object is not a mesh ot bone")
-        else: print ("Select object")
-        return {'FINISHED'}
+                else: print "No shape keys"
+            else: print "Object is not a mesh ot bone"
+        else: print "Select object"
+        return set(['FINISHED'])
 
 
 #defining custom enumeratos

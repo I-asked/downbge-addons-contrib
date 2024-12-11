@@ -21,6 +21,8 @@
 
 # <pep8 compliant>
 
+from __future__ import division
+from __future__ import absolute_import
 from collections import defaultdict as dd
 from random import random, seed, expovariate
 from math import sqrt, pow, sin, cos
@@ -31,7 +33,7 @@ from mathutils import Vector
 from .kdtree import Tree
 
 
-class Branchpoint:
+class Branchpoint(object):
     def __init__(self, p, parent):
         self.v = Vector(p)
         self.parent = parent
@@ -51,7 +53,7 @@ def sphere(r, p):
             yield p + Vector((x, y, z))
 
 
-class SCA:
+class SCA(object):
     def __init__(self, NENDPOINTS=100, d=0.3, NBP=2000, KILLDIST=5, INFLUENCE=15, SEED=42, volume=partial(sphere, 5, Vector((0, 0, 8))), TROPISM=0.0, exclude=lambda p: False,
         startingpoints=[]):
         seed(SEED)
@@ -64,8 +66,8 @@ class SCA:
         self.endpoints = []
 
         self.volumepoint = volume()
-        for i in range(NENDPOINTS):
-            self.endpoints.append(next(self.volumepoint))
+        for i in xrange(NENDPOINTS):
+            self.endpoints.append(self.volumepoint.next())
 
         self.branchpoints = [Branchpoint((0, 0, 0), None)] if len(startingpoints) == 0 else startingpoints
 
@@ -153,7 +155,7 @@ class SCA:
                 # when we first arrive here, t already hold the time to the first event
                 niterations += 1
                 while t < niterations:  # we keep on adding endpoints as long as the next event still happens within this iteration
-                    self.endpoints.append(next(self.volumepoint))
+                    self.endpoints.append(self.volumepoint.next())
                     endpointsadded += 1
                     t += expovariate(newendpointsper1000)  # time to new 'endpoint add event'
 
@@ -243,6 +245,6 @@ class SCA:
                 # when we first arrive here, t already hold the time to the first event
                 niterations += 1
                 while t < niterations:  # we keep on adding endpoints as long as the next event still happens within this iteration
-                    self.endpoints.append(next(self.volumepoint))
+                    self.endpoints.append(self.volumepoint.next())
                     endpointsadded += 1
                     t += expovariate(newendpointsper1000)  # time to new 'endpoint add event'

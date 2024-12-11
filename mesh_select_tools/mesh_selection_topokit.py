@@ -16,6 +16,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import absolute_import
+from itertools import ifilter
 bl_info = {
     "name": "Topokit 2",
     "author": "dustractor",
@@ -37,7 +39,7 @@ cachedata = dict()
 bpy.types.Object.tkkey = bpy.props.IntVectorProperty(size=4)
 
 # just a mix-in for the operators...
-class meshpoller:
+class meshpoller(object):
     @classmethod
     def poll(self,context):
         try:
@@ -61,7 +63,7 @@ class meshpoller:
 class MESH_OT_vneighbors_edgewise(meshpoller,bpy.types.Operator):
     bl_idname = "mesh.v2v_by_edge"
     bl_label = "Neighbors by Edge"
-    bl_options = {"REGISTER","UNDO"}
+    bl_options = set(["REGISTER","UNDO"])
 
     def execute(self,context):
         global cachedata
@@ -73,23 +75,23 @@ class MESH_OT_vneighbors_edgewise(meshpoller,bpy.types.Operator):
         if (meshkey == obj.tkkey) and (meshkey in cachedata):
             vert_to_vert_map,prev_state = cachedata[meshkey]
         else:
-            vert_to_vert_map = {i:{} for i in range(meshkey[0])}
+            vert_to_vert_map = dict((i, {}) for i in xrange(meshkey[0]))
             for a,b in mesh.edge_keys:
                 vert_to_vert_map[a][b] = 1
                 vert_to_vert_map[b][a] = 1
             obj.tkkey = meshkey
             prev_state = None
         if not prev_state:
-            selected_vert_indices = filter(lambda _:mesh.vertices[_].select,range(len(mesh.vertices)))
+            selected_vert_indices = ifilter(lambda _:mesh.vertices[_].select,xrange(len(mesh.vertices)))
         else:
-            selected_vert_indices = filter(lambda _:mesh.vertices[_].select and not prev_state[_],range(len(mesh.vertices)))
+            selected_vert_indices = ifilter(lambda _:mesh.vertices[_].select and not prev_state[_],xrange(len(mesh.vertices)))
         for v in selected_vert_indices:
             for neighbor_index in vert_to_vert_map[v]:
                 next_state[neighbor_index] = True
         mesh.vertices.foreach_set("select",next_state)
         cachedata[meshkey] = (vert_to_vert_map,next_state)
         bpy.ops.object.mode_set(mode="EDIT")
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 # This one is an alternate / counterpart to the previous.
 # Think: diagonal opposite corners of a quad
@@ -104,7 +106,7 @@ class MESH_OT_vneighbors_edgewise(meshpoller,bpy.types.Operator):
 class MESH_OT_vneighbors_facewise(meshpoller,bpy.types.Operator):
     bl_idname = "mesh.v2v_facewise"
     bl_label = "Neighbors by Face - Edge"
-    bl_options = {"REGISTER","UNDO"}
+    bl_options = set(["REGISTER","UNDO"])
 
     def execute(self,context):
         global cachedata
@@ -116,12 +118,12 @@ class MESH_OT_vneighbors_facewise(meshpoller,bpy.types.Operator):
         if (meshkey == obj.tkkey) and (meshkey in cachedata):
             vert_to_vert_map = cachedata[meshkey]
         else:
-            vert_to_vert_map = {i:{} for i in range(meshkey[0])}
+            vert_to_vert_map = dict((i, {}) for i in xrange(meshkey[0]))
             for a,b in mesh.edge_keys:
                 vert_to_vert_map[a][b] = 1
                 vert_to_vert_map[b][a] = 1
             obj.tkkey = meshkey
-        faces = filter(lambda face:(len(face.vertices)==4) and (face.select == False),mesh.polygons)
+        faces = ifilter(lambda face:(len(face.vertices)==4) and (face.select == False),mesh.polygons)
         for f in faces:
             has = False
             t = set()
@@ -137,7 +139,7 @@ class MESH_OT_vneighbors_facewise(meshpoller,bpy.types.Operator):
         mesh.vertices.foreach_set("select",next_state)
         cachedata[meshkey] = vert_to_vert_map
         bpy.ops.object.mode_set(mode="EDIT")
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 def vvmenuitem(self,context):
     self.layout.operator(MESH_OT_vneighbors_edgewise.bl_idname)
@@ -159,7 +161,7 @@ def vvmenuitem(self,context):
 class MESH_OT_eneighbors_shared_v_f(meshpoller,bpy.types.Operator):
     bl_idname = "mesh.e2e_evfe"
     bl_label = "Neighbors by Vert+Face"
-    bl_options = {"REGISTER","UNDO"}
+    bl_options = set(["REGISTER","UNDO"])
     def execute(self,context):
         global cachedata
         bpy.ops.object.mode_set(mode="OBJECT")
@@ -170,14 +172,14 @@ class MESH_OT_eneighbors_shared_v_f(meshpoller,bpy.types.Operator):
         if (meshkey == obj.tkkey) and (meshkey in cachedata):
             edge_to_edges_dict = cachedata
         else:
-            edge_key_to_index = {k:i for i,k in enumerate(mesh.edge_keys)}
-            edge_to_edges_dict = {i:set() for i in range(len(mesh.edges))}
+            edge_key_to_index = dict((k, i) for i,k in enumerate(mesh.edge_keys))
+            edge_to_edges_dict = dict((i, set()) for i in xrange(len(mesh.edges)))
             for f in mesh.polygons:
                 fed=[edge_key_to_index[k] for k in f.edge_keys]
                 for k in f.edge_keys:
                     edge_to_edges_dict[edge_key_to_index[k]].update(fed)
             obj.tkkey = meshkey
-        for e in filter(lambda _:mesh.edges[_].select,edge_to_edges_dict):
+        for e in ifilter(lambda _:mesh.edges[_].select,edge_to_edges_dict):
             k1 = set(mesh.edges[e].key)
             for n in edge_to_edges_dict[e]:
                 k2 = set(mesh.edges[n].key)
@@ -187,7 +189,7 @@ class MESH_OT_eneighbors_shared_v_f(meshpoller,bpy.types.Operator):
             e.select ^= state_mask[e.index]
         cachedata[meshkey] = edge_key_to_index
         bpy.ops.object.mode_set(mode="EDIT")
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 
 #   +--0--+--0--+--0--+          +--0--+--0--+--0--+
@@ -202,7 +204,7 @@ class MESH_OT_eneighbors_shared_v_f(meshpoller,bpy.types.Operator):
 class MESH_OT_eneighbors_shared_v(meshpoller,bpy.types.Operator):
     bl_idname = "mesh.e2e_eve"
     bl_label = "Neighbors by Vert"
-    bl_options = {"REGISTER","UNDO"}
+    bl_options = set(["REGISTER","UNDO"])
     def execute(self,context):
         bpy.ops.object.mode_set(mode="OBJECT")
         mesh = context.active_object.data
@@ -211,7 +213,7 @@ class MESH_OT_eneighbors_shared_v(meshpoller,bpy.types.Operator):
             state_mask[e.index] = mesh.vertices[e.vertices[0]].select ^ mesh.vertices[e.vertices[1]].select
         mesh.edges.foreach_set('select',state_mask)
         bpy.ops.object.mode_set(mode="EDIT")
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 
 #   +--0--+--0--+--0--+          +--0--+--1--+--0--+
@@ -226,7 +228,7 @@ class MESH_OT_eneighbors_shared_v(meshpoller,bpy.types.Operator):
 class MESH_OT_eneighbors_shared_f(meshpoller,bpy.types.Operator):
     bl_idname = "mesh.e2e_efe"
     bl_label = "Neighbors by Face"
-    bl_options = {"REGISTER","UNDO"}
+    bl_options = set(["REGISTER","UNDO"])
     def execute(self,context):
         global cachedata
         bpy.ops.object.mode_set(mode="OBJECT")
@@ -236,8 +238,8 @@ class MESH_OT_eneighbors_shared_f(meshpoller,bpy.types.Operator):
         if (meshkey == obj.tkkey) and (meshkey in cachedata):
             edge_to_edges_dict = cachedata
         else:
-            edge_key_to_index = {k:i for i,k in enumerate(mesh.edge_keys)}
-            edge_to_edges_dict = {i:set() for i in range(len(mesh.edges))}
+            edge_key_to_index = dict((k, i) for i,k in enumerate(mesh.edge_keys))
+            edge_to_edges_dict = dict((i, set()) for i in xrange(len(mesh.edges)))
             for f in mesh.polygons:
                 fed=[edge_key_to_index[k] for k in f.edge_keys]
                 for k in f.edge_keys:
@@ -245,15 +247,15 @@ class MESH_OT_eneighbors_shared_f(meshpoller,bpy.types.Operator):
             obj.tkkey = meshkey
         state_mask,esel = (bytearray(meshkey[1]),bytearray(meshkey[1]))
         mesh.edges.foreach_get('select',esel)
-        for e in filter(lambda _:mesh.edges[_].select,range(meshkey[1])):
+        for e in ifilter(lambda _:mesh.edges[_].select,xrange(meshkey[1])):
             for n in edge_to_edges_dict[e]:
                 state_mask[n] = 1
-        for e in range(meshkey[1]):
+        for e in xrange(meshkey[1]):
             esel[e] ^= state_mask[e]
         mesh.edges.foreach_set('select',esel)
         cachedata[meshkey] = edge_to_edges_dict
         bpy.ops.object.mode_set(mode="EDIT")
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 # notice that on these next two, the original selection stays
 #   +--0--+--0--+--0--+          +--0--+--1--+--0--+
@@ -268,7 +270,7 @@ class MESH_OT_eneighbors_shared_f(meshpoller,bpy.types.Operator):
 class MESH_OT_eneighbors_shared_f_notv(meshpoller,bpy.types.Operator):
     bl_idname = "mesh.e2e_efnve"
     bl_label = "Lateral Neighbors"
-    bl_options = {"REGISTER","UNDO"}
+    bl_options = set(["REGISTER","UNDO"])
     def execute(self,context):
         global cachedata
         bpy.ops.object.mode_set(mode="OBJECT")
@@ -280,14 +282,14 @@ class MESH_OT_eneighbors_shared_f_notv(meshpoller,bpy.types.Operator):
             edge_to_face_map,edge_key_to_index = cachedata[meshkey]
         else:
             edge_key_to_index = {}
-            edge_to_face_map = {i:set() for i in range(meshkey[1])}
+            edge_to_face_map = dict((i, set()) for i in xrange(meshkey[1]))
             for i,k in enumerate(mesh.edge_keys):
                 edge_key_to_index[k] = i
             for f in mesh.polygons:
                 for k in f.edge_keys:
                     edge_to_face_map[edge_key_to_index[k]].add(f.index)
             obj.tkkey = meshkey
-        selected_edge_indices = filter(lambda _:mesh.edges[_].select,range(meshkey[1]))
+        selected_edge_indices = ifilter(lambda _:mesh.edges[_].select,xrange(meshkey[1]))
         for e in selected_edge_indices:
             for f in edge_to_face_map[e]:
                 for k in mesh.polygons[f].edge_keys:
@@ -299,11 +301,11 @@ class MESH_OT_eneighbors_shared_f_notv(meshpoller,bpy.types.Operator):
                         continue
                     else:
                         state_mask[edge_key_to_index[k]] = True
-        for e in filter(lambda _:state_mask[_],range(meshkey[1])):
+        for e in ifilter(lambda _:state_mask[_],xrange(meshkey[1])):
             mesh.edges[e].select |= state_mask[e]
         cachedata[meshkey] = (edge_to_face_map,edge_key_to_index)
         bpy.ops.object.mode_set(mode="EDIT")
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 
 
@@ -319,7 +321,7 @@ class MESH_OT_eneighbors_shared_f_notv(meshpoller,bpy.types.Operator):
 class MESH_OT_eneighbors_shared_v_notf(meshpoller,bpy.types.Operator):
     bl_idname = "mesh.e2e_evnfe"
     bl_label = "Longitudinal Edges"
-    bl_options = {"REGISTER","UNDO"}
+    bl_options = set(["REGISTER","UNDO"])
     def execute(self,context):
         global cachedata
         bpy.ops.object.mode_set(mode="OBJECT")
@@ -333,8 +335,8 @@ class MESH_OT_eneighbors_shared_v_notf(meshpoller,bpy.types.Operator):
             edge_to_face_map,vert_to_vert_map,edge_key_to_index = cachedata[meshkey]
         else:
             edge_key_to_index = {}
-            vert_to_vert_map = {i:set() for i in range(meshkey[0])}
-            edge_to_face_map = {i:set() for i in range(meshkey[1])}
+            vert_to_vert_map = dict((i, set()) for i in xrange(meshkey[0]))
+            edge_to_face_map = dict((i, set()) for i in xrange(meshkey[1]))
             for i,k in enumerate(mesh.edge_keys):
                 edge_key_to_index[k] = i
                 vert_to_vert_map[k[0]].add(k[1])
@@ -343,26 +345,26 @@ class MESH_OT_eneighbors_shared_v_notf(meshpoller,bpy.types.Operator):
                 for k in f.edge_keys:
                     edge_to_face_map[edge_key_to_index[k]].add(f.index)
             obj.tkkey = meshkey
-        selected_edge_indices = filter(lambda _:mesh.edges[_].select,range(meshkey[1]))
+        selected_edge_indices = ifilter(lambda _:mesh.edges[_].select,xrange(meshkey[1]))
         for e in selected_edge_indices:
             for v in mesh.edges[e].key:
                 state_mask[v] ^=1
             for f in edge_to_face_map[e]:
                 for v in mesh.polygons[f].vertices:
                     vstate[v] = 1
-        for v in filter(lambda _:state_mask[_],range(meshkey[1])):
+        for v in ifilter(lambda _:state_mask[_],xrange(meshkey[1])):
             for n in vert_to_vert_map[v]:
                 if not vstate[n] and (n != v):
                     mesh.edges[edge_key_to_index[(min(v,n),max(v,n))]].select = True
         cachedata[meshkey] = (edge_to_face_map,vert_to_vert_map,edge_key_to_index)
         bpy.ops.object.mode_set(mode="EDIT")
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 #deselects faces, leaving only edges selected
 class MESH_OT_just_the_edges(meshpoller,bpy.types.Operator):
     bl_idname = "mesh.je"
     bl_label = "Just the Edge Selection"
-    bl_options = {"REGISTER","UNDO"}
+    bl_options = set(["REGISTER","UNDO"])
     def execute(self,context):
         global cachedata
         bpy.ops.object.mode_set(mode="OBJECT")
@@ -373,23 +375,23 @@ class MESH_OT_just_the_edges(meshpoller,bpy.types.Operator):
         if (meshkey == obj.tkkey) and (meshkey in cachedata):
             edge_key_to_index = cachedata[meshkey]
         else:
-            edge_key_to_index = {k:i for i,k in enumerate(mesh.edge_keys)}
+            edge_key_to_index = dict((k, i) for i,k in enumerate(mesh.edge_keys))
             obj.tkkey = meshkey
-        for f in filter(lambda _:mesh.polygons[_].select,range(meshkey[2])):
+        for f in ifilter(lambda _:mesh.polygons[_].select,xrange(meshkey[2])):
             for k in mesh.polygons[f].edge_keys:
                 state_mask[edge_key_to_index[k]] = 1
-        for e in range(meshkey[1]):
+        for e in xrange(meshkey[1]):
             mesh.edges[e].select ^= state_mask[e]
         cachedata[meshkey] = edge_key_to_index
         bpy.ops.object.mode_set(mode="EDIT")
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 # deselects edges which are at the edge of a face-selection,
 # causing selection to 'shrink in'
 class MESH_OT_inner_edges(meshpoller,bpy.types.Operator):
     bl_idname = "mesh.ie"
     bl_label = "Inner Edge Selection"
-    bl_options = {"REGISTER","UNDO"}
+    bl_options = set(["REGISTER","UNDO"])
     def execute(self,context):
         global cachedata
         bpy.ops.object.mode_set(mode="OBJECT")
@@ -400,21 +402,21 @@ class MESH_OT_inner_edges(meshpoller,bpy.types.Operator):
         if (meshkey == obj.tkkey) and (meshkey in cachedata):
             edge_to_face_map = cachedata[meshkey]
         else:
-            edge_key_to_index = {k:i for i,k in enumerate(mesh.edge_keys)}
-            edge_to_face_map = {i:set() for i in range(meshkey[1])}
+            edge_key_to_index = dict((k, i) for i,k in enumerate(mesh.edge_keys))
+            edge_to_face_map = dict((i, set()) for i in xrange(meshkey[1]))
             for f in mesh.polygons:
                 for k in f.edge_keys:
                     edge_to_face_map[edge_key_to_index[k]].add(f.index)
             obj.tkkey = meshkey
-        for e in filter(lambda _:mesh.edges[_].select,range(meshkey[1])):
+        for e in ifilter(lambda _:mesh.edges[_].select,xrange(meshkey[1])):
             for f in edge_to_face_map[e]:
                 if mesh.polygons[f].select:
                     state_mask[e] ^=1
-        for e in range(meshkey[1]):
+        for e in xrange(meshkey[1]):
             mesh.edges[e].select ^= state_mask[e]
         cachedata[meshkey] = edge_to_face_map
         bpy.ops.object.mode_set(mode="EDIT")
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 
 def eemenuitem(self,context):
@@ -438,7 +440,7 @@ def eemenuitem(self,context):
 class MESH_OT_fneighbors_shared_e(meshpoller,bpy.types.Operator):
     bl_idname = "mesh.f2f_fef"
     bl_label = "Neighbors by Edge"
-    bl_options = {"REGISTER","UNDO"}
+    bl_options = set(["REGISTER","UNDO"])
     def execute(self,context):
         global cachedata
         bpy.ops.object.mode_set(mode="OBJECT")
@@ -448,25 +450,25 @@ class MESH_OT_fneighbors_shared_e(meshpoller,bpy.types.Operator):
         if (meshkey == obj.tkkey) and (meshkey in cachedata):
             face_to_face_map = cachedata[meshkey]
         else:
-            edge_key_to_index = {k:i for i,k in enumerate(mesh.edge_keys)}
-            edge_to_face_map = {i:set() for i in range(meshkey[1])}
+            edge_key_to_index = dict((k, i) for i,k in enumerate(mesh.edge_keys))
+            edge_to_face_map = dict((i, set()) for i in xrange(meshkey[1]))
             for f in mesh.polygons:
                 for k in f.edge_keys:
                     edge_to_face_map[edge_key_to_index[k]].add(f.index)
-            face_to_face_map = {i:set() for i in range(meshkey[2])}
+            face_to_face_map = dict((i, set()) for i in xrange(meshkey[2]))
             for f in mesh.polygons:
                 for k in f.edge_keys:
                     face_to_face_map[f.index].update(edge_to_face_map[edge_key_to_index[k]])
             obj.tkkey = meshkey
         mask_state = bytearray(meshkey[2])
-        for f in filter(lambda _:mesh.polygons[_].select,range(meshkey[2])):
+        for f in ifilter(lambda _:mesh.polygons[_].select,xrange(meshkey[2])):
             for n in face_to_face_map[f]:
                 mask_state[n] = True
-        for f in range(meshkey[2]):
+        for f in xrange(meshkey[2]):
             mesh.polygons[f].select ^= mask_state[f]
         cachedata[meshkey] = face_to_face_map
         bpy.ops.object.mode_set(mode="EDIT")
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 
 #   [0][0][0]          [1][0][1]
@@ -475,7 +477,7 @@ class MESH_OT_fneighbors_shared_e(meshpoller,bpy.types.Operator):
 class MESH_OT_fneighbors_shared_v_note(meshpoller,bpy.types.Operator):
     bl_idname = "mesh.f2f_fvnef"
     bl_label = "Neighbors by Vert not Edge"
-    bl_options = {"REGISTER","UNDO"}
+    bl_options = set(["REGISTER","UNDO"])
     def execute(self,context):
         global cachedata
         bpy.ops.object.mode_set(mode="OBJECT")
@@ -485,13 +487,13 @@ class MESH_OT_fneighbors_shared_v_note(meshpoller,bpy.types.Operator):
         if (meshkey == obj.tkkey) and (meshkey in cachedata):
             edge_key_to_index = cachedata[meshkey]
         else:
-            edge_key_to_index = {k:i for i,k in enumerate(mesh.edge_keys)}
+            edge_key_to_index = dict((k, i) for i,k in enumerate(mesh.edge_keys))
             obj.tkkey = meshkey
         state_mask = bytearray(meshkey[2])
         face_verts = set()
-        for f in filter(lambda _:mesh.polygons[_].select,range(meshkey[2])):
+        for f in ifilter(lambda _:mesh.polygons[_].select,xrange(meshkey[2])):
             face_verts.update(mesh.polygons[f].vertices)
-        for f in filter(lambda _:not mesh.polygons[_].select,range(meshkey[2])):
+        for f in ifilter(lambda _:not mesh.polygons[_].select,xrange(meshkey[2])):
             ct = 0
             for v in mesh.polygons[f].vertices:
                 ct += (v in face_verts)
@@ -500,14 +502,14 @@ class MESH_OT_fneighbors_shared_v_note(meshpoller,bpy.types.Operator):
         mesh.polygons.foreach_set('select',state_mask)
         cachedata[meshkey] = edge_key_to_index
         bpy.ops.object.mode_set(mode="EDIT")
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 
 # http://en.wikipedia.org/wiki/Conway's_Game_of_Life
 class MESH_OT_conway(meshpoller,bpy.types.Operator):
     bl_idname = "mesh.conway"
     bl_label = "Conway"
-    bl_options = {"REGISTER","UNDO"}
+    bl_options = set(["REGISTER","UNDO"])
     def execute(self,context):
         global cachedata
         bpy.ops.object.mode_set(mode="OBJECT")
@@ -517,31 +519,31 @@ class MESH_OT_conway(meshpoller,bpy.types.Operator):
         if (meshkey == obj.tkkey) and (meshkey in cachedata):
             vert_to_face_map = cachedata[meshkey]
         else:
-            vert_to_face_map = {i:set() for i in range(meshkey[0])}
+            vert_to_face_map = dict((i, set()) for i in xrange(meshkey[0]))
             for f in mesh.polygons:
                 for v in f.vertices:
                     vert_to_face_map[v].add(f.index)
             obj.tkkey = meshkey
         sel = set()
         uns = set()
-        F = {i:set() for i in range(meshkey[2])}
-        for f in range(meshkey[2]):
+        F = dict((i, set()) for i in xrange(meshkey[2]))
+        for f in xrange(meshkey[2]):
             for v in mesh.polygons[f].vertices:
-                for n in filter(lambda _: mesh.polygons[_].select and (_ != f),vert_to_face_map[v]):
+                for n in ifilter(lambda _: mesh.polygons[_].select and (_ != f),vert_to_face_map[v]):
                     F[f].add(n)
         for f in F:
             if len(F[f]) == 3:
                 sel.add(f)
             elif len(F[f]) != 2:
                 uns.add(f)
-        for f in range(meshkey[2]):
+        for f in xrange(meshkey[2]):
             if f in sel:
                 mesh.polygons[f].select = True
             if f in uns:
                 mesh.polygons[f].select = False
         cachedata[meshkey] = vert_to_face_map
         bpy.ops.object.mode_set(mode="EDIT")
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 
 

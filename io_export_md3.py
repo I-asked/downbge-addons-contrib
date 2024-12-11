@@ -16,6 +16,9 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import division
+from __future__ import absolute_import
+from io import open
 bl_info = {
     "name": "Quake Model 3 (.md3)",
     "author": "Xembie",
@@ -43,7 +46,7 @@ MD3_MAX_VERTICES = 4096
 MD3_MAX_TRIANGLES = 8192
 MD3_XYZ_SCALE = 64.0
 
-class md3Vert:
+class md3Vert(object):
     xyz = []
     normal = 0
     binaryFormat = "<3hH"
@@ -100,7 +103,7 @@ class md3Vert:
         data = struct.pack(self.binaryFormat, tmpData[0], tmpData[1], tmpData[2], tmpData[3])
         file.write(data)
 
-class md3TexCoord:
+class md3TexCoord(object):
     u = 0.0
     v = 0.0
 
@@ -120,7 +123,7 @@ class md3TexCoord:
         data = struct.pack(self.binaryFormat, tmpData[0], tmpData[1])
         file.write(data)
 
-class md3Triangle:
+class md3Triangle(object):
     indexes = []
 
     binaryFormat = "<3i"
@@ -139,7 +142,7 @@ class md3Triangle:
         data = struct.pack(self.binaryFormat,tmpData[0], tmpData[1], tmpData[2])
         file.write(data)
 
-class md3Shader:
+class md3Shader(object):
     name = ""
     index = 0
 
@@ -159,7 +162,7 @@ class md3Shader:
         data = struct.pack(self.binaryFormat, tmpData[0], tmpData[1])
         file.write(data)
 
-class md3Surface:
+class md3Surface(object):
     ident = ""
     name = ""
     flags = 0
@@ -248,7 +251,7 @@ class md3Surface:
         for v in self.verts:
             v.Save(file)
 
-class md3Tag:
+class md3Tag(object):
     name = ""
     origin = []
     axis = []
@@ -281,7 +284,7 @@ class md3Tag:
         data = struct.pack(self.binaryFormat, tmpData[0],tmpData[1],tmpData[2],tmpData[3],tmpData[4],tmpData[5],tmpData[6], tmpData[7], tmpData[8], tmpData[9], tmpData[10], tmpData[11], tmpData[12])
         file.write(data)
 
-class md3Frame:
+class md3Frame(object):
     mins = 0
     maxs = 0
     localOrigin = 0
@@ -316,7 +319,7 @@ class md3Frame:
         data = struct.pack(self.binaryFormat, tmpData[0],tmpData[1],tmpData[2],tmpData[3],tmpData[4],tmpData[5],tmpData[6],tmpData[7], tmpData[8], tmpData[9], tmpData[10])
         file.write(data)
 
-class md3Object:
+class md3Object(object):
     # header structure
     ident = ""            # this is used to identify the file (must be IDP3)
     version = 0            # the version number of the file (Must be 15)
@@ -399,9 +402,9 @@ def message(log,msg):
   if log:
     log.write(msg + "\n")
   else:
-    print(msg)
+    print msg
 
-class md3Settings:
+class md3Settings(object):
   def __init__(self,
                savepath,
                name,
@@ -576,7 +579,7 @@ def save_md3(settings):
         nsurface.shaders.append(nshader)
         nsurface.numShaders += 1
 
-      for frame in range(bpy.context.scene.frame_start,bpy.context.scene.frame_end + 1):
+      for frame in xrange(bpy.context.scene.frame_start,bpy.context.scene.frame_end + 1):
         bpy.context.scene.set_frame(frame)
         fobj = obj.create_mesh(bpy.context.scene,True,'PREVIEW')
         fobj.calc_normals()
@@ -590,7 +593,7 @@ def save_md3(settings):
             nvert.xyz[1] = (round(nvert.xyz[1] + obj.matrix_world[3][1],5) * settings.scale) + settings.offsety
             nvert.xyz[2] = (round(nvert.xyz[2] + obj.matrix_world[3][2],5) * settings.scale) + settings.offsetz
             nvert.normal = nvert.Encode(vert.normal)
-            for i in range(0,3):
+            for i in xrange(0,3):
               nframe.mins[i] = min(nframe.mins[i],nvert.xyz[i])
               nframe.maxs[i] = max(nframe.maxs[i],nvert.xyz[i])
             minlength = math.sqrt(math.pow(nframe.mins[0],2) + math.pow(nframe.mins[1],2) + math.pow(nframe.mins[2],2))
@@ -605,7 +608,7 @@ def save_md3(settings):
 
     elif obj.type == 'EMPTY':
       md3.numTags += 1
-      for frame in range(bpy.context.scene.frame_start,bpy.context.scene.frame_end + 1):
+      for frame in xrange(bpy.context.scene.frame_start,bpy.context.scene.frame_end + 1):
         bpy.context.scene.set_frame(frame)
         ntag = md3Tag()
         ntag.origin[0] = (round(obj.matrix_world[3][0] * settings.scale,5)) + settings.offsetx
@@ -635,7 +638,7 @@ def save_md3(settings):
 
   message(log,"MD3: " + settings.name + " saved to " + settings.savepath)
   if log:
-    print("Logged to",settings.logpath)
+    print "Logged to",settings.logpath
     log.close()
 
 from bpy.props import *
@@ -667,12 +670,12 @@ class ExportMD3(bpy.types.Operator):
                           offsety = self.properties.md3offsety,
                           offsetz = self.properties.md3offsetz)
    save_md3(settings)
-   return {'FINISHED'}
+   return set(['FINISHED'])
 
   def invoke(self, context, event):
     wm = context.window_manager
     wm.fileselect_add(self)
-    return {'RUNNING_MODAL'}
+    return set(['RUNNING_MODAL'])
 
   @classmethod
   def poll(cls, context):

@@ -21,6 +21,8 @@
 
 # <pep8 compliant>
 
+from __future__ import division
+from __future__ import absolute_import
 from math import pi
 from mathutils import Quaternion
 
@@ -188,7 +190,7 @@ def bridgequads(aquad, bquad, verts):
 
     #print('bridgequads', aquad, bquad, ai, bi)
 
-    return ([(aquad[(ai + i) % n], aquad[(ai + i + 1) % n], bquad[(bi + i + 1) % n], bquad[(bi + i) % n]) for i in range(n)], [aquad[(ai + i) % n] for i in range(n)], [bquad[(bi + i) % n] for i in range(n)])
+    return ([(aquad[(ai + i) % n], aquad[(ai + i + 1) % n], bquad[(bi + i + 1) % n], bquad[(bi + i) % n]) for i in xrange(n)], [aquad[(ai + i) % n] for i in xrange(n)], [bquad[(bi + i) % n] for i in xrange(n)])
 
 
 def quadfork(p0, p1, p2, p3, r0, r1, r2, r3):

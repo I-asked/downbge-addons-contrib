@@ -27,12 +27,14 @@
 """
 
 
+from __future__ import division
+from __future__ import absolute_import
 from mathutils import Vector, Matrix
 from mathutils import geometry
 
 
 # 3D Geometry
-class G3:
+class G3(object):
 
     @classmethod
     def distanceP2P(cls, p1, p2):

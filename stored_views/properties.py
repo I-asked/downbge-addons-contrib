@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from bpy.types import PropertyGroup
 from bpy.props import (BoolProperty,
                         BoolVectorProperty,

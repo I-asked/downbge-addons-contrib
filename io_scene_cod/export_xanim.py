@@ -31,8 +31,10 @@ TODO
 
 """
 
+from __future__ import absolute_import
 import bpy
 from datetime import datetime
+from io import open
 
 def save(self, context, filepath="",
          use_selection=False,
@@ -115,7 +117,7 @@ def save(self, context, filepath="",
         frame_min = use_frame_end
         frame_max = use_frame_start
 
-    for i_frame, frame in enumerate(range(use_frame_start,
+    for i_frame, frame in enumerate(xrange(use_frame_start,
                                           use_frame_end + frame_order,
                                           frame_order),
                                     frame_min):
@@ -206,7 +208,7 @@ def save(self, context, filepath="",
     # Close to flush buffers!
     file.close()
 
-    if use_notetrack and use_notetrack_format in {'5', '7'}:
+    if use_notetrack and use_notetrack_format in set(['5', '7']):
 
         import os.path
         filepath = os.path.splitext(filepath)[0] + ".NT_EXPORT"

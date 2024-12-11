@@ -23,6 +23,7 @@
 
 # Converts a formated string to a float tuple:
 #   IN - '(0.5, 0.2)' -> CONVERT -> OUT - (0.5, 0.2)
+from __future__ import absolute_import
 def toTuple(stringIn):
     sTemp = str(stringIn)[1:len(str(stringIn)) - 1].split(', ')
     fTemp = []

@@ -22,6 +22,7 @@ many different kinds one after the other.
 On the Nodes Editor Properties N panel.
 """
 
+from __future__ import absolute_import
 import bpy
 
 
@@ -54,7 +55,7 @@ class AMTH_NODE_PT_simplify(bpy.types.Panel):
     bl_space_type = "NODE_EDITOR"
     bl_region_type = "UI"
     bl_label = "Simplify"
-    bl_options = {"DEFAULT_CLOSED"}
+    bl_options = set(["DEFAULT_CLOSED"])
 
     @classmethod
     def poll(cls, context):
@@ -132,7 +133,7 @@ class AMTH_NODE_OT_toggle_mute(bpy.types.Operator):
         pass_vector = sorted(set(pass_vector))
         scene["amaranth_pass_vector"] = pass_vector
 
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 
 def register():

@@ -16,6 +16,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import absolute_import
 bl_info = {
     "name": "Worn Edges",
     "author": "Oscurart",
@@ -62,7 +63,7 @@ class OscurartWorn(bpy.types.Operator):
     """Tooltip"""
     bl_idname = "paint.worn_edges"
     bl_label = "Worn Edges Map"
-    bl_options = {"REGISTER", "UNDO"}
+    bl_options = set(["REGISTER", "UNDO"])
 
     @classmethod
     def poll(cls, context):
@@ -72,7 +73,7 @@ class OscurartWorn(bpy.types.Operator):
 
     def execute(self, context):
         CreateWornEdges(context, self.factor)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 def add_osc_futurism_button(self, context):

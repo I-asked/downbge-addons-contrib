@@ -1,3 +1,7 @@
+from __future__ import division
+from __future__ import absolute_import
+from itertools import izip
+from io import open
 bl_info = {
     "name": "BProjection",
     "description": "Help Clone tool",
@@ -77,7 +81,7 @@ def applyimage(context):
         face = ob.data.polygons
         uvdata = ob.data.uv_textures.active.data
 
-        for f,d in zip(face,uvdata):
+        for f,d in izip(face,uvdata):
             if f.select:
                 d.image = img
 
@@ -119,7 +123,7 @@ def update_UVScale(self, context):
     scale = s - os
     l = find_uv(context)
     for i,j in l:
-        for t in range(j):
+        for t in xrange(j):
             d = context.object.data.uv_layers.active.data[i+t]
             vres =  v - d.uv
             d.uv.x = v.x - vres.x/os[0]*s[0]
@@ -150,7 +154,7 @@ def update_UVOffset(self, context):
     oo = em.custom_old_offsetuv
     l = find_uv(context)
     for i,j in l:
-        for t in range(j):
+        for t in xrange(j):
             d = context.object.data.uv_layers.active.data[i+t]
             d.uv = [d.uv[0] - oo[0]/10 + o[0]/10, d.uv[1] - oo[1]/10 + o[1]/10]
     em.custom_old_offsetuv = o
@@ -161,7 +165,7 @@ def update_UVOffset(self, context):
 def update_FlipUVX(self, context):
     l = find_uv(context)
     for i,j in l:
-        for t in range(j):
+        for t in xrange(j):
             d = context.object.data.uv_layers.active.data[i+t]
             x = d.uv.x
             d.uv.x = 1 - x
@@ -172,7 +176,7 @@ def update_FlipUVX(self, context):
 def update_FlipUVY(self, context):
     l = find_uv(context)
     for i,j in l:
-        for t in range(j):
+        for t in xrange(j):
             d = context.object.data.uv_layers.active.data[i+t]
             y = d.uv[1]
             d.uv[1] = 1 - y
@@ -450,7 +454,7 @@ class CreateView(Operator):
         ob.data.shape_keys.key_blocks[ob.active_shape_key_index].value = 1.0
         new_props.custom_index = len(em.custom_props)-1
         bpy.ops.object.active_view(index = new_props.custom_index)
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 # Oprerator Class to copy view
 class SaveView(Operator):
@@ -477,7 +481,7 @@ class SaveView(Operator):
         except:
             pass
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 # Oprerator Class to copy view
 class PasteView(Operator):
@@ -511,7 +515,7 @@ class PasteView(Operator):
             em.custom_flipuvy = prop.custom_flipuvy
         em.custom_scac3d = tmp_scac3d
         em.custom_rotc3d = tmp_rotc3d
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 # Oprerator Class to remove view
 class RemoveView(Operator):
@@ -548,7 +552,7 @@ class RemoveView(Operator):
         for item in (item for item in em.custom_props if item.custom_active):
                 ob.active_shape_key_index = item.custom_index+1
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 # Oprerator Class to copy view
 class ActiveView(Operator):
@@ -574,7 +578,7 @@ class ActiveView(Operator):
 
         bpy.ops.object.paste_view(index = self.index)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 # Draw Class to show the panel
 class BProjection(Panel):
@@ -703,7 +707,7 @@ class ApplyImage(Operator):
     def execute(self, context):
         applyimage(context)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 # Oprerator Class to make the 4 or 6 point and scale the plan
 class IntuitiveScale(Operator):
@@ -747,7 +751,7 @@ class IntuitiveScale(Operator):
                     em.custom_scale[1] *= abs(propy)
                 bpy.ops.gpencil.active_frame_delete()
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 # Oprerator Class to configure all wath is needed
 class AddBProjectionPlane(Operator):
@@ -812,7 +816,7 @@ class AddBProjectionPlane(Operator):
             bpy.ops.object.vertex_group_select()
 
             bpy.ops.object.editmode_toggle()
-            for i in range(4):
+            for i in xrange(4):
                 ob.data.edges[len(ob.data.edges)-1-i].crease = 1
             bpy.ops.object.editmode_toggle()
 
@@ -877,7 +881,7 @@ class AddBProjectionPlane(Operator):
             bpy.ops.object.mode_set(mode = cm, toggle=False)
             bpy.data.objects[BProjection_Empty].custom_active_object = context.object.name
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 # Oprerator Class to remove what is no more needed
 class RemoveBProjectionPlane(Operator):
@@ -954,7 +958,7 @@ class RemoveBProjectionPlane(Operator):
         except:
             nothing = 0
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 def reinitkey():
     km = bpy.data.window_managers['WinMan'].keyconfigs['Blender'].keymaps['3D View']
@@ -984,7 +988,7 @@ def reinitkey():
         if kmi.idname == 'paint.bp_paint':
             kmi.idname = 'paint.image_paint'
 
-    for kmi in (kmi for kmi in km.keymap_items if kmi.idname in {"object.intuitivescale", "object.bp_grab", "object.bp_rotate", "object.bp_scale", "object.bp_scaleuv", "object.bp_clear_prop", "object.bp_offsetuv","object.bp_toggle_alpha", }):
+    for kmi in (kmi for kmi in km.keymap_items if kmi.idname in set(["object.intuitivescale", "object.bp_grab", "object.bp_rotate", "object.bp_scale", "object.bp_scaleuv", "object.bp_clear_prop", "object.bp_offsetuv","object.bp_toggle_alpha",])):
             km.keymap_items.remove(kmi)
 
 # Oprerator Class to remove what is no more needed
@@ -1092,7 +1096,7 @@ class ChangeObject(Operator):
                 em.custom_location += Vector((ob_loc.x - new_ob_loc.x, ob_loc.y - new_ob_loc.y, 0.0))
                 em.custom_c3d = tmp
 
-            return {'FINISHED'}
+            return set(['FINISHED'])
 
 #Paint from the bp_plan
 
@@ -1154,15 +1158,15 @@ class BP_Paint(bpy.types.Operator):
             em.custom_c3d = True
             bpy.data.materials['Material for BProjection'].alpha = self.alpha
             em.custom_location = self.first_location
-            return {'FINISHED'}
+            return set(['FINISHED'])
 
         if event.type == 'ESC' or event.type == 'RIGHTMOUSE':
             em.custom_c3d = True
             bpy.data.materials['Material for BProjection'].alpha = self.alpha
             em.custom_location = self.first_location
-            return {'FINISHED'}
+            return set(['FINISHED'])
 
-        return {'PASS_THROUGH'}
+        return set(['PASS_THROUGH'])
 
     def invoke(self, context, event):
         em = bpy.data.objects['Empty for BProjection']
@@ -1189,7 +1193,7 @@ class BP_Paint(bpy.types.Operator):
         bpy.ops.paint.image_paint(stroke=[{"name":"", "location":(0, 0, 0), "mouse":(event.mouse_region_x, event.mouse_region_y),
                                                    "pressure":1, "pen_flip":False, "time":0, "is_start":False}])
         self.step_prev = Vector((event.mouse_region_x, event.mouse_region_y))
-        return {'RUNNING_MODAL'}
+        return set(['RUNNING_MODAL'])
 
 # Oprerator Class toggle the alpha of the plane
 temp_alpha = 0
@@ -1206,7 +1210,7 @@ class ApplyImage(Operator):
             temp_alpha = bpy.data.materials['Material for BProjection'].alpha
             bpy.data.materials['Material for BProjection'].alpha = 0
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 #reinit the values of the bp_plane
 class BP_Clear_Props(Operator):
@@ -1216,7 +1220,7 @@ class BP_Clear_Props(Operator):
     def execute(self, context):
         clear_props(context)
 
-        return{'FINISHED'}
+        returnset(['FINISHED'])
 
 #Move the UV of the bp_plane
 class BP_OffsetUV(bpy.types.Operator):
@@ -1276,13 +1280,13 @@ class BP_OffsetUV(bpy.types.Operator):
             self.first_mouse.y = event.mouse_region_y
 
         if event.type == 'LEFTMOUSE':
-            return {'FINISHED'}
+            return set(['FINISHED'])
 
         if event.type == 'ESC' or event.type == 'RIGHTMOUSE':
             em.custom_offsetuv = self.first_offsetuv
-            return {'FINISHED'}
+            return set(['FINISHED'])
 
-        return {'RUNNING_MODAL'}
+        return set(['RUNNING_MODAL'])
 
     def invoke(self, context, event):
         em = bpy.data.objects['Empty for BProjection']
@@ -1291,7 +1295,7 @@ class BP_OffsetUV(bpy.types.Operator):
         self.first_mouse.y = event.mouse_region_y
         self.first_offsetuv = em.custom_offsetuv.copy()
 
-        return {'RUNNING_MODAL'}
+        return set(['RUNNING_MODAL'])
 
 #Scale the UV of the bp_plane
 class BP_ScaleUV(bpy.types.Operator):
@@ -1357,13 +1361,13 @@ class BP_ScaleUV(bpy.types.Operator):
             self.first_mouse.y = event.mouse_region_y
 
         if event.type == 'LEFTMOUSE':
-            return {'FINISHED'}
+            return set(['FINISHED'])
 
         if event.type == 'ESC' or event.type == 'RIGHTMOUSE':
             em.custom_scaleuv = self.first_scaleuv
-            return {'FINISHED'}
+            return set(['FINISHED'])
 
-        return {'RUNNING_MODAL'}
+        return set(['RUNNING_MODAL'])
 
     def invoke(self, context, event):
         em = bpy.data.objects['Empty for BProjection']
@@ -1372,7 +1376,7 @@ class BP_ScaleUV(bpy.types.Operator):
         self.first_mouse.y = event.mouse_region_y
         self.first_scaleuv = em.custom_scaleuv.copy()
 
-        return {'RUNNING_MODAL'}
+        return set(['RUNNING_MODAL'])
 
 #Scale the bp_plane
 class BP_Scale(bpy.types.Operator):
@@ -1432,13 +1436,13 @@ class BP_Scale(bpy.types.Operator):
                 em.custom_linkscale = False
 
         if event.type == 'LEFTMOUSE':
-            return {'FINISHED'}
+            return set(['FINISHED'])
 
         if event.type == 'ESC' or event.type == 'RIGHTMOUSE':
             em.custom_scale = self.first_scale
-            return {'FINISHED'}
+            return set(['FINISHED'])
 
-        return {'RUNNING_MODAL'}
+        return set(['RUNNING_MODAL'])
 
     def invoke(self, context, event):
         em = bpy.data.objects['Empty for BProjection']
@@ -1447,7 +1451,7 @@ class BP_Scale(bpy.types.Operator):
         self.first_mouse.y = event.mouse_region_y
         self.first_scale = em.custom_scale.copy()
 
-        return {'RUNNING_MODAL'}
+        return set(['RUNNING_MODAL'])
 
 #Rotate the bp_plan
 class BP_Rotate(bpy.types.Operator):
@@ -1483,13 +1487,13 @@ class BP_Rotate(bpy.types.Operator):
             em.custom_rotation = self.first_rotation + rot
 
         if event.type == 'LEFTMOUSE':
-            return {'FINISHED'}
+            return set(['FINISHED'])
 
         if event.type == 'ESC' or event.type == 'RIGHTMOUSE':
             em.custom_rotation = self.first_rotation
-            return {'FINISHED'}
+            return set(['FINISHED'])
 
-        return {'RUNNING_MODAL'}
+        return set(['RUNNING_MODAL'])
 
     def invoke(self, context, event):
         em = bpy.data.objects['Empty for BProjection']
@@ -1498,7 +1502,7 @@ class BP_Rotate(bpy.types.Operator):
         self.first_mouse.y = event.mouse_region_y
         self.first_rotation = em.custom_rotation
 
-        return {'RUNNING_MODAL'}
+        return set(['RUNNING_MODAL'])
 
 # grab the bp_plan
 class BP_Grab(bpy.types.Operator):
@@ -1588,13 +1592,13 @@ class BP_Grab(bpy.types.Operator):
             self.first_mouse.y = event.mouse_region_y
 
         if event.type == 'LEFTMOUSE':
-            return {'FINISHED'}
+            return set(['FINISHED'])
 
         if event.type == 'ESC' or event.type == 'RIGHTMOUSE':
             em.custom_location = self.first_location
-            return {'FINISHED'}
+            return set(['FINISHED'])
 
-        return {'RUNNING_MODAL'}
+        return set(['RUNNING_MODAL'])
 
     def invoke(self, context, event):
         em = bpy.data.objects['Empty for BProjection']
@@ -1603,7 +1607,7 @@ class BP_Grab(bpy.types.Operator):
         self.first_mouse.y = event.mouse_region_y
         self.first_location = em.custom_location.copy()
 
-        return {'RUNNING_MODAL'}
+        return set(['RUNNING_MODAL'])
 
 # Oprerator Class to rotate the view3D
 class RotateView3D(Operator):
@@ -1708,7 +1712,7 @@ class RotateView3D(Operator):
                 for sub in context.object.modifiers:
                     if sub.type in ['SUBSURF','MULTIRES']:
                         sub.levels = self.tmp_level
-            return {'FINISHED'}
+            return set(['FINISHED'])
 
         if event.type == 'MOUSEMOVE':
             if context.user_preferences.inputs.view_rotate_method == 'TRACKBALL':
@@ -1726,12 +1730,12 @@ class RotateView3D(Operator):
                 bpy.ops.view3d.view_persportho()
                 self.first_time = False
 
-        return {'RUNNING_MODAL'}
+        return set(['RUNNING_MODAL'])
 
     def execute(self, context):
         align_to_view(context)
 
-        return{'FINISHED'}
+        returnset(['FINISHED'])
 
     def invoke(self, context, event):
         bpy.data.objects['Empty for BProjection']
@@ -1745,7 +1749,7 @@ class RotateView3D(Operator):
                     sub.levels = 0
                 else:
                     sub.levels += bpy.context.object.custom_fnlevel
-        return {'RUNNING_MODAL'}
+        return set(['RUNNING_MODAL'])
 
 # Oprerator Class to pan the view3D
 class PanView3D(bpy.types.Operator):
@@ -1789,9 +1793,9 @@ class PanView3D(bpy.types.Operator):
                 for sub in context.object.modifiers:
                     if sub.type in ['SUBSURF','MULTIRES']:
                         sub.levels = self.tmp_level
-            return {'FINISHED'}
+            return set(['FINISHED'])
 
-        return {'RUNNING_MODAL'}
+        return set(['RUNNING_MODAL'])
 
     def invoke(self, context, event):
         bpy.data.objects['Empty for BProjection']
@@ -1806,12 +1810,12 @@ class PanView3D(bpy.types.Operator):
                 else:
                     sub.levels += bpy.context.object.custom_fnlevel
 
-        return {'RUNNING_MODAL'}
+        return set(['RUNNING_MODAL'])
 
     def execute(self, context):
         align_to_view(context)
 
-        return{'FINISHED'}
+        returnset(['FINISHED'])
 
 # Oprerator Class to zoom the view3D
 class ZoomView3D(Operator):
@@ -1862,12 +1866,12 @@ class ZoomView3D(Operator):
 
         align_to_view(context)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
     def execute(self, context):
         align_to_view(context)
 
-        return{'FINISHED'}
+        returnset(['FINISHED'])
 
 # Oprerator Class to use numpad shortcut
 class PresetView3D(Operator):
@@ -1896,7 +1900,7 @@ class PresetView3D(Operator):
         pos_init.rotate(vr_a*vr_b)
         sd.region_3d.view_location =  pos_init + origine
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 @persistent
 def load_handler(dummy):

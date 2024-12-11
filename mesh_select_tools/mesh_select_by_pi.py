@@ -43,11 +43,12 @@ Additional links:
 	e-mail: dolf {at} macouno {dot} com
 """
 '''
+from __future__ import absolute_import
 import bpy
 from bpy.props import BoolProperty
 
 
-class Select_by_pi():
+class Select_by_pi(object):
 
 	# Initialise the class
 	def __init__(self, context, e, invert, extend):
@@ -195,7 +196,7 @@ class Select_init(bpy.types.Operator):
 	'''Select faces based on pi'''
 	bl_idname = 'mesh.select_by_pi'
 	bl_label = 'Select by pi'
-	bl_options = {'REGISTER', 'UNDO'}
+	bl_options = set(['REGISTER', 'UNDO'])
 
 	e = BoolProperty(name='Use e', description='use e in stead of pi', default=False)
 
@@ -210,4 +211,4 @@ class Select_init(bpy.types.Operator):
 
 	def execute(self, context):
 		SELECT_DIRECTION = Select_by_pi(context, self.e, self.invert, self.extend)
-		return {'FINISHED'}
+		return set(['FINISHED'])

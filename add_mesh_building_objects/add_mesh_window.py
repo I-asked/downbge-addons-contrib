@@ -10,6 +10,8 @@
     "tracker_url": "",
     "category": "Add Mesh"}
 	'''
+from __future__ import division
+from __future__ import absolute_import
 import bpy
 from bpy.props import *
 from math import pi, sin, cos, sqrt, radians
@@ -116,7 +118,7 @@ def add_object(self, context):
     Z[-1]=Z[-2]+k1
 
     u = X[-1]/2
-    for i in range(0,len(X)):X[i]-=u
+    for i in xrange(0,len(X)):X[i]-=u
     kx=[[self.k00,self.k10,self.k20,self.k30,self.k40],
         [self.k01,self.k11,self.k21,self.k31,self.k41],
         [self.k02,self.k12,self.k22,self.k32,self.k42],
@@ -128,15 +130,15 @@ def add_object(self, context):
     cam=[];mer=[];ftl=[];SM=[]
 #VERTICES ------------------------
     vr.extend([[X[0],-k1/2,Z[0]],[X[0],k1/2,Z[0]]])
-    for x in range(1,len(X)-1):vr.extend([[X[x],-k1/2,Z[1]],[X[x], k1/2,Z[1]]])
+    for x in xrange(1,len(X)-1):vr.extend([[X[x],-k1/2,Z[1]],[X[x], k1/2,Z[1]]])
     vr.extend([[X[-1],-k1/2,Z[0]],[X[-1], k1/2,Z[0]]])
-    for z in range(2,len(Z)-2,2):
-        for x in range(0,len(X)):vr.extend([[X[x],-k1/2,Z[z]],[X[x], k1/2,Z[z]]])
-        for x in range(0,len(X)):vr.extend([[X[x],-k1/2,Z[z+1]],[X[x], k1/2,Z[z+1]]])
+    for z in xrange(2,len(Z)-2,2):
+        for x in xrange(0,len(X)):vr.extend([[X[x],-k1/2,Z[z]],[X[x], k1/2,Z[z]]])
+        for x in xrange(0,len(X)):vr.extend([[X[x],-k1/2,Z[z+1]],[X[x], k1/2,Z[z+1]]])
     z=len(Z)-2
     vr.extend([[X[0],-k1/2,Z[z+1]],[X[0], k1/2,Z[z+1]]])
     ALT=[];UST=[len(vr)-2,len(vr)-1]
-    for x in range(1,len(X)-1):
+    for x in xrange(1,len(X)-1):
         vr.extend([[X[x],-k1/2,Z[z]],[X[x], k1/2,Z[z]]])
         ALT.extend([len(vr)-2,len(vr)-1])
     vr.extend([[X[-1],-k1/2,Z[z+1]],[X[-1],k1/2,Z[z+1]]])
@@ -144,7 +146,7 @@ def add_object(self, context):
 #FACES ---------------------------
     fc.append([0,1,3+mx*4,2+mx*4])
     FB=[0];FR=[1]
-    for i in range(0,mx*4,4):
+    for i in xrange(0,mx*4,4):
         fc.append([i+3,i+2,i+4,i+5])
         FB.extend([i+2,i+4])
         FR.extend([i+3,i+5])
@@ -153,19 +155,19 @@ def add_object(self, context):
     fc.extend([FB,FR])
     #Yatay
     Y=(mx*4+4);V=mx*4+2
-    for z in range(0,(my-1)*Y*2,Y*2):
+    for z in xrange(0,(my-1)*Y*2,Y*2):
         fc.extend([[z+Y+1,z+Y,z+Y+4+mx*4,z+Y+5+mx*4],[z+Y+V,z+Y+V+1,z+Y+V+5+mx*4,z+Y+V+4+mx*4]])
-        for i in range(0,mx*4+2,2):fc.extend([[z+i+Y+0,z+i+Y+2,z+i+Y+V+4,z+i+Y+V+2],[z+i+Y  +3,z+i+Y  +1,z+i+Y+V+3,z+i+Y+V+5]])
-        for i in range(0,mx*4-3,4):fc.extend([[z+i+Y+2,z+i+Y+3,z+i+Y  +5,z+i+Y  +4],[z+i+Y+V+5,z+i+Y+V+4,z+i+Y+V+6,z+i+Y+V+7]])
+        for i in xrange(0,mx*4+2,2):fc.extend([[z+i+Y+0,z+i+Y+2,z+i+Y+V+4,z+i+Y+V+2],[z+i+Y  +3,z+i+Y  +1,z+i+Y+V+3,z+i+Y+V+5]])
+        for i in xrange(0,mx*4-3,4):fc.extend([[z+i+Y+2,z+i+Y+3,z+i+Y  +5,z+i+Y  +4],[z+i+Y+V+5,z+i+Y+V+4,z+i+Y+V+6,z+i+Y+V+7]])
     #Dikey
-    for Y in range(0,my):
+    for Y in xrange(0,my):
         z=Y*(mx*4+4)*2
-        for i in range(0,mx*4+2,4):fc.extend([[z+i+1,z+i+0,z+i+V+2,z+i+V+3],[z+i+3,z+i+1,z+i+V+3,z+i+V+5],[z+i+2,z+i+3,z+i+V+5,z+i+V+4],[z+i+0,z+i+2,z+i+V+4,z+i+V+2]])
+        for i in xrange(0,mx*4+2,4):fc.extend([[z+i+1,z+i+0,z+i+V+2,z+i+V+3],[z+i+3,z+i+1,z+i+V+3,z+i+V+5],[z+i+2,z+i+3,z+i+V+5,z+i+V+4],[z+i+0,z+i+2,z+i+V+4,z+i+V+2]])
     #Fitil-------------------
     if self.UST=='1':y1=my
     else:            y1=my-1
-    for y in range(0,y1):
-        for x in range(0,mx):
+    for y in xrange(0,y1):
+        for x in xrange(0,mx):
             if  kx[x][y]==True:
                 Kapak(vr,fc,X,Z,x*2+1,y*2+1,k2/2,(k1+k2)*0.5-0.01)
                 Fitil(vr,fc,X,Z,x*2+1,y*2+1,k3,(k1+k2)*0.5-0.01,k2)
@@ -176,11 +178,11 @@ def add_object(self, context):
     #-----------------------------------------------------
     if  self.UST=='1':#Duz
         fc.append([UST[1],UST[0],SON[0],SON[1]])
-        for i in range(0,mx*4,4):
+        for i in xrange(0,mx*4,4):
             fc.append([ALT[i],ALT[i+1],ALT[i+3],ALT[i+2]])
         ON=[UST[0]]
         AR=[UST[1]]
-        for i in range(0,len(ALT)-1,2):
+        for i in xrange(0,len(ALT)-1,2):
             ON.append(ALT[i  ])
             AR.append(ALT[i+1])
         ON.append(SON[0])
@@ -211,18 +213,18 @@ def add_object(self, context):
         for i in ALT:vr[i][2]=sqrt(R**2-vr[i][0]**2)+z
 
         ON=[SON[0]];U1=[]
-        for i in range(0,RES):
+        for i in xrange(0,RES):
             A=i*pi/RES;x=cos(A)*C
             if  x>-u and x<u:
                 vr.append([x,-k1/2,sin(A)*C+z]);ON.append(len(vr)-1)
         U1.extend(ON);U1.append(UST[0])
         ON.extend([UST[0],ALT[0]])
         AR=[];D1=[];D2=[]
-        for i in range(0,len(ALT)-2,4):
+        for i in xrange(0,len(ALT)-2,4):
             x1=vr[ALT[i+0]][0]; x2=vr[ALT[i+2]][0]
             ON.append(ALT[i+0]);AR.append(ALT[i+1])
             T1=[ALT[i+0]];      T2=[ALT[i+1]]
-            for j in range(0,RES):
+            for j in xrange(0,RES):
                 A=j*pi/RES;x=-cos(A)*R
                 if  x1<x and x<x2:
                     vr.extend([[x,-k1/2,sin(A)*R+z],[x,k1/2,sin(A)*R+z]])
@@ -233,7 +235,7 @@ def add_object(self, context):
             D1.append(T1);      D2.append(T2)
         AR.append(SON[1])
         U2=[SON[1]]
-        for i in range(0,RES):
+        for i in xrange(0,RES):
             A=i*pi/RES;x=cos(A)*C
             if  x>-u and x<u:
                 vr.append([x,k1/2,sin(A)*C+z])
@@ -242,12 +244,12 @@ def add_object(self, context):
         U2.append(UST[1])
         AR.reverse()
         fc.extend([ON,AR])
-        for i in range(0,len(U1)-1):fc.append([U1[i+1],U1[i],U2[i],U2[i+1]]);SM.append(len(fc)-1)
-        for A in range(0,mx):
-            for i in range(0,len(D1[A])-1):
+        for i in xrange(0,len(U1)-1):fc.append([U1[i+1],U1[i],U2[i],U2[i+1]]);SM.append(len(fc)-1)
+        for A in xrange(0,mx):
+            for i in xrange(0,len(D1[A])-1):
                 fc.append([D1[A][i+1],D1[A][i],D2[A][i],D2[A][i+1]]);SM.append(len(fc)-1)
         y=my-1
-        for x in range(0,mx):
+        for x in xrange(0,mx):
             if  kx[x][y]==True:
                 fr=(k1+k2)*0.5-0.01;ek=k2
                 R=C-k1;K=R-k2
@@ -269,7 +271,7 @@ def add_object(self, context):
                 vr[ALT[6]][2]=sqrt(K**2-vr[ALT[6]][0]**2)+z;vr[ALT[7]][2]=sqrt(R**2-vr[ALT[7]][0]**2)+z
 
                 D1=[];D2=[];T1=[];T2=[]
-                for i in range(0,RES):
+                for i in xrange(0,RES):
                     A =i*pi/RES;y1=cos(A)*R;y2=-cos(A)*K
                     if x1   <y1 and y1<x2:   vr.extend([[y1,fr-k2/2,sin(A)*R+z],[y1,fr+k2/2,sin(A)*R+z]]);T1.append(len(vr)-2);T2.append(len(vr)-1)
                     if x1+k2<y2 and y2<x2-k2:vr.extend([[y2,fr-k2/2,sin(A)*K+z],[y2,fr+k2/2,sin(A)*K+z]]);D1.append(len(vr)-2);D2.append(len(vr)-1)
@@ -281,8 +283,8 @@ def add_object(self, context):
                 elif D1!=[] and T1==[]:fc.extend([ON,AR,[ALT[5],ALT[6],D2[0],D1[0]],[ALT[2],ALT[1],D1[-1],D2[-1]],[ALT[7],ALT[4],ALT[0],ALT[3]]]);                            m=len(fc);SM.extend([m-1,m-2,m-3])
                 else:                  fc.extend([ON,AR,[ALT[5],ALT[6],D2[0],D1[0]],[ALT[2],ALT[1],D1[-1],D2[-1]],[ALT[7],ALT[4],T1[-1],T2[-1]],[ALT[0],ALT[3],T2[0],T1[0]]]);m=len(fc);SM.extend([m-1,m-2,m-3,m-4])
 
-                for i in range(0,len(D1)-1):fc.append([D1[i+1],D1[i],D2[i],D2[i+1]]);SM.append(len(fc)-1)
-                for i in range(0,len(T1)-1):fc.append([T1[i+1],T1[i],T2[i],T2[i+1]]);SM.append(len(fc)-1)
+                for i in xrange(0,len(D1)-1):fc.append([D1[i+1],D1[i],D2[i],D2[i+1]]);SM.append(len(fc)-1)
+                for i in xrange(0,len(T1)-1):fc.append([T1[i+1],T1[i],T2[i],T2[i+1]]);SM.append(len(fc)-1)
                 R=C-k1-k2;K=R-k3*2
             else:
                 fr=0;ek=0
@@ -304,7 +306,7 @@ def add_object(self, context):
             vr[ALT[4]][2]=sqrt(R**2-vr[ALT[4]][0]**2)+z;vr[ALT[5]][2]=sqrt(K**2-vr[ALT[5]][0]**2)+z
             vr[ALT[6]][2]=sqrt(K**2-vr[ALT[6]][0]**2)+z;vr[ALT[7]][2]=sqrt(R**2-vr[ALT[7]][0]**2)+z
             D1=[];D2=[];T1=[];T2=[]
-            for i in range(0,RES):
+            for i in xrange(0,RES):
                 A =i*pi/RES;y1=cos(A)*R;y2=-cos(A)*K
                 if x1     <y1 and y1<x2:     vr.extend([[y1,fr-k3,sin(A)*R+z],[y1,fr+k3,sin(A)*R+z]]);T1.append(len(vr)-2);T2.append(len(vr)-1);ftl.extend([len(fc)-1,len(fc)-2])
                 if x1+k3*2<y2 and y2<x2-k3*2:vr.extend([[y2,fr-k3,sin(A)*K+z],[y2,fr+k3,sin(A)*K+z]]);D1.append(len(vr)-2);D2.append(len(vr)-1);ftl.extend([len(fc)-1,len(fc)-2])
@@ -314,11 +316,11 @@ def add_object(self, context):
             if  D1==[]:fc.extend([ON,AR,[ALT[5],ALT[6],ALT[2],ALT[1]]]);                            m=len(fc);ftl.extend([m-1,m-2,m-3    ]);SM.extend([m-1    ])
             else:      fc.extend([ON,AR,[ALT[5],ALT[6],D2[0],D1[0]],[ALT[2],ALT[1],D1[-1],D2[-1]]]);m=len(fc);ftl.extend([m-1,m-2,m-3,m-4]);SM.extend([m-1,m-2])
 
-            for i in range(0,len(D1)-1):fc.append([D1[i+1],D1[i],D2[i],D2[i+1]]);ftl.append(len(fc)-1);SM.append(len(fc)-1)
+            for i in xrange(0,len(D1)-1):fc.append([D1[i+1],D1[i],D2[i],D2[i+1]]);ftl.append(len(fc)-1);SM.append(len(fc)-1)
             #Cam
             x1=X[x*2+1]+ek+k3*2;x2=X[x*2+2]-ek-k3*2
             ON=[];AR=[]
-            for i in range(0,RES):
+            for i in xrange(0,RES):
                 A= i*pi/RES;y1=-cos(A)*K
                 if  x1<y1 and y1<x2:
                     vr.extend([[y1,fr-0.005,sin(A)*K+z],[y1,fr+0.005,sin(A)*K+z]])
@@ -345,11 +347,11 @@ def add_object(self, context):
         vr[SON[0]][2]=Z[-1]+vr[SON[0]][0]*H
         vr[SON[1]][2]=Z[-1]+vr[SON[1]][0]*H
         fc.append([UST[1],UST[0], SON[0],SON[1] ])
-        for i in range(0,mx*4,4):
+        for i in xrange(0,mx*4,4):
             fc.append([ALT[i],ALT[i+1],ALT[i+3],ALT[i+2]])
         ON=[UST[0]]
         AR=[UST[1]]
-        for i in range(0,len(ALT)-1,2):
+        for i in xrange(0,len(ALT)-1,2):
             ON.append(ALT[i  ])
             AR.append(ALT[i+1])
         ON.append(SON[0])
@@ -357,7 +359,7 @@ def add_object(self, context):
         AR.append(SON[1])
         AR.reverse();fc.append(AR)
         y=my-1
-        for x in range(0,mx):
+        for x in xrange(0,mx):
             if  kx[x][y]==True:
                 Kapak(vr,fc,X,Z,x*2+1,y*2+1,k2/2,(k1+k2)*0.5-0.01)
                 n=len(vr)
@@ -416,7 +418,7 @@ def add_object(self, context):
         vr.extend([[0,-k1/2,Z[-1]],[0, k1/2,Z[-1]]])
 
         x = 0
-        for j in range(2,len(ALT)-2,4):
+        for j in xrange(2,len(ALT)-2,4):
             if vr[ALT[j]][0]<0 and 0<vr[ALT[j+2]][0]:x=1
 
         n=len(vr)
@@ -424,7 +426,7 @@ def add_object(self, context):
         ON=[SON[0],n-2,UST[0]];AR=[SON[1],n-1,UST[1]]
 
         if  x==0:vr.extend([[0,-k1/2,Z[-1]-z],[0,k1/2,Z[-1]-z]])
-        for j in range(0,len(ALT)-2,4):
+        for j in xrange(0,len(ALT)-2,4):
             if  vr[ALT[j]][0]<0 and vr[ALT[j+2]][0]<0:
                 fc.append([ALT[j],ALT[j+1],ALT[j+3],ALT[j+2]])
                 ON.extend([ALT[j  ],ALT[j+2]])
@@ -440,7 +442,7 @@ def add_object(self, context):
                 AR.extend([ALT[j+1],n-1,ALT[j+3]])
         fc.append(ON);AR.reverse();fc.append(AR)
         y=my-1
-        for x in range(0,mx):
+        for x in xrange(0,mx):
             if  vr[ALT[x*4]][0]<0 and vr[ALT[x*4+2]][0]<0:
                 if  kx[x][y]==True:
                     Kapak(vr,fc,X,Z,x*2+1,y*2+1,k2/2,(k1+k2)*0.5-0.01)
@@ -630,7 +632,7 @@ class PENCERE(bpy.types.Operator):
     bl_idname = "mesh.add_say3d_pencere2"
     bl_label = "Window"
     bl_description = "Window Generator"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
     prs = EnumProperty(items = (('1',"WINDOW 250X200",""),
                                 ('2',"WINDOW 200X200",""),
                                 ('3',"WINDOW 180X200",""),
@@ -745,12 +747,12 @@ class PENCERE(bpy.types.Operator):
             elif self.DT3=='2':row.prop(self,'VL3')
             elif self.DT3=='3':row.prop(self,'VL4')
         row =layout.row()
-        for i in range(0,self.gen):
+        for i in xrange(0,self.gen):
             row.prop(self,'gnx'+str(i))
-        for j in range(0,self.yuk):
+        for j in xrange(0,self.yuk):
             row=layout.row()
             row.prop(self,'gny'+str(self.yuk-j-1))
-            for i in range(0,self.gen):
+            for i in xrange(0,self.gen):
                 row.prop(self,'k'+str(self.yuk-j-1)+str(i))
         row =layout.row()
         box.row();row.label('X');row.label('Y');row.label('Z')
@@ -774,4 +776,4 @@ class PENCERE(bpy.types.Operator):
         bpy.data.objects[name].location[0] = bpy.context.scene.cursor_location[0] + self.locationPropX
         bpy.data.objects[name].location[1] = bpy.context.scene.cursor_location[1] + self.locationPropY
         bpy.data.objects[name].location[2] = bpy.context.scene.cursor_location[2] + self.locationPropZ
-        return {'FINISHED'}
+        return set(['FINISHED'])

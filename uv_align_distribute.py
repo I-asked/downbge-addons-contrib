@@ -16,6 +16,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import division
+from __future__ import absolute_import
 bl_info = {
     "name": "UV Align/Distribute",
     "author": "Rebellion (Luca Carella)",
@@ -248,7 +250,7 @@ def averageIslandDist(islands):
     distY = 0
     counter = 0
 
-    for i in range(len(islands)):
+    for i in xrange(len(islands)):
         elem1 = BBox(islands[i][1])[1]
         try:
             elem2 = BBox(islands[i + 1][1])[0]
@@ -272,7 +274,7 @@ def islandSize(island):
     return sizeX, sizeY
 
 
-class MakeIslands():
+class MakeIslands(object):
 
     def __init__(self):
         InitBMesh()
@@ -353,7 +355,7 @@ class AlignSXMargin(OperatorTemplate):
     """Align left margin"""
     bl_idname = "uv.align_left_margin"
     bl_label = "Align left margin"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     def execute(self, context):
 
@@ -363,8 +365,8 @@ class AlignSXMargin(OperatorTemplate):
 
         targetElement = getTargetPoint(context, makeIslands)
         if not targetElement:
-            self.report({"ERROR"}, "No active face")
-            return {"CANCELLED"}
+            self.report(set(["ERROR"]), "No active face")
+            return set(["CANCELLED"])
 
         if context.scene.selectionAsGroup:
             groupBox = GBBox(selectedIslands)
@@ -382,7 +384,7 @@ class AlignSXMargin(OperatorTemplate):
                 moveIslands(vector, island)
 
         update()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class AlignRxMargin(OperatorTemplate):
@@ -390,7 +392,7 @@ class AlignRxMargin(OperatorTemplate):
     """Align right margin"""
     bl_idname = "uv.align_right_margin"
     bl_label = "Align right margin"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     def execute(self, context):
         makeIslands = MakeIslands()
@@ -399,8 +401,8 @@ class AlignRxMargin(OperatorTemplate):
 
         targetElement = getTargetPoint(context, makeIslands)
         if not targetElement:
-            self.report({"ERROR"}, "No active face")
-            return {"CANCELLED"}
+            self.report(set(["ERROR"]), "No active face")
+            return set(["CANCELLED"])
 
         if context.scene.selectionAsGroup:
             groupBox = GBBox(selectedIslands)
@@ -418,7 +420,7 @@ class AlignRxMargin(OperatorTemplate):
                 moveIslands(vector, island)
 
         update()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class AlignVAxis(OperatorTemplate):
@@ -426,7 +428,7 @@ class AlignVAxis(OperatorTemplate):
     """Align vertical axis"""
     bl_idname = "uv.align_vertical_axis"
     bl_label = "Align vertical axis"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     def execute(self, context):
         makeIslands = MakeIslands()
@@ -435,8 +437,8 @@ class AlignVAxis(OperatorTemplate):
 
         targetElement = getTargetPoint(context, makeIslands)
         if not targetElement:
-            self.report({"ERROR"}, "No active face")
-            return {"CANCELLED"}
+            self.report(set(["ERROR"]), "No active face")
+            return set(["CANCELLED"])
         targetCenter = (targetElement[0] + targetElement[1]) / 2
         if context.scene.selectionAsGroup:
             groupBoxCenter = GBBoxCenter(selectedIslands)
@@ -454,7 +456,7 @@ class AlignVAxis(OperatorTemplate):
                 moveIslands(vector, island)
 
         update()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 ##################################################
@@ -463,7 +465,7 @@ class AlignTopMargin(OperatorTemplate):
     """Align top margin"""
     bl_idname = "uv.align_top_margin"
     bl_label = "Align top margin"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     def execute(self, context):
 
@@ -473,8 +475,8 @@ class AlignTopMargin(OperatorTemplate):
 
         targetElement = getTargetPoint(context, makeIslands)
         if not targetElement:
-            self.report({"ERROR"}, "No active face")
-            return {"CANCELLED"}
+            self.report(set(["ERROR"]), "No active face")
+            return set(["CANCELLED"])
         if context.scene.selectionAsGroup:
             groupBox = GBBox(selectedIslands)
             if context.scene.relativeItems == 'ACTIVE':
@@ -491,7 +493,7 @@ class AlignTopMargin(OperatorTemplate):
                 moveIslands(vector, island)
 
         update()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class AlignLowMargin(OperatorTemplate):
@@ -499,7 +501,7 @@ class AlignLowMargin(OperatorTemplate):
     """Align low margin"""
     bl_idname = "uv.align_low_margin"
     bl_label = "Align low margin"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     def execute(self, context):
         makeIslands = MakeIslands()
@@ -508,8 +510,8 @@ class AlignLowMargin(OperatorTemplate):
 
         targetElement = getTargetPoint(context, makeIslands)
         if not targetElement:
-            self.report({"ERROR"}, "No active face")
-            return {"CANCELLED"}
+            self.report(set(["ERROR"]), "No active face")
+            return set(["CANCELLED"])
         if context.scene.selectionAsGroup:
             groupBox = GBBox(selectedIslands)
             if context.scene.relativeItems == 'ACTIVE':
@@ -526,7 +528,7 @@ class AlignLowMargin(OperatorTemplate):
                 moveIslands(vector, island)
 
         update()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class AlignHAxis(OperatorTemplate):
@@ -534,7 +536,7 @@ class AlignHAxis(OperatorTemplate):
     """Align horizontal axis"""
     bl_idname = "uv.align_horizontal_axis"
     bl_label = "Align horizontal axis"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     def execute(self, context):
         makeIslands = MakeIslands()
@@ -543,8 +545,8 @@ class AlignHAxis(OperatorTemplate):
 
         targetElement = getTargetPoint(context, makeIslands)
         if not targetElement:
-            self.report({"ERROR"}, "No active face")
-            return {"CANCELLED"}
+            self.report(set(["ERROR"]), "No active face")
+            return set(["CANCELLED"])
         targetCenter = (targetElement[0] + targetElement[1]) / 2
 
         if context.scene.selectionAsGroup:
@@ -563,7 +565,7 @@ class AlignHAxis(OperatorTemplate):
                 moveIslands(vector, island)
 
         update()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 #########################################
@@ -572,7 +574,7 @@ class AlignRotation(OperatorTemplate):
     """Align island rotation """
     bl_idname = "uv.align_rotation"
     bl_label = "Align island rotation"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     def execute(self, context):
         makeIslands = MakeIslands()
@@ -580,8 +582,8 @@ class AlignRotation(OperatorTemplate):
         selectedIslands = makeIslands.selectedIslands()
         activeIsland = makeIslands.activeIsland()
         if not activeIsland:
-            self.report({"ERROR"}, "No active face")
-            return {"CANCELLED"}
+            self.report(set(["ERROR"]), "No active face")
+            return set(["CANCELLED"])
         activeAngle = islandAngle(activeIsland)
 
         for island in selectedIslands:
@@ -591,7 +593,7 @@ class AlignRotation(OperatorTemplate):
             rotateIsland(island, deltaAngle)
 
         update()
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class EqualizeScale(OperatorTemplate):
@@ -599,7 +601,7 @@ class EqualizeScale(OperatorTemplate):
     """Equalize the islands scale to the active one"""
     bl_idname = "uv.equalize_scale"
     bl_label = "Equalize Scale"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
     
     keepProportions = BoolProperty(
     name="Keep Proportions",
@@ -618,8 +620,8 @@ class EqualizeScale(OperatorTemplate):
         activeIsland = makeIslands.activeIsland()
 
         if not activeIsland:
-            self.report({"ERROR"}, "No active face")
-            return {"CANCELLED"}
+            self.report(set(["ERROR"]), "No active face")
+            return set(["CANCELLED"])
 
         activeSize = islandSize(activeIsland)
         selectedIslands.remove(activeIsland)
@@ -638,7 +640,7 @@ class EqualizeScale(OperatorTemplate):
             scaleIsland(island, scaleX, scaleY)
 
         update()
-        return {"FINISHED"}
+        return set(["FINISHED"])
     
     def draw(self,context):
         layout = self.layout      
@@ -655,7 +657,7 @@ class DistributeLEdgesH(OperatorTemplate):
     """Distribute left edges equidistantly horizontally"""
     bl_idname = "uv.distribute_ledges_horizontally"
     bl_label = "Distribute Left Edges Horizontally"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     def execute(self, context):
         makeIslands = MakeIslands()
@@ -663,7 +665,7 @@ class DistributeLEdgesH(OperatorTemplate):
         selectedIslands = makeIslands.selectedIslands()
 
         if len(selectedIslands) < 3:
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
 
         islandSpatialSort = IslandSpatialSortX(selectedIslands)
         uvFirstX = BBox(islandSpatialSort[0][1])[0].x
@@ -683,7 +685,7 @@ class DistributeLEdgesH(OperatorTemplate):
             pos += deltaDist
             moveIslands(vec, island[1])
         update()
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 
 class DistributeCentersH(OperatorTemplate):
@@ -691,7 +693,7 @@ class DistributeCentersH(OperatorTemplate):
     """Distribute centers equidistantly horizontally"""
     bl_idname = "uv.distribute_center_horizontally"
     bl_label = "Distribute Centers Horizontally"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     def execute(self, context):
         makeIslands = MakeIslands()
@@ -699,7 +701,7 @@ class DistributeCentersH(OperatorTemplate):
         selectedIslands = makeIslands.selectedIslands()
 
         if len(selectedIslands) < 3:
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
 
         islandSpatialSort = IslandSpatialSortX(selectedIslands)
         uvFirstX = min(islandSpatialSort)
@@ -719,7 +721,7 @@ class DistributeCentersH(OperatorTemplate):
             pos += deltaDist
             moveIslands(vec, island[1])
         update()
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 
 class DistributeREdgesH(OperatorTemplate):
@@ -727,7 +729,7 @@ class DistributeREdgesH(OperatorTemplate):
     """Distribute right edges equidistantly horizontally"""
     bl_idname = "uv.distribute_redges_horizontally"
     bl_label = "Distribute Right Edges Horizontally"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     def execute(self, context):
         makeIslands = MakeIslands()
@@ -735,7 +737,7 @@ class DistributeREdgesH(OperatorTemplate):
         selectedIslands = makeIslands.selectedIslands()
 
         if len(selectedIslands) < 3:
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
 
         islandSpatialSort = IslandSpatialSortX(selectedIslands)
         uvFirstX = BBox(islandSpatialSort[0][1])[1].x
@@ -755,7 +757,7 @@ class DistributeREdgesH(OperatorTemplate):
             pos += deltaDist
             moveIslands(vec, island[1])
         update()
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 
 class DistributeTEdgesV(OperatorTemplate):
@@ -763,7 +765,7 @@ class DistributeTEdgesV(OperatorTemplate):
     """Distribute top edges equidistantly vertically"""
     bl_idname = "uv.distribute_tedges_vertically"
     bl_label = "Distribute Top Edges Vertically"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     def execute(self, context):
         makeIslands = MakeIslands()
@@ -771,7 +773,7 @@ class DistributeTEdgesV(OperatorTemplate):
         selectedIslands = makeIslands.selectedIslands()
 
         if len(selectedIslands) < 3:
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
 
         islandSpatialSort = IslandSpatialSortY(selectedIslands)
         uvFirstX = BBox(islandSpatialSort[0][1])[1].y
@@ -791,7 +793,7 @@ class DistributeTEdgesV(OperatorTemplate):
             pos += deltaDist
             moveIslands(vec, island[1])
         update()
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 
 class DistributeCentersV(OperatorTemplate):
@@ -799,7 +801,7 @@ class DistributeCentersV(OperatorTemplate):
     """Distribute centers equidistantly vertically"""
     bl_idname = "uv.distribute_center_vertically"
     bl_label = "Distribute Centers Vertically"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     def execute(self, context):
         makeIslands = MakeIslands()
@@ -807,7 +809,7 @@ class DistributeCentersV(OperatorTemplate):
         selectedIslands = makeIslands.selectedIslands()
 
         if len(selectedIslands) < 3:
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
 
         islandSpatialSort = IslandSpatialSortY(selectedIslands)
         uvFirst = BBoxCenter(islandSpatialSort[0][1]).y
@@ -827,7 +829,7 @@ class DistributeCentersV(OperatorTemplate):
             pos += deltaDist
             moveIslands(vec, island[1])
         update()
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 
 class DistributeBEdgesV(OperatorTemplate):
@@ -835,7 +837,7 @@ class DistributeBEdgesV(OperatorTemplate):
     """Distribute bottom edges equidistantly vertically"""
     bl_idname = "uv.distribute_bedges_vertically"
     bl_label = "Distribute Bottom Edges Vertically"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     def execute(self, context):
         makeIslands = MakeIslands()
@@ -843,7 +845,7 @@ class DistributeBEdgesV(OperatorTemplate):
         selectedIslands = makeIslands.selectedIslands()
 
         if len(selectedIslands) < 3:
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
 
         islandSpatialSort = IslandSpatialSortY(selectedIslands)
         uvFirst = BBox(islandSpatialSort[0][1])[0].y
@@ -863,7 +865,7 @@ class DistributeBEdgesV(OperatorTemplate):
             pos += deltaDist
             moveIslands(vec, island[1])
         update()
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 
 class EqualizeHGap(OperatorTemplate):
@@ -871,7 +873,7 @@ class EqualizeHGap(OperatorTemplate):
     """Equalize horizontal gap between island"""
     bl_idname = "uv.equalize_horizontal_gap"
     bl_label = "Equalize Horizontal Gap"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     def execute(self, context):
         makeIslands = MakeIslands()
@@ -879,13 +881,13 @@ class EqualizeHGap(OperatorTemplate):
         selectedIslands = makeIslands.selectedIslands()
 
         if len(selectedIslands) < 3:
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
 
         islandSpatialSort = IslandSpatialSortX(selectedIslands)
 
         averageDist = averageIslandDist(islandSpatialSort)
 
-        for i in range(len(islandSpatialSort)):
+        for i in xrange(len(islandSpatialSort)):
             if islandSpatialSort.index(islandSpatialSort[i + 1]) == \
                     islandSpatialSort.index(islandSpatialSort[-1]):
                 break
@@ -899,7 +901,7 @@ class EqualizeHGap(OperatorTemplate):
             island = islandSpatialSort[i + 1][1]
             moveIslands(vec, islandSpatialSort[i + 1][1])
         update()
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 
 class EqualizeVGap(OperatorTemplate):
@@ -907,7 +909,7 @@ class EqualizeVGap(OperatorTemplate):
     """Equalize vertical gap between island"""
     bl_idname = "uv.equalize_vertical_gap"
     bl_label = "Equalize Vertical Gap"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     def execute(self, context):
         makeIslands = MakeIslands()
@@ -915,13 +917,13 @@ class EqualizeVGap(OperatorTemplate):
         selectedIslands = makeIslands.selectedIslands()
 
         if len(selectedIslands) < 3:
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
 
         islandSpatialSort = IslandSpatialSortY(selectedIslands)
 
         averageDist = averageIslandDist(islandSpatialSort)
 
-        for i in range(len(islandSpatialSort)):
+        for i in xrange(len(islandSpatialSort)):
             if islandSpatialSort.index(islandSpatialSort[i + 1]) ==\
                     islandSpatialSort.index(islandSpatialSort[-1]):
                 break
@@ -937,7 +939,7 @@ class EqualizeVGap(OperatorTemplate):
 
             moveIslands(vec, islandSpatialSort[i + 1][1])
         update()
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 ##############
 # SPECIALS
@@ -949,7 +951,7 @@ class MatchIsland(OperatorTemplate):
     """Match UV Island by moving their vertex"""
     bl_idname = "uv.match_island"
     bl_label = "Match Island"
-    bl_options = {'REGISTER', 'UNDO'}
+    bl_options = set(['REGISTER', 'UNDO'])
 
     threshold = FloatProperty(
         name="Threshold",
@@ -969,11 +971,11 @@ class MatchIsland(OperatorTemplate):
         activeIsland = makeIslands.activeIsland()
         
         if not activeIsland:
-            self.report({"ERROR"}, "No active face")
-            return {"CANCELLED"}
+            self.report(set(["ERROR"]), "No active face")
+            return set(["CANCELLED"])
         
         if len(selectedIslands) < 2:
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
 
         selectedIslands.remove(activeIsland)
 
@@ -981,7 +983,7 @@ class MatchIsland(OperatorTemplate):
             matchIsland(activeIsland, self.threshold, island)
 
         update()
-        return{'FINISHED'}
+        returnset(['FINISHED'])
 
 
 ##############

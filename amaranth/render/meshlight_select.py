@@ -18,6 +18,7 @@ Select all the meshes that emit light. On the header of the 3D View, top
 of the select menu.
 """
 
+from __future__ import absolute_import
 import bpy
 from amaranth import utils
 
@@ -27,7 +28,7 @@ class AMTH_OBJECT_OT_select_meshlights(bpy.types.Operator):
     """Select light emitting meshes"""
     bl_idname = "object.select_meshlights"
     bl_label = "Select Meshlights"
-    bl_options = {"UNDO"}
+    bl_options = set(["UNDO"])
 
     @classmethod
     def poll(cls, context):
@@ -43,9 +44,9 @@ class AMTH_OBJECT_OT_select_meshlights(bpy.types.Operator):
                 context.scene.objects.active = ob
 
         if not context.selected_objects and not context.scene.objects.active:
-            self.report({"INFO"}, "No meshlights to select")
+            self.report(set(["INFO"]), "No meshlights to select")
 
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 
 def button_select_meshlights(self, context):

@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import time
 
 import bpy
@@ -62,7 +63,7 @@ class CurveTools2SelectedObject(bpy.types.PropertyGroup):
             
             selectedObjects = bpy.context.scene.curvetools.SelectedObjects
             selectedObjects.clear()
-            for i in range(nrNewSelectedObjects): selectedObjects.add()
+            for i in xrange(nrNewSelectedObjects): selectedObjects.add()
             for i, newSelectedObjectName in enumerate(newSelectedObjectNames):
                 selectedObjects[i].name = newSelectedObjectName
         except: pass

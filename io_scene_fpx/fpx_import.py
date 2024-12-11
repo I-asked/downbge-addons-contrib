@@ -30,6 +30,9 @@
 # ##### END COPYRIGHT BLOCK #####
 
 
+from __future__ import division
+from __future__ import with_statement
+from __future__ import absolute_import
 DEV_MODE__APPEND_TO_EXISTING = False # do not enable - only for developing purpose (e.g. appending fpx_resource.blend)
 
 
@@ -151,7 +154,7 @@ DEFAULT_SLINGHAMMER_TEXTURE = "rsrc_bmp_290"
 
 TRANSLITE_OBJECT = 2
 ###############################################################################
-class FpmImporter():
+class FpmImporter(object):
     """ Load a Future Pinball Model FPM File """
     LAYERS_PRIMARY_MODEL = (
             True, False, False, False, False,
@@ -276,18 +279,18 @@ class FpmImporter():
                             pass
 
             if self.verbose in FpxUI.VERBOSE_NORMAL:
-                print()
-                print("##########################################################")
-                print("Import from FPM to Blender")
+                print
+                print "##########################################################"
+                print "Import from FPM to Blender"
                 for item in debug_data:
-                    print("#DEBUG", item)
-                print("##########################################################")
+                    print "#DEBUG", item
+                print "##########################################################"
 
-        except Exception as ex:
+        except Exception, ex:
             type, value, traceback = exc_info()
             if self.verbose in FpxUI.VERBOSE_NORMAL:
-                print("read fpm - exception in try block\n  type: '{0}'\n"
-                        "  value: '{1}'".format(type, value, traceback))
+                print "read fpm - exception in try block\n  type: '{0}'\n"
+                        "  value: '{1}'".format(type, value, traceback)
 
             if t2 is None:
                 t2 = time()
@@ -304,10 +307,10 @@ class FpmImporter():
 
         t3 = time()
         if self.verbose in FpxUI.VERBOSE_NORMAL:
-            print(fpx_str['SUMMARY_IMPORT'].format(
-                    (t3 - t1), (t2 - t1), (t3 - t2)))
+            print fpx_str['SUMMARY_IMPORT'].format(
+                    (t3 - t1), (t2 - t1), (t3 - t2))
 
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
     ###########################################################################
     def read_ex(self, blender_context, dst_sub_path_names, model_name, debug_data):
@@ -317,7 +320,7 @@ class FpmImporter():
                 if DEV_MODE__APPEND_TO_EXISTING:
                     blender_scene = blender_context.blend_data.scenes.get(FpxUtilities.toGoodName(FORMAT_SCENE.format(model_name)))
                     if not blender_scene:
-                        print("#DEBUG missing scene for:", model_name)
+                        print "#DEBUG missing scene for:", model_name
                         return
                 else:
                     blender_scene = blender_context.blend_data.scenes.new(FpxUtilities.toGoodName(FORMAT_SCENE.format(model_name)))
@@ -383,7 +386,7 @@ class FpmImporter():
         # cleanup
         if not self.keep_temp:
             for key, file in dst_sub_path_names.items():
-                if key in {'type', 'sub_dir', }:
+                if key in set(['type', 'sub_dir',]):
                     continue
                 try:
                     remove(file)
@@ -399,7 +402,7 @@ class FpmImporter():
 
 
 ###############################################################################
-class FplImporter():
+class FplImporter(object):
     """ Load a Future Pinball Library FPL File """
     def __init__(self,
             report,
@@ -504,7 +507,7 @@ class FplImporter():
                                     item_dir, item_file = path.split(item_path)
                                     blend_image.filepath_raw = "//unpacked_resource/{}".format(item_file)
                                 if not blend_image or not blend_image.has_data:
-                                    print("#DEBUG fpl images.load failed", item_path)
+                                    print "#DEBUG fpl images.load failed", item_path
 
                         else:
                             pass
@@ -519,7 +522,7 @@ class FplImporter():
                                 cleanup_sub_dirs.append(file)
                                 continue
 
-                            if key in {'type', None, } or key.startswith('type'):
+                            if key in set(['type', None,]) or key.startswith('type'):
                                 continue
 
                             try:
@@ -546,18 +549,18 @@ class FplImporter():
                             pass
 
             if self.verbose in FpxUI.VERBOSE_NORMAL:
-                print()
-                print("##########################################################")
-                print("Import from FPM to Blender")
+                print
+                print "##########################################################"
+                print "Import from FPM to Blender"
                 for item in debug_data:
-                    print("#DEBUG", item)
-                print("##########################################################")
+                    print "#DEBUG", item
+                print "##########################################################"
 
-        except Exception as ex:
+        except Exception, ex:
             type, value, traceback = exc_info()
             if self.verbose in FpxUI.VERBOSE_NORMAL:
-                print("read fpl - exception in try block\n  type: '{0}'\n"
-                        "  value: '{1}'".format(type, value, traceback))
+                print "read fpl - exception in try block\n  type: '{0}'\n"
+                        "  value: '{1}'".format(type, value, traceback)
 
             if t2 is None:
                 t2 = time()
@@ -575,16 +578,16 @@ class FplImporter():
 
         t3 = time()
         if self.verbose in FpxUI.VERBOSE_NORMAL:
-            print(fpx_str['SUMMARY_IMPORT'].format(
-                    (t3 - t1), (t2 - t1), (t3 - t2)))
+            print fpx_str['SUMMARY_IMPORT'].format(
+                    (t3 - t1), (t2 - t1), (t3 - t2))
 
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
     ###########################################################################
 
 
 ###############################################################################
-class FptImporter():
+class FptImporter(object):
     """ Load a Future Pinball Table FPT File """
     LAYERS_WIRE_RING = (
             True, True, False, False, True,
@@ -813,7 +816,7 @@ class FptImporter():
                             else:
                                 blender_rotation = Euler((0.0, 0.0, radians(self.angle_correction(0.0))), 'XZY')
 
-                            if fpx_id in {FptElementType.CONTROL_FLIPPER, FptElementType.CONTROL_DIVERTER, }:
+                            if fpx_id in set([FptElementType.CONTROL_FLIPPER, FptElementType.CONTROL_DIVERTER,]):
                                 fpx_start_angle = fpx_item.get_value("start_angle")
                                 if fpx_start_angle is None:
                                     fpx_start_angle = 0
@@ -905,7 +908,7 @@ class FptImporter():
                                 cleanup_sub_dirs.append(file)
                                 continue
 
-                            if key in {'type', 'data', None, } or key.startswith('type') or key.startswith('data'):
+                            if key in set(['type', 'data', None,]) or key.startswith('type') or key.startswith('data'):
                                 continue
 
                             try:
@@ -940,16 +943,16 @@ class FptImporter():
                 FpxUtilities.select_all(False)
 
             if self.verbose in FpxUI.VERBOSE_NORMAL:
-                print()
-                print("##########################################################")
-                print("Import from FPT to Blender")
-                print("##########################################################")
+                print
+                print "##########################################################"
+                print "Import from FPT to Blender"
+                print "##########################################################"
 
-        except Exception as ex:
+        except Exception, ex:
             type, value, traceback = exc_info()
             if self.verbose in FpxUI.VERBOSE_NORMAL:
-                print("read fpt - exception in try block\n  type: '{0}'\n"
-                        "  value: '{1}'".format(type, value, traceback))
+                print "read fpt - exception in try block\n  type: '{0}'\n"
+                        "  value: '{1}'".format(type, value, traceback)
 
             if t2 is None:
                 t2 = time()
@@ -966,10 +969,10 @@ class FptImporter():
 
         t3 = time()
         if self.verbose in FpxUI.VERBOSE_NORMAL:
-            print(fpx_str['SUMMARY_IMPORT'].format(
-                    (t3 - t1), (t2 - t1), (t3 - t2)))
+            print fpx_str['SUMMARY_IMPORT'].format(
+                    (t3 - t1), (t2 - t1), (t3 - t2))
 
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
     def add_table_camera(self, fpx_table_data):
         name = "Camera.table"
@@ -1086,7 +1089,7 @@ class FptImporter():
     def append_texture_material(self, blender_object, fpx_image_name, light_on=False, uv_layer=None):
         if not blender_object:
             return
-        if blender_object.type not in {'MESH', 'CURVE', }:
+        if blender_object.type not in set(['MESH', 'CURVE',]):
             for child in blender_object.children:
                 self.append_texture_material(child, fpx_image_name, light_on, uv_layer)
             return
@@ -1211,7 +1214,7 @@ class FptImporter():
     def append_chrome_material(self, blender_object, color=(1.0, 1.0, 1.0, 1.0)):
         if not blender_object:
             return
-        if blender_object.type not in {'MESH', 'CURVE', }:
+        if blender_object.type not in set(['MESH', 'CURVE',]):
             for child in blender_object.children:
                 self.append_chrome_material(child)
             return
@@ -1275,7 +1278,7 @@ class FptImporter():
     def append_christal_material(self, blender_object, color=(0.9, 0.9, 0.9, 1.0)):
         if not blender_object:
             return
-        if blender_object.type not in {'MESH', 'CURVE', }:
+        if blender_object.type not in set(['MESH', 'CURVE',]):
             for child in blender_object.children:
                 self.append_chrome_material(child)
             return
@@ -1346,7 +1349,7 @@ class FptImporter():
     def append_light_material(self, blender_object, color=(0.9, 0.9, 0.8, 1.0), strength=10.0):
         if not blender_object:
             return
-        if blender_object.type not in {'MESH', 'CURVE', }:
+        if blender_object.type not in set(['MESH', 'CURVE',]):
             for child in blender_object.children:
                 self.append_chrome_material(child)
             return
@@ -1439,7 +1442,7 @@ class FptImporter():
             if fpx_image_object:
                 blender_image = self.__data.images.get(fpx_image_object[self.BLENDER_OBJECT_NAME])
             else:
-                print("#DEBUG fpx_image_name ***:", fpx_image_name, "not found")
+                print "#DEBUG fpx_image_name ***:", fpx_image_name, "not found"
 
         for bmf in bm.faces:
             for ivert, bmv in enumerate(bmf.verts):
@@ -2424,7 +2427,7 @@ class FptImporter():
 
         ## Catmull-Rom
         catmull_rom_vectors = []
-        for index_bezier_point in range(count_bezier_point):
+        for index_bezier_point in xrange(count_bezier_point):
             if index_bezier_point > 0 and index_bezier_point < max_index_bezier_point:
                 point_prev = spline.bezier_points[index_bezier_point - 1].co
                 point_next = spline.bezier_points[index_bezier_point + 1].co
@@ -2450,10 +2453,10 @@ class FptImporter():
             catmull_rom_vectors.append(catmull_rom_vector)
 
         ## Hermite to Cubic Bezier right handles
-        for index_bezier_point in range(count_bezier_point):
+        for index_bezier_point in xrange(count_bezier_point):
             bezier_point = spline.bezier_points[index_bezier_point]
             point = bezier_point.co
-            if bezier_point.handle_right_type in {'VECTOR', }:
+            if bezier_point.handle_right_type in set(['VECTOR',]):
                 if index_bezier_point < max_index_bezier_point:
                     bezier_point_next = spline.bezier_points[index_bezier_point + 1]
                     point_next = bezier_point_next.co
@@ -2473,10 +2476,10 @@ class FptImporter():
             bezier_point.handle_right = bezier_handle_point
 
         ## Hermite to Cubic Bezier left handles
-        for index_bezier_point in range(count_bezier_point):
+        for index_bezier_point in xrange(count_bezier_point):
             bezier_point = spline.bezier_points[index_bezier_point]
             point = bezier_point.co
-            if bezier_point.handle_left_type in {'VECTOR', }:
+            if bezier_point.handle_left_type in set(['VECTOR',]):
                 bezier_point.handle_left_type = 'FREE'
                 if index_bezier_point > 0:
                     bezier_point_prev = spline.bezier_points[index_bezier_point - 1]
@@ -2611,7 +2614,7 @@ class FptImporter():
             fpx_model_object = self.fpx_pinmodels.get(fpx_model_name)
             if not fpx_model_object:
                 if self.verbose in FpxUI.VERBOSE_NORMAL:
-                    print("#DEBUG attach_dupli_group, fpx_pinmodel not found!", fpx_model_name, fpx_type_name)
+                    print "#DEBUG attach_dupli_group, fpx_pinmodel not found!", fpx_model_name, fpx_type_name
                     self.debug_missing_resources.add(fpx_model_name)
                 return blender_empty_object_new
             blender_group_name = fpx_model_object[self.BLENDER_OBJECT_NAME]
@@ -2670,7 +2673,7 @@ class FptImporter():
             self.__scene.objects.active = active_object
             """
         else:
-            print("#DEBUG attach_dupli_group, blender_group not found!", fpx_model_name, fpx_type_name, blender_group_name)
+            print "#DEBUG attach_dupli_group, blender_group not found!", fpx_model_name, fpx_type_name, blender_group_name
             self.debug_missing_resources.add(fpx_model_name)
 
         # add name to fpt property
@@ -2700,7 +2703,7 @@ class FptImporter():
             base = False
 
         layers = []
-        for index in range(20):
+        for index in xrange(20):
             # layers, left block, top row
             if index == 0:
                 layers.append(True)
@@ -2764,7 +2767,7 @@ class FptImporter():
             obj = self.LoadFromBlendLibrary(name, type, self.blend_resource_file)
 
         if not obj:
-            print("#DEBUG resource finally not found", name, type)
+            print "#DEBUG resource finally not found", name, type
 
         return obj
 
@@ -2789,7 +2792,7 @@ class FptImporter():
             obj = self.LoadFromPathLibrary(name, type, lib, self.path_libraries)
 
         if not obj:
-            print("#DEBUG resource finally not found", name, type, lib)
+            print "#DEBUG resource finally not found", name, type, lib
 
         return obj
 
@@ -2941,7 +2944,7 @@ class FptImporter():
                             item_dir, item_file = path.split(item_path)
                             blend_image.filepath_raw = "//unpacked_resource/{}".format(item_file)
                         if not blend_image or not blend_image.has_data:
-                            print("#DEBUG fpt images.load failed", item_path)
+                            print "#DEBUG fpt images.load failed", item_path
                 elif item_type == Fpt_PackedLibrary_Type.TYPE_MODEL:
                     item_data = dst_sub_path_names.get("data_{}".format(fpx_item_name))
                     if item_data:
@@ -3055,7 +3058,7 @@ def adjust_position(blender_context, blender_scene, fpx_model, fpx_model_type=No
     #
 
     blender_location = None
-    if fpx_type in {
+    if fpx_type in set([
             Fpm_Model_Type.OBJECT_PEG, #
             Fpm_Model_Type.OBJECT_ORNAMENT, # mask
             Fpm_Model_Type.CONTROL_BUMPER_BASE, #
@@ -3066,8 +3069,7 @@ def adjust_position(blender_context, blender_scene, fpx_model, fpx_model_type=No
             Fpm_Model_Type.LIGHT_FLASHER, # mask
             Fpm_Model_Type.LIGHT_BULB, #
             Fpm_Model_Type.TRIGGER_OPTO, #
-            Fpm_Model_Type.TOY_CUSTOM,
-            }:
+            Fpm_Model_Type.TOY_CUSTOM,]):
         static_offset = 0
         if has_mask:
             #align to top
@@ -3078,74 +3080,63 @@ def adjust_position(blender_context, blender_scene, fpx_model, fpx_model_type=No
             #blender_location = Vector((blender_parent.location.x, blender_parent.location.y, blender_object.dimensions.z / 2.0))
             blender_location = Vector((blender_parent.location.x, blender_parent.location.y, get_min_max(blender_object)[5] + static_offset))
 
-    elif fpx_type in {
-            Fpm_Model_Type.CONTROL_BUMPER_CAP, #
-            }:
+    elif fpx_type in set([
+            Fpm_Model_Type.CONTROL_BUMPER_CAP,]):
         # align to bottom + static offset
         static_offset = 31.5
         #blender_location = Vector((blender_parent.location.x, blender_parent.location.y, (blender_object.dimensions.z / 2.0) + static_offset))
         blender_location = Vector((blender_parent.location.x, blender_parent.location.y, get_min_max(blender_object)[5] + static_offset))
-    elif fpx_type in {
-            Fpm_Model_Type.TOY_SPINNINGDISK, #
-            }:
+    elif fpx_type in set([
+            Fpm_Model_Type.TOY_SPINNINGDISK,]):
         # align to top + static offset
         static_offset = 0.25
         #blender_location = Vector((blender_parent.location.x, blender_parent.location.y, (-blender_object.dimensions.z / 2.0) + static_offset))
         blender_location = Vector((blender_parent.location.x, blender_parent.location.y, get_min_max(blender_object)[2] + static_offset))
-    elif fpx_type in {
-            Fpm_Model_Type.TRIGGER_TRIGGER, #
-            }:
+    elif fpx_type in set([
+            Fpm_Model_Type.TRIGGER_TRIGGER,]):
         # dont touch
         pass
-    elif fpx_type in {
-            Fpm_Model_Type.TRIGGER_SPINNER, #
-            }:
+    elif fpx_type in set([
+            Fpm_Model_Type.TRIGGER_SPINNER,]):
         # static offset
         static_offset = 3
         blender_location = Vector((blender_parent.location.x, blender_parent.location.y, blender_parent.location.z + static_offset))
-    elif fpx_type in {
-            Fpm_Model_Type.TRIGGER_GATE, #
-            }:
+    elif fpx_type in set([
+            Fpm_Model_Type.TRIGGER_GATE,]):
         # align to top + static offset
         static_offset = 6
         #blender_location = Vector((blender_parent.location.x, blender_parent.location.y, (-blender_object.dimensions.z / 2.0) + static_offset))
         blender_location = Vector((blender_parent.location.x, blender_parent.location.y, get_min_max(blender_object)[2] + static_offset))
-    elif fpx_type in {
-            Fpm_Model_Type.CONTROL_POPUP, #
-            }:
+    elif fpx_type in set([
+            Fpm_Model_Type.CONTROL_POPUP,]):
         # align to top
         static_offset = 0
         #blender_location = Vector((blender_parent.location.x, blender_parent.location.y, (-blender_object.dimensions.z / 2.0) + static_offset))
         blender_location = Vector((blender_parent.location.x, blender_parent.location.y, get_min_max(blender_object)[2] + static_offset))
-    elif fpx_type in {
-            Fpm_Model_Type.TARGET_DROP, #
-            }:
+    elif fpx_type in set([
+            Fpm_Model_Type.TARGET_DROP,]):
         # static offset
         static_offset = 12.5
         blender_location = Vector((blender_parent.location.x, blender_parent.location.y, blender_parent.location.z + static_offset))
-    elif fpx_type in {
-            Fpm_Model_Type.TARGET_TARGET, #
-            }:
+    elif fpx_type in set([
+            Fpm_Model_Type.TARGET_TARGET,]):
         # static offset
         static_offset = 15
         blender_location = Vector((blender_parent.location.x, blender_parent.location.y, blender_parent.location.z + static_offset))
-    elif fpx_type in {
-            Fpm_Model_Type.RAMP_WIRE_CAP, #
-            }:
+    elif fpx_type in set([
+            Fpm_Model_Type.RAMP_WIRE_CAP,]):
         # static offset
         static_offset = 13
         blender_location = Vector((blender_parent.location.x, blender_parent.location.y, blender_parent.location.z + static_offset))
-    elif fpx_type in {
-            Fpm_Model_Type.OBJECT_OBJECT, # wire ring
-            }:
+    elif fpx_type in set([
+            Fpm_Model_Type.OBJECT_OBJECT,]):
         # static offset
         static_offset = 11
         blender_location = Vector((blender_parent.location.x, blender_parent.location.y, blender_parent.location.z + static_offset))
-    elif fpx_type in {
+    elif fpx_type in set([
             Fpm_Model_Type.RUBBER_MODEL, #
             Fpm_Model_Type.GUIDE_LANE, #
-            Fpm_Model_Type.RAMP_MODEL, #
-            }:
+            Fpm_Model_Type.RAMP_MODEL,]):
         # align to bottom + static offset
         static_offset = 0
         blender_location = Vector((blender_parent.location.x, blender_parent.location.y, get_min_max(blender_object)[5] + static_offset))
@@ -3292,7 +3283,7 @@ def rename_active_fpm(blender_context, dst_name):
     if blender_scene:
         blender_scene.name = FORMAT_SCENE.format(dst_name).lower()
 
-    for object_type in {'', '.secondary', '.mask', '.reflection', '.collision', }:
+    for object_type in set(['', '.secondary', '.mask', '.reflection', '.collision',]):
         fpm_ext_ex = "{}{}".format(src_name, object_type)
         rename_active_ms3d(blender_context, fpm_ext_ex, dst_name, object_type);
 
@@ -3306,7 +3297,7 @@ def get_blend_resource_file_name():
     resource_blend = path.join(module_path, 'fpx_resource.blend')
 
     if not path.exists(resource_blend):
-        print("#DEBUG", "resource not found!")
+        print "#DEBUG", "resource not found!"
 
     return resource_blend
 

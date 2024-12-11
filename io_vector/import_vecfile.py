@@ -21,6 +21,8 @@
 """Importing a vector file into Model format.
 """
 
+from __future__ import division
+from __future__ import absolute_import
 __author__ = "howard.trickey@gmail.com"
 
 from . import geom

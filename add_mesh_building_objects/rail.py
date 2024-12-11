@@ -36,10 +36,11 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+from __future__ import absolute_import
 from math import tan
 from mathutils import Vector
 
-class Rails:
+class Rails(object):
     def __init__(self,G,w,t,h,tT,wP,dP,wT, rEnable, lEnable):
         self.G = G #General
         self.w=w #rail width
@@ -65,7 +66,7 @@ class Rails:
         coords.append(self.start-offset+Vector([0,self.w,0]))
         coords.append(self.stop+offset+Vector([self.dP,self.w,
                                                self.dP*tan(self.G.angle)]))
-        for j in range(4):
+        for j in xrange(4):
             coords.append(coords[j]+Vector([0,0,self.t]))
         #centre over posts
         for j in coords:

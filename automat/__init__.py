@@ -1,5 +1,6 @@
 # Copyright 2015 Théo Friberg under GNU GPL 3
 
+from __future__ import absolute_import
 bl_info = {
 	"name": "Cycles Automatic Materials",
 	"author": "Théo Friberg",

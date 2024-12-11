@@ -35,10 +35,13 @@ TODO
 
 """
 
+from __future__ import absolute_import
 import os
 import bpy
 from mathutils import *
 import math
+from io import open
+from itertools import izip
 #from mathutils.geometry import tesselate_polygon
 #from io_utils import load_image, unpack_list, unpack_face_list
 
@@ -76,7 +79,7 @@ def load(self, context, filepath=""):
     bones_influencing_i = 0
     numfaces = 0
 
-    print("\nImporting %s" % filepath)
+    print "\nImporting %s" % filepath
 
     try:
         file = open(filepath, "r")
@@ -97,7 +100,7 @@ def load(self, context, filepath=""):
         elif state == 1 and line_split[0] == "VERSION":
             if line_split[1] != "6":
                 error_string = "Unsupported version: %s" % line_split[1]
-                print("\n%s" % error_string)
+                print "\n%s" % error_string
                 return error_string
             state = 2
 
@@ -108,7 +111,7 @@ def load(self, context, filepath=""):
         elif state == 3 and line_split[0] == "BONE":
             if numbones_i != int(line_split[1]):
                 error_string = "Unexpected bone number: %s (expected %i)" % (line_split[1], numbones_i)
-                print("\n%s" % error_string)
+                print "\n%s" % error_string
                 return error_string
             bone_table.append((line_split[3][1:-1], int(line_split[2]), vec0, mat0))
             test_0.append(line_split[3][1:-1])
@@ -122,7 +125,7 @@ def load(self, context, filepath=""):
             bone_num = int(line_split[1])
             if bone_i != bone_num:
                 error_string = "Unexpected bone number: %s (expected %i)" % (line_split[1], bone_i)
-                print("\n%s" % error_string)
+                print "\n%s" % error_string
                 return error_string
             state = 5
 
@@ -198,7 +201,7 @@ def load(self, context, filepath=""):
             vert_num = int(line_split[1])
             if vert_i != vert_num:
                 error_string = "Unexpected vertex number: %s (expected %i)" % (line_split[1], vert_i)
-                print("\n%s" % error_string)
+                print "\n%s" % error_string
                 return error_string
             vert_i += 1
             state = 12
@@ -259,11 +262,11 @@ def load(self, context, filepath=""):
                 state = 17
                 
         elif state > 15 and state < 30 and line_split[0] == "NUMOBJECTS":
-            print("Bad numfaces, terminated loop\n")
+            print "Bad numfaces, terminated loop\n"
             state = 30
             
         elif state == 30:
-            print("Adding mesh!")
+            print "Adding mesh!"
             me = bpy.data.meshes.new("pymesh")
             me.from_pydata(vert_table, [], face_table)
             me.update()
@@ -274,7 +277,7 @@ def load(self, context, filepath=""):
 
         else: #elif state == 16:
             #UNDONE
-            print("eh? state is %i line: %s" % (state, line))
+            print "eh? state is %i line: %s" % (state, line)
             pass
 
         #print("\nCurrent state=" + str(state) + "\nLine:" + line)
@@ -309,7 +312,7 @@ def load(self, context, filepath=""):
     bpy.ops.object.mode_set(mode='EDIT')
     #for (bname, pname, vector, matrix) in boneTable:
     #i = 0
-    for (t0, t1, t2, t3) in zip(test_0, test_1, test_2, test_3):
+    for (t0, t1, t2, t3) in izip(test_0, test_1, test_2, test_3):
 
         t3 = Matrix(t3)
 
@@ -323,7 +326,7 @@ def load(self, context, filepath=""):
             #local_mat = parent.matrix.to_3x3() * t3()
             #bone.align_roll(local_mat[2])
             from math import degrees
-            print("t3[2]: %s\nroll: %f\n---------" % (t3.col[2], degrees(bone.roll)))
+            print "t3[2]: %s\nroll: %f\n---------" % (t3.col[2], degrees(bone.roll))
             #bone.roll = math.radians(180 - math.degrees(bone.roll))
             #print("###\nalign_roll: %s\nroll: %.2f\ntest_3:%s" % (t3, math.degrees(bone.roll), list(test_3)))
             bone.use_connect = True

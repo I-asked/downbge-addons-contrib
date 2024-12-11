@@ -18,6 +18,7 @@
 
 # <pep8 compliant>
 
+from __future__ import absolute_import
 bl_info = {
     "name": "Copy UV's from Joined",
     "description": "Copy UV coordinates from the active joined mesh",
@@ -44,7 +45,7 @@ def MINMAX_INIT():
 
 
 def MINMAX_DO(min, max, vec):
-    for x in range(3):
+    for x in xrange(3):
         if vec[x] < min[x]:
             min[x] = vec[x]
 
@@ -134,15 +135,15 @@ class  OBJECT_OT_copy_uv_from_joined(Operator):
         # Check wether we're working with meshes
         # other object types are not supported
         if obact.type != 'MESH':
-            self.report({'ERROR'}, "Only meshes are supported")
-            return {'CANCELLED'}
+            self.report(set(['ERROR']), "Only meshes are supported")
+            return set(['CANCELLED'])
 
         objects = context.selected_objects
 
         for obj in context.selected_objects:
             if obj.type != 'MESH':
-                self.report({'ERROR'}, "Only meshes are supported")
-                return {'CANCELLED'}
+                self.report(set(['ERROR']), "Only meshes are supported")
+                return set(['CANCELLED'])
 
         uv_map = self._getVertexLookupMap(obact, objects)
 
@@ -184,9 +185,9 @@ class  OBJECT_OT_copy_uv_from_joined(Operator):
                         new_uv = uv_layer.data[loop_index].uv
                         orig_uv_layer.data[orig_loop_index].uv = new_uv
                 else:
-                    print("Failed to lookup %r" % (key,))
+                    print "Failed to lookup %r" % (key,)
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 def menu_func(self, context):

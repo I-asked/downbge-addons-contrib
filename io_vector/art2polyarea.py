@@ -21,6 +21,9 @@
 """Convert an Art object to a list of PolyArea objects.
 """
 
+from __future__ import division
+from __future__ import absolute_import
+from itertools import imap
 __author__ = "howard.trickey@gmail.com"
 
 import math
@@ -148,16 +151,16 @@ def CombineSimplePolyAreas(subpolyareas):
 
     n = len(subpolyareas)
     areas = [geom.SignedArea(pa.poly, pa.points) for pa in subpolyareas]
-    lens = list(map(lambda x: len(x.poly), subpolyareas))
+    lens = list(imap(lambda x: len(x.poly), subpolyareas))
     cls = dict()
-    for i in range(n):
-        for j in range(n):
+    for i in xrange(n):
+        for j in xrange(n):
             cls[(i, j)] = _ClassifyPathPairs(subpolyareas[i], subpolyareas[j])
     # calculate set cont where (i,j) is in cont if
     # subpolyareas[i] contains subpolyareas[j]
     cont = set()
-    for i in range(n):
-        for j in range(n):
+    for i in xrange(n):
+        for j in xrange(n):
             if i != j and _Contains(i, j, areas, lens, cls):
                 cont.add((i, j))
     # now make real PolyAreas, with holes assigned
@@ -165,7 +168,7 @@ def CombineSimplePolyAreas(subpolyareas):
     assigned = set()
     count = 0
     while len(assigned) < n and count < n:
-        for i in range(n):
+        for i in xrange(n):
             if i in assigned:
                 continue
             if _IsBoundary(i, n, cont, assigned):
@@ -179,7 +182,7 @@ def CombineSimplePolyAreas(subpolyareas):
         count += 1
     if len(assigned) < n:
         # shouldn't happen
-        print("Whoops, PathToPolyAreas didn't assign all")
+        print "Whoops, PathToPolyAreas didn't assign all"
     return polyareas
 
 
@@ -224,21 +227,21 @@ def _SubpathToPolyArea(subpath, options, points, color=(0.0, 0.0, 0.0)):
             face.extend(approx[1:])
             prev = end
         elif ty == "Q":
-            print("unimplemented segment type Q")
+            print "unimplemented segment type Q"
         elif ty == "A":
             approx = ArcApprox(start, end, seg[3], seg[4], seg[5], seg[6],
                 options)
             face.extend(approx[1:])
             prev = end
         else:
-            print("unexpected segment type", ty)
+            print "unexpected segment type", ty
     # now make a cleaned face in a new PolyArea
     # with no two successive points approximately equal
     if len(face) <= 2:
         # degenerate face, return an empty PolyArea
         return ans
     previndex = -1
-    for i in range(0, len(face)):
+    for i in xrange(0, len(face)):
         point = face[i]
         newindex = ans.points.AddPoint(point)
         if newindex == previndex or \
@@ -338,7 +341,7 @@ def _EvenBezier3Approx(cps, options):
     if options.smoothness > 0 and numsegs == 1:
         numsegs = 2
     ans = [cps[0]]
-    for i in range(1, numsegs):
+    for i in xrange(1, numsegs):
         t = i * (1.0 / numsegs)
         pt = _BezierEval(cps, t)
         ans.append(pt)
@@ -377,7 +380,7 @@ def _EvenLineDivide(start, end, options):
     line_length = geom.VecLen(geom.VecSub(end, start))
     numsegs = math.ceil(line_length / options.even_length)
     ans = [start]
-    for i in range(1, numsegs):
+    for i in xrange(1, numsegs):
         t = i * (1.0 / numsegs)
         pt = _LinInterp(start, end, t)
         ans.append(pt)
@@ -398,7 +401,7 @@ def _LinInterp(a, b, t):
 
     n = len(a)  # dimension of coordinates
     ans = [0.0] * n
-    for i in range(n):
+    for i in xrange(n):
         ans[i] = (1.0 - t) * a[i] + t * b[i]
     return tuple(ans)
 
@@ -482,10 +485,10 @@ def _Bez3step(b, r, alpha):
     ans = []
     n = len(b[0])  # dimension of coordinates
     beta = 1 - alpha
-    for i in range(0, 4 - r):
+    for i in xrange(0, 4 - r):
         # find c, alpha of the way from b[i] to b[i+1]
         t = [0.0] * n
-        for d in range(n):
+        for d in xrange(n):
             t[d] = b[i][d] * beta + b[i + 1][d] * alpha
         ans.append(tuple(t))
     return ans
@@ -584,7 +587,7 @@ def ArcApprox(start, end, rad, xrot, large_arc, ccw, options):
     ans = [start]
     # end condition should be theta ~== endtheta but also
     # should be no more than numsegs iters
-    for i in range(numsegs):
+    for i in xrange(numsegs):
         theta = theta + theta_incr
         if abs(theta - endtheta) < 1e-5:
             break
@@ -684,7 +687,7 @@ def _IsBoundary(i, n, cont, assigned):
              path j contains path i
     """
 
-    for j in range(0, n):
+    for j in xrange(0, n):
         if j == i or j in assigned:
             continue
         if (j, i) in cont:
@@ -711,12 +714,12 @@ def _GetHoles(i, n, cont, assigned):
     """
 
     isls = []
-    for j in range(0, n):
+    for j in xrange(0, n):
         if j in assigned:
             continue   # catches i==j too, since i is assigned by now
         if (i, j) in cont:
             directly = True
-            for k in range(0, n):
+            for k in xrange(0, n):
                 if k == j or k in assigned:
                     continue
                 if (i, k) in cont and (k, j) in cont:

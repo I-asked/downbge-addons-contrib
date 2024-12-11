@@ -29,6 +29,7 @@ Object Properties.
 """
 
 
+from __future__ import absolute_import
 import bpy
 from amaranth.scene.debug import AMTH_SCENE_OT_blender_instance_open
 
@@ -127,12 +128,12 @@ class AMTH_OBJECT_OT_id_dupligroup(bpy.types.Operator):
                 for dob in ob.dupli_group.objects:
                     dob.pass_index = ob.pass_index
 
-        self.report({"INFO"},
+        self.report(set(["INFO"]),
                     "%s ID: %s to all objects in this Dupli Group" % (
                         "Applied" if not script_exists else "Updated",
                         ob.pass_index))
 
-        return {"FINISHED"}
+        return set(["FINISHED"])
 
 
 class AMTH_OBJECT_OT_id_dupligroup_clear(bpy.types.Operator):
@@ -159,8 +160,8 @@ class AMTH_OBJECT_OT_id_dupligroup_clear(bpy.types.Operator):
                             li.body = ""
                             continue
 
-        self.report({"INFO"}, "Object IDs back to normal")
-        return {"FINISHED"}
+        self.report(set(["INFO"]), "Object IDs back to normal")
+        return set(["FINISHED"])
 
 
 def ui_object_id_duplis(self, context):

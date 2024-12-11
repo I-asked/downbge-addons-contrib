@@ -30,6 +30,7 @@
 # ##### END COPYRIGHT BLOCK #####
 
 
+from __future__ import absolute_import
 bl_info = {
     'name': "Future Pinball FPx format (.fpm/.fpl/.fpt)",
     'description': "Import Future Pinball Model, Library and Table files",

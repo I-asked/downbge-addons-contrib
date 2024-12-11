@@ -94,7 +94,7 @@ from codecs import (
         )
 
 
-class FpxSpec:
+class FpxSpec(object):
     ## TEST_STR = 'START@€@µ@²@³@©@®@¶@ÿ@A@END.bmp'
     ## TEST_RAW = b'START@\x80@\xb5@\xb2@\xb3@\xa9@\xae@\xb6@\xff@A@END.bmp\x00'
     ##
@@ -168,7 +168,10 @@ class Fpl_File_Reader(Cfb_RawIO_Reader):
     pass
 """
 
-class FpmCollisionData:
+from __future__ import division
+from __future__ import with_statement
+from __future__ import absolute_import
+class FpmCollisionData(object):
     SIZE =  (4 * Fp_Size_Type.DWORD + 7 * Fp_Size_Type.FLOAT)
 
     def __init__(self):
@@ -202,7 +205,7 @@ class FpmCollisionData:
 
 
 ###############################################################################
-class Fpm_Model_Type:
+class Fpm_Model_Type(object):
     OBJECT_OBJECT = 0 ## e.g.: BULB, COIN_DOOR, FLIPPER_BUTTON, PLUNGER_CASE, RAMP_PROFILE, SHOOTER_LANE, SLING_HAMMER, WIRE_RING, ...
     OBJECT_PEG = 1 # # e.g.: GAME_ROOM, CABINE_LEG, LOCK_DOWN_BAR, RAIL,
     CONTROL_FLIPPER = 2 #
@@ -231,18 +234,16 @@ class Fpm_Model_Type:
     TRIGGER_OPTO = 25 #
     TARGET_VARI = 26 ## e.g.: Target-Vari-T1.fpm
 
-    SET_ALIGN_BOTTOM = {
+    SET_ALIGN_BOTTOM = set([
             OBJECT_ORNAMENT,
             RAMP_MODEL,
             TARGET_DROP,
-            TARGET_TARGET,
-            }
+            TARGET_TARGET,])
 
-    SET_ALIGN_TOP = {
-            TOY_SPINNINGDISK,
-            }
+    SET_ALIGN_TOP = set([
+            TOY_SPINNINGDISK,])
 
-    SET_ALIGN_NONE = {
+    SET_ALIGN_NONE = set([
             OBJECT_OBJECT,
             CONTROL_PLUNGER,
             TARGET_DROP,
@@ -250,8 +251,7 @@ class Fpm_Model_Type:
             TRIGGER_SPINNER,
             TRIGGER_OPTO,
             TARGET_VARI,
-            RAMP_WIRE_CAP
-            }
+            RAMP_WIRE_CAP])
 
     VALUE_INT_TO_NAME = {
             OBJECT_OBJECT: 'OBJECT_OBJECT',
@@ -284,7 +284,7 @@ class Fpm_Model_Type:
             }
 
 
-class Fpl_Library_Type:
+class Fpl_Library_Type(object):
     UNKNOWN = 0
     GRAPHIC = 1
     SOUND = 2
@@ -301,9 +301,9 @@ class Fpl_Library_Type:
     TYPE_DMDFONT = 'DMDFONT'
     TYPE_SCRIPT = 'SCRIPT'
 
-    FILTER_ALL = {TYPE_GRAPHIC, TYPE_SOUND, TYPE_MUSIC, TYPE_MODEL, TYPE_DMDFONT, TYPE_SCRIPT, TYPE_UNKNOWN, }
+    FILTER_ALL = set([TYPE_GRAPHIC, TYPE_SOUND, TYPE_MUSIC, TYPE_MODEL, TYPE_DMDFONT, TYPE_SCRIPT, TYPE_UNKNOWN,])
 
-class Fpt_PackedLibrary_Type:
+class Fpt_PackedLibrary_Type(object):
     UNKNOWN = Fpl_Library_Type.UNKNOWN
     IMAGE = Fpl_Library_Type.GRAPHIC
     SOUND = Fpl_Library_Type.SOUND
@@ -324,9 +324,9 @@ class Fpt_PackedLibrary_Type:
     TYPE_IMAGE_LIST = 'IMAGE_LIST'
     TYPE_LIGHT_LIST = 'LIGHT_LIST'
 
-    FILTER_ALL = {TYPE_IMAGE, TYPE_SOUND, TYPE_MUSIC, TYPE_MODEL, TYPE_DMDFONT, TYPE_SCRIPT, TYPE_IMAGE_LIST, TYPE_LIGHT_LIST, TYPE_UNKNOWN, }
+    FILTER_ALL = set([TYPE_IMAGE, TYPE_SOUND, TYPE_MUSIC, TYPE_MODEL, TYPE_DMDFONT, TYPE_SCRIPT, TYPE_IMAGE_LIST, TYPE_LIGHT_LIST, TYPE_UNKNOWN,])
 
-class Fpt_Resource_Type:
+class Fpt_Resource_Type(object):
     BMP = 1
     JPG = 2
     TGA = 4
@@ -353,13 +353,13 @@ class Fpt_Resource_Type:
             DMD: TYPE_DMD,
             }
 
-    FILTER_ALL_IMAGES = {TYPE_BMP, TYPE_JPG, TYPE_TGA, }
-    FILTER_ALL_SOUNDS = {TYPE_OGG, TYPE_WAV, }
-    FILTER_ALL_MUSICS = {TYPE_OGG, TYPE_MP3, }
-    FILTER_ALL_DMDFONTS = {TYPE_DMD, }
+    FILTER_ALL_IMAGES = set([TYPE_BMP, TYPE_JPG, TYPE_TGA,])
+    FILTER_ALL_SOUNDS = set([TYPE_OGG, TYPE_WAV,])
+    FILTER_ALL_MUSICS = set([TYPE_OGG, TYPE_MP3,])
+    FILTER_ALL_DMDFONTS = set([TYPE_DMD,])
 
 
-class Fpt_Chunk_Type:
+class Fpt_Chunk_Type(object):
     END = -1
     RAWDATA = 0
     INT = 1
@@ -375,7 +375,7 @@ class Fpt_Chunk_Type:
     GENERIC = 11
 
 
-class FptElementType:
+class FptElementType(object):
     SURFACE = 2
     LIGHT_ROUND = 3
     LIGHT_SHAPEABLE = 4
@@ -426,7 +426,7 @@ class FptElementType:
     TARGET_VARI = 62
     TOY_HOLOGRAM = 64
 
-    SET_MESH_OBJECTS = {
+    SET_MESH_OBJECTS = set([
             OBJECT_PEG,
             CONTROL_FLIPPER,
             CONTROL_BUMPER,
@@ -451,10 +451,9 @@ class FptElementType:
             KICKER_EMKICKER,
             TRIGGER_OPTO,
             TARGET_VARI,
-            TOY_HOLOGRAM,
-            }
+            TOY_HOLOGRAM,])
 
-    SET_LIGHT_OBJECTS = {
+    SET_LIGHT_OBJECTS = set([
             LIGHT_ROUND,
             LIGHT_SHAPEABLE,
             CONTROL_BUMPER,
@@ -469,15 +468,13 @@ class FptElementType:
             DISPLAY_HUDDMD,
             LIGHT_LIGHTIMAGE,
             LIGHT_HUDLIGHTIMAGE,
-            TOY_HOLOGRAM,
-            }
+            TOY_HOLOGRAM,])
 
-    SET_RUBBER_OBJECTS = {
+    SET_RUBBER_OBJECTS = set([
             RUBBER_ROUND,
-            RUBBER_SHAPEABLE,
-            }
+            RUBBER_SHAPEABLE,])
 
-    SET_SPHERE_MAPPING_OBJECTS = {
+    SET_SPHERE_MAPPING_OBJECTS = set([
             SURFACE,
             OBJECT_PEG,
             OBJECT_ORNAMENT,
@@ -489,15 +486,13 @@ class FptElementType:
             CONTROL_POPUP,
             RAMP_MODEL,
             RAMP_RAMP,
-            TARGET_VARI,
-            }
+            TARGET_VARI,])
 
-    SET_WIRE_OBJECTS = {
+    SET_WIRE_OBJECTS = set([
             GUIDE_WIRE,
-            RAMP_WIRE,
-            }
+            RAMP_WIRE,])
 
-    SET_CURVE_OBJECTS = {
+    SET_CURVE_OBJECTS = set([
             SURFACE,
             LIGHT_ROUND,
             LIGHT_SHAPEABLE,
@@ -506,8 +501,7 @@ class FptElementType:
             GUIDE_WALL,
             GUIDE_WIRE,
             RAMP_WIRE,
-            RAMP_RAMP,
-            }
+            RAMP_RAMP,])
 
     VALUE_NAME_TO_INT = {
             'SURFACE': SURFACE,
@@ -615,10 +609,10 @@ class FptElementType:
 
 
 ###############################################################################
-class Fpx_zLZO_RawData_Stream:
+class Fpx_zLZO_RawData_Stream(object):
     def __init__(self, stream, n=-1):
         buffer = stream.read(4)
-        if buffer == b'zLZO':
+        if buffer == 'zLZO':
             self.signature = buffer
             self.uncompressed_size = stream.read_dword()
             if n != -1:
@@ -643,7 +637,7 @@ class Fpx_zLZO_RawData_Stream:
 
 
 ###############################################################################
-class Fpt_ChunkDescription:
+class Fpt_ChunkDescription(object):
     def __init__(self, id=0, type=Fpt_Chunk_Type.RAWDATA, name='', offset=0):
         self.id = id
         self.type = type
@@ -660,7 +654,7 @@ class Fpt_ChunkDescription:
                 )
 
 
-class Fpt_Data_Reader:
+class Fpt_Data_Reader(object):
     NEW_OLD_CORRECTION = 0x15BDECDB
 
     def __repr__(self):
@@ -691,8 +685,8 @@ class Fpt_Data_Reader:
             elif attr.startswith("val__"):
                 v = getattr(self, attr, None)
                 if v is not None:
-                    if isinstance(v, bytes) and len(v) > 4:
-                        v = v[:4] + b'...'
+                    if isinstance(v, str) and len(v) > 4:
+                        v = v[:4] + '...'
                     str_list.append("{}=\"{}\", ".format(attr.replace("val__", ""), v))
             else:
                 pass
@@ -724,7 +718,7 @@ class Fpt_Data_Reader:
             if descriptor is None:
                 # unknown chunk type
                 stream.read(chunk_size - Fp_Size_Type.DWORD)
-                print("#DEBUG unknown chunk id:", "0x{:08X}".format(chunk_id), ", size:", chunk_size - Fp_Size_Type.DWORD, " in ", self.get_obj_value("class"), self)
+                print "#DEBUG unknown chunk id:", "0x{:08X}".format(chunk_id), ", size:", chunk_size - Fp_Size_Type.DWORD, " in ", self.get_obj_value("class"), self
             else:
                 self.read_chunk_data(stream, owner, stream_pos, chunk_size, descriptor)
 
@@ -781,7 +775,7 @@ class Fpt_Data_Reader:
         elif descriptor.type == Fpt_Chunk_Type.STRINGLIST:
             value = []
             num_items = self.read_int(stream)
-            for i in range(num_items):
+            for i in xrange(num_items):
                 value.append(self.read_string(stream))
         elif descriptor.type == Fpt_Chunk_Type.VALUELIST:
             value = None # TODO
@@ -799,7 +793,7 @@ class Fpt_Data_Reader:
                 if sub_reader:
                     sub_reader.read(stream)
             else:
-                print("#DEBUG", descriptor.name, "not handled!")
+                print "#DEBUG", descriptor.name, "not handled!"
                 pass
             value = getattr(owner, descriptor.name, None)
             if value is None:
@@ -1223,7 +1217,7 @@ class FptTableElementReader(Fpt_Data_Reader):
         elif value == FptElementType.TOY_HOLOGRAM:
             reader = FptTableElementReader_TOY_HOLOGRAM(self)
         else:
-            print("#DEBUG", "unknown element type", value)
+            print "#DEBUG", "unknown element type", value
             pass
 
         if reader:
@@ -2768,7 +2762,7 @@ class FptTableElementReader_TOY_HOLOGRAM(Fpt_Data_Reader):
 
 
 ###############################################################################
-class Fpl_Library_Element():
+class Fpl_Library_Element(object):
     pass
 
 
@@ -2791,7 +2785,7 @@ class Fpm_File_Reader(Cfb_RawIO_Reader):
             reader = Fpt_PinModel_Reader()
             self.PinModel = reader
         else:
-            print("#DEBUG skip read_component:", name)
+            print "#DEBUG skip read_component:", name
             reader = None
 
         if reader:
@@ -2812,7 +2806,7 @@ class Fpm_File_Reader(Cfb_RawIO_Reader):
         else:
             dst_path = path.normpath(dst_path)
 
-        makedirs(dst_path, mode=0o777, exist_ok=True)
+        makedirs(dst_path, mode=0777, exist_ok=True)
         self.__dst_path = dst_path
 
         return Fpm_File_Reader.grab_content_ex(dst_path, { "modeldata": self.PinModel, }, dst_sub_path_names)
@@ -2824,7 +2818,7 @@ class Fpm_File_Reader(Cfb_RawIO_Reader):
             item_name = FpxUtilities.toGoodName(item_name) ###
             if item_name:
                 dst_sub_path = path.join(dst_path, item_name)
-                makedirs(dst_sub_path, mode=0o777, exist_ok=True)
+                makedirs(dst_sub_path, mode=0777, exist_ok=True)
                 #print("#DEBUG", item_name, dst_path, dst_sub_path)
                 dst_sub_path_names["sub_dir"] = dst_sub_path
             else:
@@ -2940,7 +2934,7 @@ class Fpl_File_Reader(Cfb_RawIO_Reader):
         elif name_type == "FLAD":
             data.FLAD = Cfb_Extras.to_time(stream.read_qword())
         elif name_type == "FPAT":
-            data.FPAT = bytes.decode(stream.read())
+            data.FPAT = str.decode(stream.read())
         elif name_type == "FDAT":
             data.FDAT = Fpx_zLZO_RawData_Stream(stream)
         pass
@@ -2958,7 +2952,7 @@ class Fpl_File_Reader(Cfb_RawIO_Reader):
             #dst_path = path.normpath(dst_path)
             dst_path = path.normpath(dst_path.rstrip('. '))
 
-        makedirs(dst_path, mode=0o777, exist_ok=True)
+        makedirs(dst_path, mode=0777, exist_ok=True)
         self.__dst_path = dst_path
 
         dst_sub_path_names = {}
@@ -2976,7 +2970,7 @@ class Fpl_File_Reader(Cfb_RawIO_Reader):
                 continue
 
             dst_sub_path = path.join(dst_path, item_name)
-            makedirs(dst_sub_path, mode=0o777, exist_ok=True)
+            makedirs(dst_sub_path, mode=0777, exist_ok=True)
 
             dst_sub_path_names["sub_dir_{}".format(item_name)] = dst_sub_path
             dst_sub_path_names["type_{}".format(item_name)] = value._FTYP
@@ -3092,7 +3086,7 @@ class Fpt_File_Reader(Cfb_RawIO_Reader):
         dst_path = path.normpath(dst_path)
         if path.exists(dst_path):
             raise OSError
-        makedirs(dst_path, mode=0o777, exist_ok=False)
+        makedirs(dst_path, mode=0777, exist_ok=False)
         self.__dst_path = dst_path
 
     def grab_content(self, dst_path=None, name=None, filter=None):
@@ -3106,7 +3100,7 @@ class Fpt_File_Reader(Cfb_RawIO_Reader):
         else:
             dst_path = path.normpath(dst_path)
 
-        makedirs(dst_path, mode=0o777, exist_ok=True)
+        makedirs(dst_path, mode=0777, exist_ok=True)
         self.__dst_path = dst_path
 
         dst_sub_path_names = {}
@@ -3193,7 +3187,7 @@ class Fpt_File_Reader(Cfb_RawIO_Reader):
 
     def dump_stream(self, stream):
         # DEBUG
-        print(stream.directory_entry())
+        print stream.directory_entry()
         size = stream.size()
         if stream.directory_entry().Directory_Entry_Name == "Table MAC" or stream.directory_entry().Directory_Entry_Name == "File Version":
             dump = stream.read()
